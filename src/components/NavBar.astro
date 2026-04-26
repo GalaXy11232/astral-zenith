@@ -34,7 +34,6 @@ const links = [
             }
         </div>
 </nav>
-
 <div class = 'nav-margin'></div>
 
 <script>
@@ -80,6 +79,10 @@ const links = [
 
         min-height: var(--min-height);
         transition: 0.25s cubic-bezier(0.445, 0.05, 0.55, 0.95);    
+    }
+
+    .nav-margin {
+        margin-bottom: calc(var(--min-height) + var(--navbar_padding));
     }
 
     a img {

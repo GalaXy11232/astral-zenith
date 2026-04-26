@@ -1,5 +1,6 @@
 ---
 import { ClientRouter } from "astro:transitions";
+import "../stylesheets/global.css";
 
 const { title } = Astro.props;
 
@@ -7,7 +8,7 @@ const { title } = Astro.props;
 <html lang="en">
 	<head>
 		<meta charset="utf-8" />
-		<link rel="icon" href="assets/tab_icon.ico" />
+		<link rel="icon" href="tab_icon.ico" />
 		<meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
 		<meta name="generator" content= {Astro.generator} />
 		<title> {title} </title>

@@ -1,0 +1,62 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import NavBar from "../components/NavBar.astro";
+import { readdirSync } from "fs";
+import { join } from "path";
+
+const galerieDir = join(process.cwd(), "public", "assets", "galerie");
+const galerieFolders = readdirSync(galerieDir, { withFileTypes: true })
+  .filter(entry => entry.isDirectory())
+  .map(folderEntry => {
+    const folderPath = join(galerieDir, folderEntry.name);
+    const images = readdirSync(folderPath, { withFileTypes: true })
+      .filter(file => file.isFile())
+      .map(file => file.name)
+      .filter(name => /\.(jpe?g|png|webp|gif|avif|svg)$/i.test(name))
+      .sort();
+
+    return {
+      name: folderEntry.name,
+      images,
+      url: `/assets/galerie/${encodeURIComponent(folderEntry.name)}`,
+    };
+  });
+---
+
+<BaseLayout title="Galerie">
+  <NavBar activeLink={5} />
+
+  <div class="gallery">
+    {
+        galerieFolders.map(folder => (
+            <section class="gallery-folder">
+                <h1>{ folder.name }</h1>
+                
+                <div class="images">
+                    {
+                        folder.images.length
+                            ? folder.images.map(image => (
+                                    <img
+                                    src={`${folder.url}/${encodeURIComponent(image)}`}
+                                    alt={image}
+                                    loading="lazy"
+                                    style = "width: 150px; height: auto;"
+                                    />
+                                ))
+                            : <p>No images found.</p>
+                    }
+                </div>
+            </section>
+        ))
+    }
+  </div>
+</BaseLayout>
+
+<style>
+    .images {
+        display: flex;
+        flex-direction: row;
+        gap: .25rem;
+
+    }
+</style>
