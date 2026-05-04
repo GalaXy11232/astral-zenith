@@ -1,3 +1,38 @@
+:root {
+    --primary: #7b28ae;
+    --purple_hgradient: linear-gradient(90deg, var(--primary), #ba12aa);
+}
+
 *, ::after, ::before {
     box-sizing: border-box;
+}
+
+.title-container {
+    text-align: center;
+    margin-bottom: 2rem;
+    padding: .2rem;
+
+    background: var(--purple_hgradient);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.title-underline {
+    font-size: clamp(25px, 2.5vw + 1rem, 34px);
+    font-weight: 600;
+    color: var(--primary);
+    position: relative;
+    padding: .75rem;
+}
+
+.title-underline::after {
+    position: absolute;
+    content: "";
+    width: 50%;
+    height: .25em;
+    left: 50%;
+    bottom: -5px;
+    background-image: var(--purple_hgradient);
+    transform: translateX(-50%);
 }

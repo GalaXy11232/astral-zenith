@@ -1,0 +1,25 @@
+---
+const { src } = Astro.props;
+---
+
+<img 
+    src={src} alt="" 
+    class = 'square-image'
+    loading = 'lazy'
+/>
+
+<style>
+    .square-image {
+        width: 250px; height: 250px;
+        object-fit: cover;
+        transition: .3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        box-shadow: 0 0 10px black;
+    }
+
+    .square-image:hover {
+        transform: scale(1.05);
+        border-radius: 20px;
+        box-shadow: 0 0 20px var(--primary), 0 0 20px var(--primary);
+        cursor: pointer
+    }
+</style>

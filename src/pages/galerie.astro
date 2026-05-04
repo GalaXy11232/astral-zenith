@@ -1,6 +1,8 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
 import NavBar from "../components/NavBar.astro";
+import GalleryImage from "../components/gallery_image.astro";
+
 import { readdirSync } from "fs";
 import { join } from "path";
 
@@ -21,6 +23,7 @@ const galerieFolders = readdirSync(galerieDir, { withFileTypes: true })
       url: `/assets/galerie/${encodeURIComponent(folderEntry.name)}`,
     };
   });
+
 ---
 
 <BaseLayout title="Galerie">
@@ -30,18 +33,17 @@ const galerieFolders = readdirSync(galerieDir, { withFileTypes: true })
     {
         galerieFolders.map(folder => (
             <section class="gallery-folder">
-                <h1>{ folder.name }</h1>
-                
+                <div class="title-container">
+                    <span class="title-underline">
+                        { folder.name }
+                    </span>
+                </div>
+
                 <div class="images">
                     {
                         folder.images.length
                             ? folder.images.map(image => (
-                                    <img
-                                    src={`${folder.url}/${encodeURIComponent(image)}`}
-                                    alt={image}
-                                    loading="lazy"
-                                    style = "width: 150px; height: auto;"
-                                    />
+                                    <GalleryImage src = { `${folder.url}/${encodeURIComponent(image)}` } />
                                 ))
                             : <p>No images found.</p>
                     }
@@ -53,10 +55,19 @@ const galerieFolders = readdirSync(galerieDir, { withFileTypes: true })
 </BaseLayout>
 
 <style>
+    .gallery-folder {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        margin: 1rem;
+        flex-wrap: wrap;
+    }
+
     .images {
         display: flex;
-        flex-direction: row;
-        gap: .25rem;
-
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 2rem;
     }
 </style>

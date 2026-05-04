@@ -1,0 +1,121 @@
+:root {
+    --navbar_bg_color: #333;
+    --navlink_underline_color: rgb(104, 0, 184);
+    --glow_color: rgb(183, 89, 255);
+    --home-container_width: 30%;
+    --home_width: 125px;
+    --min-height: 50px;
+    --navbar_padding: .5rem;
+    --height_beneath: calc(
+        var(--min-height) + 
+        (var(--navbar_padding) * 2)
+    )
+}
+
+nav {
+    position: relative;
+    top: 0px; left: 0; right: 0;
+    width: 100%; height: 100%;
+    padding: var(--navbar_padding);
+    z-index: 10;
+
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    background-color: transparent;
+
+    min-height: var(--min-height);
+    transition: 0.25s cubic-bezier(0.445, 0.05, 0.55, 0.95);     
+}
+
+.nav-margin {
+    margin-bottom: calc(var(--min-height) + var(--navbar_padding));
+}
+
+a img {
+    display: block;
+    margin: auto;
+    height: auto; width: var(--home_width)
+}
+
+.nav-margin { margin-bottom: 200px; }
+
+.scale-hover { transition: .25s cubic-bezier(0.175, 0.885, 0.32, 1.275) } /* Ease-out back */
+.scale-hover:hover, .active { transform: scale(1.05); }
+
+.home-container { 
+    display: flex; 
+    justify-content: center;
+    width: var(--home-container_width); 
+}
+
+.links-container { 
+    display: flex; 
+    justify-content: flex-end; 
+    flex-wrap: wrap;
+    width: calc(100% - var(--home-container_width)); 
+    min-width: min(50rem, 70vw);
+    gap: 1rem;
+    margin-right: 1rem;
+}
+
+.navbar-home {
+    margin-left: 1rem;
+}
+
+.navbar-link {
+    font-size: 1.25rem;
+    font-weight: normal;
+    text-decoration: none;
+    transition: .25s cubic-bezier(0.445, 0.05, 0.55, 0.95); /* Ease-in-out sine */
+}
+.navbar-link:hover {
+    /* font-weight: bold; */
+    text-shadow:
+        0 0 3px var(--glow_color),
+        0 0 4px var(--glow_color),
+        0 0 5px var(--glow_color);
+}
+
+.navbar-link{ display: inline-block }
+.navbar-link::after, .active::after { 
+    content: '';
+    width: 100%; height: 1.5px;
+    opacity: 0;
+    display: block;
+    background-color: var(--navlink_underline_color);
+    transition: 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+.active::after { height: 2px; }
+
+.navbar-link:hover::after,
+.navbar-link:focus::after,
+.active::after { 
+    opacity: 1;
+    transform: translateY(2px);
+}
+
+
+/* liquid glass related */
+.navbar-fixed-container * { transform: none !important; }
+.navbar-fixed-container div.glass {
+    width: 100% !important;
+}
+
+.navbar-fixed-container {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    width: 100%; height: var(--height_beneath);
+    z-index: 10;
+    margin-top: 2rem;
+
+    display: flex;
+    justify-content: center;
+}
+
+.navbar-fixed-container div.glass > div {
+    width: 100% !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+}
