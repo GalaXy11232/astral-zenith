@@ -1,6 +1,4 @@
 ---
-import LiquidGlass from 'liquid-glass-react';
-
 const home_button_src = "/assets/Logo_mov.png";
 
 // selected link prop
@@ -16,52 +14,47 @@ const links = [
     { name: "Balatro", href: "/balatro" }
 ]
 ---
-<div class="navbar-fixed-container">
-    <LiquidGlass
-        client:only="react"
-        blurAmount={0.4}
-        elasticity={0}
-        className='glass-wrapper'
-    >
-        <nav>
-            <div class = 'home-container'>
-                <a class = 'navbar-home scale-hover' href="/"> <img style = "width: calc(var(--min-height) - 5px);" src = {home_button_src} alt="Home" /> </a>
-            </div>
+<nav>
+    <div class = 'home-container'>
+        <a class = 'navbar-home scale-hover' href="/"> <img style = "width: calc(var(--min-height) - 5px);" src = {home_button_src} alt="Home" /> </a>
+    </div>
 
-            <div class = 'links-container'>
-                <!-- genereaza dinamic linkurile -> se poate atribui din index activeLink prop -->
-                {
-                    links.map((link, index) => {
-                        return (<a 
-                            class = {`navbar-link scale-hover ${activeLink === index ? "active" : ""}`}
-                            href = {link.href}
-                        > 
-                            {link.name} 
-                        </a>);
-                    })
-                }
-            </div>
-        </nav>
-    </LiquidGlass>
-</div>
+    <div class = 'links-container'>
+        <!-- genereaza dinamic linkurile -> se poate atribui din index activeLink prop -->
+        {
+            links.map((link, index) => {
+                return (<a 
+                    class = {`navbar-link scale-hover ${activeLink === index ? "active" : ""}`}
+                    href = {link.href}
+                > 
+                    {link.name} 
+                </a>);
+            })
+        }
+    </div>
+</nav>
+
 
 <div class = 'nav-margin'></div>
 
 <script>
-    document.addEventListener('astro:page-load', () => {
+    function update_background() {
         const nav = document.querySelector("nav") as HTMLElement;
-
-        window.onscroll = function() {
-            var yOffset = window.pageYOffset || document.body.scrollTop;
-            // if (yOffset <= 20) {
-            //     nav.style.backgroundColor = "#aaa0"
-            // } else {
-            //     nav.style.backgroundColor = "var(--navbar_bg_color)";
-            // }
+        var yOffset = window.pageYOffset || document.body.scrollTop;
+        
+        if (yOffset <= 20) {
+            nav.style.background = "transparent";
+            nav.style.backdropFilter = "none";
+        } else {
+            nav.style.background = "var(--navbar_bg_color)";
+            nav.style.backdropFilter = "var(--navbar_bg_filter)";
         }
+    }
+    
+        document.addEventListener('astro:page-load', () => {
+            window.addEventListener("scroll", update_background);
     });
 </script>
-
 
 <!-- navbar.css -->
 <style></style>

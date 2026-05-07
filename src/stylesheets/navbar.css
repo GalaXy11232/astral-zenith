@@ -1,11 +1,13 @@
 :root {
-    --navbar_bg_color: #333;
+    --navbar_bg_color: rgba(255, 255, 255, 0.15);
+    --navbar_bg_filter: blur(12px) saturate(180%);
     --navlink_underline_color: rgb(104, 0, 184);
     --glow_color: rgb(183, 89, 255);
     --home-container_width: 30%;
     --home_width: 125px;
     --min-height: 50px;
     --navbar_padding: .5rem;
+    --navbar_margin: 1.5rem;
     --height_beneath: calc(
         var(--min-height) + 
         (var(--navbar_padding) * 2)
@@ -13,19 +15,27 @@
 }
 
 nav {
-    position: relative;
+    position: fixed;
     top: 0px; left: 0; right: 0;
-    width: 100%; height: 100%;
     padding: var(--navbar_padding);
     z-index: 10;
 
     display: flex;
     justify-content: space-around;
     align-items: center;
-    background-color: transparent;
+
 
     min-height: var(--min-height);
-    transition: 0.25s cubic-bezier(0.445, 0.05, 0.55, 0.95);     
+    transition: 0.25s cubic-bezier(0.445, 0.05, 0.55, 0.95);    
+
+    /* backdrop-filter: blur(12px) saturate(180%);
+    -webkit-backdrop-filter: blur(12px) saturate(180%); */
+}
+
+.gallery-placed-image {
+    will-change: transform, filter;
+    transform: translateZ(0); 
+    backface-visibility: hidden;
 }
 
 .nav-margin {
@@ -38,7 +48,7 @@ a img {
     height: auto; width: var(--home_width)
 }
 
-.nav-margin { margin-bottom: 200px; }
+/* .nav-margin { margin-bottom: var(--height_beneath); } */
 
 .scale-hover { transition: .25s cubic-bezier(0.175, 0.885, 0.32, 1.275) } /* Ease-out back */
 .scale-hover:hover, .active { transform: scale(1.05); }
@@ -52,9 +62,7 @@ a img {
 .links-container { 
     display: flex; 
     justify-content: flex-end; 
-    flex-wrap: wrap;
     width: calc(100% - var(--home-container_width)); 
-    min-width: min(50rem, 70vw);
     gap: 1rem;
     margin-right: 1rem;
 }
@@ -93,29 +101,4 @@ a img {
 .active::after { 
     opacity: 1;
     transform: translateY(2px);
-}
-
-
-/* liquid glass related */
-.navbar-fixed-container * { transform: none !important; }
-.navbar-fixed-container div.glass {
-    width: 100% !important;
-}
-
-.navbar-fixed-container {
-    position: fixed;
-    top: 0; left: 0; right: 0;
-    width: 100%; height: var(--height_beneath);
-    z-index: 10;
-    margin-top: 2rem;
-
-    display: flex;
-    justify-content: center;
-}
-
-.navbar-fixed-container div.glass > div {
-    width: 100% !important;
-    display: flex !important;
-    justify-content: center !important;
-    align-items: center !important;
 }

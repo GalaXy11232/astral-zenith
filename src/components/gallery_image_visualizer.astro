@@ -1,0 +1,131 @@
+---
+
+---
+
+<div class = 'full-img'>
+    <img id = 'image-visualizer' src="" alt="">
+</div>
+
+<style>
+    #image-visualizer {
+        width: auto;
+        height: auto;
+        max-width: 80%;
+        max-height: 80%;
+        object-fit: contain;
+        border: none;
+        
+        transform-origin: center center;
+        pointer-events: auto;
+    }
+
+    .full-img {
+        position: fixed;
+        touch-action: none;
+        top: 0; bottom: 0; left: 0; right: 0;
+        width: 100vw; height: 100dvh;
+        margin: auto;
+        object-fit: contain;
+
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+</style>
+
+<script>
+    document.addEventListener('astro:page-load', () => {
+        const full_image = document.querySelector('.full-img') as HTMLDivElement;
+        const image_element = document.getElementById('image-visualizer') as HTMLImageElement;
+
+        document.body.addEventListener('mouseup', (e) => {  
+            let target = e.target as HTMLElement;
+            let visible = image_element.getAttribute('data-visible') as string;
+
+            if (visible && target != image_element) {
+                image_element.src = '';                
+                image_element.setAttribute('data-visible', 'false');
+                full_image.style.zIndex = '-1';
+
+                window.dispatchEvent(new Event('close-image-visualizer'));
+            }
+        })
+    });
+</script>
+
+<script>
+    function initProZoom() {
+        const container = document.querySelector('.full-img') as HTMLElement;
+        const img = container.querySelector('img') as HTMLImageElement;
+
+        let isLocked = false as any;
+        let currentScale = 1;
+        const MAX_ZOOM = 4;
+        const MIN_ZOOM = 1;
+
+        function updateTransform(clientX: any, clientY: any) {
+            if (currentScale === 1) {
+                img.style.transform = 'scale(1) translate(0, 0)';
+                return;
+            }
+
+            const rect = container.getBoundingClientRect();
+            const xPerc = (clientX - rect.left) / rect.width;
+            const yPerc = (clientY - rect.top) / rect.height;
+
+            // Standard Math
+            const moveX = (0.5 - xPerc) * (currentScale - 1) * (100 / currentScale);
+            const moveY = (0.5 - yPerc) * (currentScale - 1) * (100 / currentScale);
+
+            img.style.transform = `scale(${currentScale}) translate(${moveX}%, ${moveY}%)`;
+        }
+
+        window.addEventListener('close-image-visualizer', () => { 
+            isLocked = false; 
+            currentScale = 1;
+            container.classList.toggle('is-locked', isLocked); 
+            img.style.transform = 'scale(1) translate(0, 0)';
+        })
+
+        container.addEventListener('mousemove', (e) => {
+            updateTransform(e.clientX, e.clientY);
+        });
+
+        container.addEventListener('click', (e) => {
+            isLocked = !isLocked;
+            container.classList.toggle('is-locked', isLocked);
+            
+            if (isLocked) {
+                currentScale = 2.5; 
+                updateTransform(e.clientX, e.clientY);
+            } else {
+                currentScale = 1;
+                img.style.transform = 'scale(1) translate(0, 0)';
+            }
+        });
+
+
+        container.addEventListener('wheel', (e) => {
+            // if (isLocked) { e.preventDefault(); return; } 
+            
+            e.preventDefault(); 
+            e.stopPropagation();
+
+            const delta = e.deltaY * -0.005; 
+            currentScale = Math.min(Math.max(MIN_ZOOM, currentScale + delta), MAX_ZOOM);
+
+            updateTransform(e.clientX, e.clientY);
+        }, { passive: false }); 
+
+
+        container.addEventListener('mouseleave', () => {
+            if (!isLocked) {
+                currentScale = 1;
+                img.style.transform = 'scale(1) translate(0, 0)';
+            }
+        });
+    }
+
+    document.addEventListener('astro:page-load', initProZoom);
+</script>

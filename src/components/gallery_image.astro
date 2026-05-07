@@ -1,11 +1,13 @@
 ---
-const { src } = Astro.props;
+const { src, identifier, ...rest } = Astro.props;
 ---
 
 <img 
     src={src} alt="" 
-    class = 'square-image'
+    class = 'square-image gallery-placed-image'
     loading = 'lazy'
+    data-identifier = {identifier}
+    draggable="false"
 />
 
 <style>

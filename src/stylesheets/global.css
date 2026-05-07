@@ -12,10 +12,7 @@
     margin-bottom: 2rem;
     padding: .2rem;
 
-    background: var(--purple_hgradient);
-    background-clip: text;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+    color: var(--primary);
 }
 
 .title-underline {

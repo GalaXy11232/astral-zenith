@@ -2,6 +2,7 @@
 import BaseLayout from "../layouts/BaseLayout.astro";
 import NavBar from "../components/NavBar.astro";
 import GalleryImage from "../components/gallery_image.astro";
+import GalleryImageVisualizer from "../components/gallery_image_visualizer.astro";
 
 import { readdirSync } from "fs";
 import { join } from "path";
@@ -27,31 +28,36 @@ const galerieFolders = readdirSync(galerieDir, { withFileTypes: true })
 ---
 
 <BaseLayout title="Galerie">
-  <NavBar activeLink={5} />
+    <NavBar activeLink={5} />
+      
+    <GalleryImageVisualizer />
 
-  <div class="gallery">
-    {
-        galerieFolders.map(folder => (
-            <section class="gallery-folder">
-                <div class="title-container">
-                    <span class="title-underline">
-                        { folder.name }
-                    </span>
-                </div>
+    <div class="gallery">
+        {
+            galerieFolders.map(folder => (
+                <section class="gallery-folder">
+                    <div class="title-container">
+                        <span class="title-underline">
+                            { folder.name }
+                        </span>
+                    </div>
 
-                <div class="images">
-                    {
-                        folder.images.length
-                            ? folder.images.map(image => (
-                                    <GalleryImage src = { `${folder.url}/${encodeURIComponent(image)}` } />
-                                ))
-                            : <p>No images found.</p>
-                    }
-                </div>
-            </section>
-        ))
-    }
-  </div>
+                    <div class="images">
+                        {
+                            folder.images.length
+                                ? folder.images.map(image => (
+                                        <GalleryImage 
+                                            src = { `${folder.url}/${encodeURIComponent(image)}` } 
+                                            identifier = { `${folder.name}` } 
+                                        />
+                                    ))
+                                : <p>No images found.</p>
+                        }
+                    </div>
+                </section>
+            ))
+        }
+    </div>
 </BaseLayout>
 
 <style>
@@ -71,3 +77,22 @@ const galerieFolders = readdirSync(galerieDir, { withFileTypes: true })
         gap: 2rem;
     }
 </style>
+
+<script>
+    function openFullView(image_element: HTMLImageElement) {
+        const image_visualizer = document.getElementById('image-visualizer') as HTMLImageElement;
+        const image_container = image_visualizer.parentElement as HTMLDivElement;
+        
+        image_visualizer.src = image_element.src;
+        image_visualizer.setAttribute('data-visible', 'true');
+        image_container.style.zIndex = '100'; // totally not overkill
+        image_container.style.background = "#111d";
+    }
+
+    document.addEventListener('astro:page-load', () => {
+        const images = document.querySelectorAll('.gallery-placed-image') as NodeListOf<HTMLImageElement>;
+        images.forEach((img) => {
+            img.addEventListener('click', () => { openFullView(img); });
+        });
+    })
+</script>
