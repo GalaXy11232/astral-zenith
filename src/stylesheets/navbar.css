@@ -1,5 +1,5 @@
 :root {
-    --navbar_bg_color: rgba(255, 255, 255, 0.15);
+    --navbar_bg_color: rgba(76, 0, 126, 0.5);
     --navbar_bg_filter: blur(12px) saturate(180%);
     --navlink_underline_color: rgb(104, 0, 184);
     --glow_color: rgb(183, 89, 255);

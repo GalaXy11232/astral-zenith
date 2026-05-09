@@ -3,10 +3,17 @@
 ---
 
 <div class = 'full-img'>
+    <p id = 'left-img'>&lt;</p>
     <img id = 'image-visualizer' src="" alt="">
+    <p id = 'right-img'>&gt;</p>
 </div>
 
 <style>
+    p {
+        color: white;
+        font-size: 400%;
+    }
+
     #image-visualizer {
         width: auto;
         height: auto;
@@ -38,12 +45,18 @@
     document.addEventListener('astro:page-load', () => {
         const full_image = document.querySelector('.full-img') as HTMLDivElement;
         const image_element = document.getElementById('image-visualizer') as HTMLImageElement;
+        const left_img = document.getElementById('left-img') as HTMLElement;
+        const right_img = document.getElementById('right-img') as HTMLElement;
 
         document.body.addEventListener('mouseup', (e) => {  
             let target = e.target as HTMLElement;
             let visible = image_element.getAttribute('data-visible') as string;
+            if (visible == null) {
+                image_element.setAttribute('data-visible', 'false');
+                visible = 'false';
+            }
 
-            if (visible && target != image_element) {
+            if (visible && ![image_element, left_img, right_img].includes(target)) {
                 image_element.src = '';                
                 image_element.setAttribute('data-visible', 'false');
                 full_image.style.zIndex = '-1';
@@ -55,6 +68,12 @@
 </script>
 
 <script>
+    interface EDetail {
+        identifier: string;
+        index: string;
+    }
+    type ImageEvent = CustomEvent<EDetail>;
+
     function initProZoom() {
         const container = document.querySelector('.full-img') as HTMLElement;
         const img = container.querySelector('img') as HTMLImageElement;
@@ -86,13 +105,43 @@
             currentScale = 1;
             container.classList.toggle('is-locked', isLocked); 
             img.style.transform = 'scale(1) translate(0, 0)';
-        })
+        });
+
+        // setup left/right buttons for image visualizer
+        window.addEventListener('open-image-visualizer', (_: Event) => {
+            var e = _ as ImageEvent;
+            var image_array = document.querySelectorAll(`[data-identifier="${e.detail.identifier}"]`);
+            var active_index = Number(e.detail.index);
+            const left_img = document.getElementById('left-img') as HTMLParagraphElement;
+            const right_img = document.getElementById('right-img') as HTMLParagraphElement;
+            const image_visualizer = document.getElementById('image-visualizer') as HTMLImageElement;
+
+            left_img.addEventListener('click', () => {
+                active_index -= 1;
+                if (active_index < 0) 
+                    active_index += image_array.length;
+                
+                let next_image = image_array[ active_index ] as HTMLImageElement;
+                image_visualizer.src = next_image.src;
+            });
+
+            right_img.addEventListener('click', () => {
+                active_index += 1;
+                if (active_index >= image_array.length) 
+                    active_index -= image_array.length;
+                
+                let next_image = image_array[ active_index ] as HTMLImageElement;
+                image_visualizer.src = next_image.src;
+            });
+        });
+
 
         container.addEventListener('mousemove', (e) => {
             updateTransform(e.clientX, e.clientY);
         });
 
-        container.addEventListener('click', (e) => {
+        // zoom functionality
+        img.addEventListener('click', (e) => {
             isLocked = !isLocked;
             container.classList.toggle('is-locked', isLocked);
             
@@ -107,15 +156,18 @@
 
 
         container.addEventListener('wheel', (e) => {
-            // if (isLocked) { e.preventDefault(); return; } 
-            
-            e.preventDefault(); 
-            e.stopPropagation();
+            const image_visualizer = document.getElementById("image-visualizer") as HTMLImageElement;
+            if (image_visualizer.getAttribute('data-visible') == 'true') {   
+                e.preventDefault(); 
+                e.stopPropagation();
 
-            const delta = e.deltaY * -0.005; 
-            currentScale = Math.min(Math.max(MIN_ZOOM, currentScale + delta), MAX_ZOOM);
+                const delta = e.deltaY * -0.005; 
+                currentScale = Math.min(Math.max(MIN_ZOOM, currentScale + delta), MAX_ZOOM);
 
-            updateTransform(e.clientX, e.clientY);
+                updateTransform(e.clientX, e.clientY);
+
+                isLocked = (currentScale != MIN_ZOOM);
+            }
         }, { passive: false }); 
 
 

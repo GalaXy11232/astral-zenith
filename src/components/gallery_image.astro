@@ -1,5 +1,5 @@
 ---
-const { src, identifier, ...rest } = Astro.props;
+const { src, identifier, index, ...rest } = Astro.props;
 ---
 
 <img 
@@ -7,6 +7,7 @@ const { src, identifier, ...rest } = Astro.props;
     class = 'square-image gallery-placed-image'
     loading = 'lazy'
     data-identifier = {identifier}
+    data-index = { index }
     draggable="false"
 />
 

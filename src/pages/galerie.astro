@@ -9,21 +9,21 @@ import { join } from "path";
 
 const galerieDir = join(process.cwd(), "public", "assets", "galerie");
 const galerieFolders = readdirSync(galerieDir, { withFileTypes: true })
-  .filter(entry => entry.isDirectory())
-  .map(folderEntry => {
-    const folderPath = join(galerieDir, folderEntry.name);
-    const images = readdirSync(folderPath, { withFileTypes: true })
-      .filter(file => file.isFile())
-      .map(file => file.name)
-      .filter(name => /\.(jpe?g|png|webp|gif|avif|svg)$/i.test(name))
-      .sort();
+    .filter(entry => entry.isDirectory())
+    .map(folderEntry => {
+        const folderPath = join(galerieDir, folderEntry.name);
+        const images = readdirSync(folderPath, { withFileTypes: true })
+            .filter(file => file.isFile())
+            .map(file => file.name)
+            .filter(name => /\.(jpe?g|png|webp|gif|avif|svg)$/i.test(name))
+            .sort();
 
-    return {
-      name: folderEntry.name,
-      images,
-      url: `/assets/galerie/${encodeURIComponent(folderEntry.name)}`,
-    };
-  });
+        return {
+            name: folderEntry.name,
+            images,
+            url: `/assets/galerie/${encodeURIComponent(folderEntry.name)}`,
+        };
+    });
 
 ---
 
@@ -45,10 +45,11 @@ const galerieFolders = readdirSync(galerieDir, { withFileTypes: true })
                     <div class="images">
                         {
                             folder.images.length
-                                ? folder.images.map(image => (
+                                ? folder.images.map((image, index) => (
                                         <GalleryImage 
                                             src = { `${folder.url}/${encodeURIComponent(image)}` } 
                                             identifier = { `${folder.name}` } 
+                                            index = { index }
                                         />
                                     ))
                                 : <p>No images found.</p>
@@ -82,6 +83,13 @@ const galerieFolders = readdirSync(galerieDir, { withFileTypes: true })
     function openFullView(image_element: HTMLImageElement) {
         const image_visualizer = document.getElementById('image-visualizer') as HTMLImageElement;
         const image_container = image_visualizer.parentElement as HTMLDivElement;
+        
+        window.dispatchEvent(new CustomEvent('open-image-visualizer', { 
+            detail: {
+                'identifier' : image_element.getAttribute('data-identifier'),
+                'index' : image_element.getAttribute('data-index')
+            } 
+        }));
         
         image_visualizer.src = image_element.src;
         image_visualizer.setAttribute('data-visible', 'true');
