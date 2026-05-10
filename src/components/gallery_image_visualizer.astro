@@ -3,27 +3,57 @@
 ---
 
 <div class = 'full-img'>
-    <p id = 'left-img'>&lt;</p>
     <img id = 'image-visualizer' src="" alt="">
-    <p id = 'right-img'>&gt;</p>
+    <div class = "img-switcher-wrapper">
+        <p id = 'left-img' class = 'img-switcher-btn hidden'>&lt;</p>
+        <p id = 'right-img' class = 'img-switcher-btn hidden'>&gt;</p>
+    </div>
 </div>
 
 <style>
-    p {
-        color: white;
-        font-size: 400%;
+    @media (max-width: 1200px) {
+        .full-img { 
+            flex-direction: column !important; 
+            gap: 2rem;
+        }
+
+        .img-switcher-wrapper {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        #left-img, #right-img { bottom: 2% };
+
     }
 
     #image-visualizer {
         width: auto;
         height: auto;
-        max-width: 80%;
-        max-height: 80%;
+        max-width: 75%;
+        max-height: 75%;
         object-fit: contain;
         border: none;
         
         transform-origin: center center;
         pointer-events: auto;
+    }
+
+    #left-img { left: 10%; }
+    #right-img { right: 10%; }
+
+    .img-switcher-btn {
+        position: absolute;
+        color: white;
+        font-size: 250%;
+        background-color: purple;
+        padding: 0 1rem;
+        border-radius: 10px;
+        transition: transform 0.2s var(--transition_overshoot);
+        user-select: none;
+    }
+    .img-switcher-btn:hover {
+        cursor: pointer;
+        transform: scale(1.1);
     }
 
     .full-img {
@@ -37,6 +67,7 @@
         display: flex;
         justify-content: center;
         align-items: center;
+        flex-direction: row;
     }
 
 </style>
@@ -82,6 +113,12 @@
         let currentScale = 1;
         const MAX_ZOOM = 4;
         const MIN_ZOOM = 1;
+        
+        // Touch dragging variables
+        let touchStartX = 0;
+        let touchStartY = 0;
+        let previousDragX = 0;
+        let previousDragY = 0;
 
         function updateTransform(clientX: any, clientY: any) {
             if (currentScale === 1) {
@@ -100,11 +137,35 @@
             img.style.transform = `scale(${currentScale}) translate(${moveX}%, ${moveY}%)`;
         }
 
+        // zoom functionality for mobile
+        function updateTransformWithDrag(dragX: number, dragY: number) {
+            if (currentScale === 1) {
+                img.style.transform = 'scale(1) translate(0, 0)';
+                return;
+            }
+
+            // Convert pixel drag to percentage based on image dimensions
+            const maxDragX = (currentScale - 1) * 50;
+            const maxDragY = (currentScale - 1) * 50;
+
+            // Clamp drag values to prevent dragging too far
+            const clampedDragX = Math.max(-maxDragX, Math.min(maxDragX, dragX));
+            const clampedDragY = Math.max(-maxDragY, Math.min(maxDragY, dragY));
+
+            img.style.transform = `scale(${currentScale}) translate(${clampedDragX}%, ${clampedDragY}%)`;
+        }
+
         window.addEventListener('close-image-visualizer', () => { 
             isLocked = false; 
             currentScale = 1;
+            previousDragX = 0;
+            previousDragY = 0;
             container.classList.toggle('is-locked', isLocked); 
             img.style.transform = 'scale(1) translate(0, 0)';
+
+            document.querySelectorAll('.img-switcher-btn').forEach((item) => {
+                item.classList.add('hidden');
+            });
         });
 
         // setup left/right buttons for image visualizer
@@ -115,6 +176,11 @@
             const left_img = document.getElementById('left-img') as HTMLParagraphElement;
             const right_img = document.getElementById('right-img') as HTMLParagraphElement;
             const image_visualizer = document.getElementById('image-visualizer') as HTMLImageElement;
+            
+            if (image_array.length >= 2) 
+                document.querySelectorAll('.img-switcher-btn').forEach((item) => {
+                    item.classList.remove('hidden');
+                });
 
             left_img.addEventListener('click', () => {
                 active_index -= 1;
@@ -145,11 +211,22 @@
             isLocked = !isLocked;
             container.classList.toggle('is-locked', isLocked);
             
+            document.querySelectorAll('.img-switcher-btn').forEach((item) => {
+                if (isLocked)
+                    item.classList.add('hidden');
+                else
+                    item.classList.remove('hidden');
+            });
+
             if (isLocked) {
-                currentScale = 2.5; 
+                currentScale = 2.5;
+                previousDragX = 0;
+                previousDragY = 0;
                 updateTransform(e.clientX, e.clientY);
             } else {
                 currentScale = 1;
+                previousDragX = 0;
+                previousDragY = 0;
                 img.style.transform = 'scale(1) translate(0, 0)';
             }
         });
@@ -177,6 +254,52 @@
                 img.style.transform = 'scale(1) translate(0, 0)';
             }
         });
+
+        
+        // Touch drag functionality for mobile
+        container.addEventListener('touchstart', (e) => {
+            if (isLocked && e.touches.length === 1) {
+                touchStartX = e.touches[0].clientX;
+                touchStartY = e.touches[0].clientY;
+            }
+        }, { passive: true });
+
+        container.addEventListener('touchmove', (e) => {
+            if (isLocked && e.touches.length === 1) {
+                e.preventDefault();
+                
+                const touchCurrentX = e.touches[0].clientX;
+                const touchCurrentY = e.touches[0].clientY;
+                
+                const dragDeltaX = touchCurrentX - touchStartX;
+                const dragDeltaY = touchCurrentY - touchStartY;
+                
+                // Convert pixel delta to percentage based on container size
+                const rect = container.getBoundingClientRect();
+                const dragPercentX = (dragDeltaX / rect.width) * 50;
+                const dragPercentY = (dragDeltaY / rect.height) * 50;
+                
+                // Add to previous drag offset for cumulative movement
+                const totalDragX = previousDragX + dragPercentX;
+                const totalDragY = previousDragY + dragPercentY;
+                
+                updateTransformWithDrag(totalDragX, totalDragY);
+            }
+        }, { passive: false });
+
+        container.addEventListener('touchend', () => {
+            // Save the current drag offset for the next drag
+            if (isLocked) {
+                const currentTransform = img.style.transform;
+                const translateMatch = currentTransform.match(/translate\(([^,]+)%,\s*([^)]+)%\)/);
+                if (translateMatch) {
+                    previousDragX = parseFloat(translateMatch[1]);
+                    previousDragY = parseFloat(translateMatch[2]);
+                }
+            }
+            touchStartX = 0;
+            touchStartY = 0;
+        }, { passive: true });
     }
 
     document.addEventListener('astro:page-load', initProZoom);

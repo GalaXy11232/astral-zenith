@@ -10,8 +10,7 @@ const links = [
     { name: "Rezultate", href: "/rezultate" },
     { name: "Sponsori", href: "/sponsori" },
     { name: "Galerie", href: "/galerie" },
-    { name: "Contact", href: "/contact" },
-    { name: "Balatro", href: "/balatro" }
+    { name: "Contact", href: "/contact" }
 ]
 ---
 <nav>
@@ -51,8 +50,9 @@ const links = [
         }
     }
     
-        document.addEventListener('astro:page-load', () => {
-            window.addEventListener("scroll", update_background);
+    document.addEventListener('astro:page-load', () => {
+        update_background();
+        window.addEventListener("scroll", update_background);
     });
 </script>
 

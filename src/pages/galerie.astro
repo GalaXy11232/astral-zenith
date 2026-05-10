@@ -18,8 +18,11 @@ const galerieFolders = readdirSync(galerieDir, { withFileTypes: true })
             .filter(name => /\.(jpe?g|png|webp|gif|avif|svg)$/i.test(name))
             .sort();
 
+        // fisierele trebuie sa aiba neaparat la inceputul numelui "{numar}. {nume folder}"
+        // faciliteaza sortarea personalizata
+        let fname = folderEntry.name;
         return {
-            name: folderEntry.name,
+            name: fname.split(' ').splice(1, fname.length - 1).join(' '),
             images,
             url: `/assets/galerie/${encodeURIComponent(folderEntry.name)}`,
         };
@@ -70,6 +73,9 @@ const galerieFolders = readdirSync(galerieDir, { withFileTypes: true })
         margin: 1rem;
         flex-wrap: wrap;
     }
+
+    .gallery-folder { margin-bottom: 8rem; }
+    .no-mb { margin-bottom: 0 !important; }
 
     .images {
         display: flex;
