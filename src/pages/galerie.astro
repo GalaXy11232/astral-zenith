@@ -1,70 +1,18 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
 import NavBar from "../components/NavBar.astro";
-import GalleryImage from "../components/gallery_image.astro";
 import GalleryImageVisualizer from "../components/gallery_image_visualizer.astro";
-
-import { readdirSync } from "fs";
-import { join } from "path";
-
-const galerieDir = join(process.cwd(), "public", "assets", "galerie");
-const galerieFolders = readdirSync(galerieDir, { withFileTypes: true })
-    .filter(entry => entry.isDirectory())
-    .map(folderEntry => {
-        const folderPath = join(galerieDir, folderEntry.name);
-        const images = readdirSync(folderPath, { withFileTypes: true })
-            .filter(file => file.isFile())
-            .map(file => file.name)
-            .filter(name => /\.(jpe?g|png|webp|gif|avif|svg)$/i.test(name))
-            .sort();
-
-        // fisierele trebuie sa aiba neaparat la inceputul numelui "{numar}. {nume folder}"
-        // faciliteaza sortarea personalizata
-        let fname = folderEntry.name;
-        return {
-            name: fname.split(' ').splice(1, fname.length - 1).join(' '),
-            images,
-            url: `/assets/galerie/${encodeURIComponent(folderEntry.name)}`,
-        };
-    });
-
 ---
 
 <BaseLayout title="Galerie">
     <NavBar activeLink={5} />
-      
     <GalleryImageVisualizer />
-
-    <div class="gallery">
-        {
-            galerieFolders.map(folder => (
-                <section class="gallery-folder">
-                    <div class="title-container">
-                        <span class="title-underline">
-                            { folder.name }
-                        </span>
-                    </div>
-
-                    <div class="images">
-                        {
-                            folder.images.length
-                                ? folder.images.map((image, index) => (
-                                        <GalleryImage 
-                                            src = { `${folder.url}/${encodeURIComponent(image)}` } 
-                                            identifier = { `${folder.name}` } 
-                                            index = { index }
-                                        />
-                                    ))
-                                : <p>No images found.</p>
-                        }
-                    </div>
-                </section>
-            ))
-        }
+    <div class="gallery" id="gallery-root">
+        <div class="gallery-loading">Se încarcă galeria...</div>
     </div>
 </BaseLayout>
 
-<style>
+<style is:global>
     .gallery-folder {
         display: flex;
         flex-direction: column;
@@ -83,30 +31,173 @@ const galerieFolders = readdirSync(galerieDir, { withFileTypes: true })
         justify-content: center;
         gap: 2rem;
     }
+
+    .square-image {
+        width: 250px; 
+        height: 250px;
+        object-fit: cover;
+        transition: .3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        box-shadow: 0 0 10px black;
+        display: block;
+        background: #222;
+    }
+
+    .square-image:hover {
+        transform: scale(1.05);
+        border-radius: 20px;
+        box-shadow: 0 0 20px var(--primary), 0 0 20px var(--primary);
+        cursor: pointer;
+    }
+    
 </style>
 
 <script>
-    function openFullView(image_element: HTMLImageElement) {
-        const image_visualizer = document.getElementById('image-visualizer') as HTMLImageElement;
-        const image_container = image_visualizer.parentElement as HTMLDivElement;
-        
-        window.dispatchEvent(new CustomEvent('open-image-visualizer', { 
-            detail: {
-                'identifier' : image_element.getAttribute('data-identifier'),
-                'index' : image_element.getAttribute('data-index')
-            } 
-        }));
-        
-        image_visualizer.src = image_element.src;
-        image_visualizer.setAttribute('data-visible', 'true');
-        image_container.style.zIndex = '100'; // totally not overkill
-        image_container.style.background = "#111d";
+// ─── types ────────────────────────────────────────────────────────────────────
+interface FolderData {
+    name: string;
+    folderRaw: string;
+    url: string;
+    images: string[];
+}
+
+// ─── lazy loader ──────────────────────────────────────────────────────────────
+function createLazyObserver(): IntersectionObserver {
+    return new IntersectionObserver((entries, observer) => {
+        entries.forEach(entry => {
+            if (!entry.isIntersecting) return;
+            const img = entry.target as HTMLImageElement;
+            const real = img.dataset.src;
+            if (!real) return;
+
+            img.src = real;
+            img.removeAttribute('data-src');
+            img.removeAttribute('data-lazy');
+            observer.unobserve(img);
+        });
+    }, {
+        // start loading when image is 200px away from the viewport
+        rootMargin: '200px',
+        threshold: 0,
+    });
+}
+
+// ─── DOM builders ─────────────────────────────────────────────────────────────
+function buildImage(src: string, identifier: string, index: number, observer: IntersectionObserver): HTMLImageElement {
+    const img = document.createElement('img');
+    img.alt = 'Gallery image';
+    img.className = 'square-image gallery-placed-image';
+    img.decoding = 'async';
+    img.draggable = false;
+    img.dataset.identifier = identifier;
+    img.dataset.index = String(index);
+
+    // lazy: store real src, show shimmer until in view
+    img.dataset.src = src;
+    img.dataset.lazy = 'true';
+
+    img.addEventListener('click', () => openFullView(img));
+    observer.observe(img);
+    return img;
+}
+
+function buildSection(folder: FolderData, observer: IntersectionObserver): HTMLElement {
+    const section = document.createElement('section');
+    section.className = 'gallery-folder';
+
+    // title
+    const titleContainer = document.createElement('div');
+    titleContainer.className = 'title-container';
+    const span = document.createElement('span');
+    span.className = 'title-underline';
+    span.textContent = folder.name;
+    titleContainer.appendChild(span);
+    section.appendChild(titleContainer);
+
+    // images wrapper
+    const imagesDiv = document.createElement('div');
+    imagesDiv.className = 'images';
+
+    if (folder.images.length === 0) {
+        const p = document.createElement('p');
+        p.textContent = 'No images found.';
+        imagesDiv.appendChild(p);
+    } else {
+        folder.images.forEach((imageName, index) => {
+            const src = `${folder.url}/${encodeURIComponent(imageName)}`;
+            imagesDiv.appendChild(buildImage(src, folder.name, index, observer));
+        });
     }
 
-    document.addEventListener('astro:page-load', () => {
-        const images = document.querySelectorAll('.gallery-placed-image') as NodeListOf<HTMLImageElement>;
-        images.forEach((img) => {
-            img.addEventListener('click', () => { openFullView(img); });
-        });
-    })
+    section.appendChild(imagesDiv);
+    return section;
+}
+
+// ─── open full view (same logic as before, centralised) ───────────────────────
+function openFullView(img: HTMLImageElement) {
+    const visualizer = document.getElementById('image-visualizer') as HTMLImageElement | null;
+    if (!visualizer) return;
+    const container = visualizer.parentElement as HTMLDivElement;
+
+    window.dispatchEvent(new CustomEvent('open-image-visualizer', {
+        detail: {
+            identifier: img.dataset.identifier,
+            index: img.dataset.index,
+        }
+    }));
+
+    visualizer.src = img.dataset.src ?? img.src; // use real src
+    visualizer.setAttribute('data-visible', 'true');
+    container.style.zIndex = '100';
+    container.style.background = '#111d';
+}
+
+// ─── main initialiser ─────────────────────────────────────────────────────────
+async function initGallery() {
+    const root = document.getElementById('gallery-root');
+    if (!root) return;
+
+    // avoid double-init on astro:page-load
+    if (root.dataset.initialized === 'true') return;
+    root.dataset.initialized = 'true';
+
+    root.innerHTML = '<div class="gallery-loading">Se încarcă galeria...</div>';
+
+    let folders: FolderData[];
+    try {
+        const res = await fetch('/api/gallery.json');
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        folders = await res.json();
+    } catch (err) {
+        console.error('Failed to load folder list:', err);
+        root.innerHTML = '<div class="gallery-loading">Eroare la încărcarea galeriei.</div>';
+        return;
+    }
+
+    root.innerHTML = '';
+    const observer = createLazyObserver();
+
+    // render sections one tick at a time so the browser doesn't block
+    for (const folder of folders) {
+        root.appendChild(buildSection(folder, observer));
+        // yield to browser between sections — keeps UI responsive
+        await new Promise(r => setTimeout(r, 0));
+    }
+
+    console.log(`Rendered ${folders.length} folders.`);
+}
+
+// ─── lifecycle hooks ──────────────────────────────────────────────────────────
+document.addEventListener('astro:page-load', () => {
+    // reset so re-navigation re-inits
+    const root = document.getElementById('gallery-root');
+    if (root) delete root.dataset.initialized;
+    initGallery();
+});
+
+// fallback for non-Astro-routed first load
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initGallery);
+} else {
+    initGallery();
+}
 </script>

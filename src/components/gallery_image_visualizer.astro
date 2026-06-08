@@ -36,6 +36,7 @@
         
         transform-origin: center center;
         pointer-events: auto;
+        cursor: pointer;
     }
 
     #left-img { left: 10%; }
@@ -73,28 +74,30 @@
 </style>
 
 <script>
-    document.addEventListener('astro:page-load', () => {
-        const full_image = document.querySelector('.full-img') as HTMLDivElement;
-        const image_element = document.getElementById('image-visualizer') as HTMLImageElement;
-        const left_img = document.getElementById('left-img') as HTMLElement;
-        const right_img = document.getElementById('right-img') as HTMLElement;
+    ['astro:page-load', 'DOMContentLoaded'].forEach((ev) => {
+        document.addEventListener(ev, () => {
+            const full_image = document.querySelector('.full-img') as HTMLDivElement;
+            const image_element = document.getElementById('image-visualizer') as HTMLImageElement;
+            const left_img = document.getElementById('left-img') as HTMLElement;
+            const right_img = document.getElementById('right-img') as HTMLElement;
 
-        document.body.addEventListener('mouseup', (e) => {  
-            let target = e.target as HTMLElement;
-            let visible = image_element.getAttribute('data-visible') as string;
-            if (visible == null) {
-                image_element.setAttribute('data-visible', 'false');
-                visible = 'false';
-            }
+            document.body.addEventListener('mouseup', (e) => {  
+                let target = e.target as HTMLElement;
+                let visible = image_element.getAttribute('data-visible') as string;
+                if (visible == null) {
+                    image_element.setAttribute('data-visible', 'false');
+                    visible = 'false';
+                }
 
-            if (visible && ![image_element, left_img, right_img].includes(target)) {
-                image_element.src = '';                
-                image_element.setAttribute('data-visible', 'false');
-                full_image.style.zIndex = '-1';
+                if (visible && ![image_element, left_img, right_img].includes(target)) {
+                    image_element.src = '';                
+                    image_element.setAttribute('data-visible', 'false');
+                    full_image.style.zIndex = '-1';
 
-                window.dispatchEvent(new Event('close-image-visualizer'));
-            }
-        })
+                    window.dispatchEvent(new Event('close-image-visualizer'));
+                }
+            })
+        });
     });
 </script>
 
@@ -302,5 +305,7 @@
         }, { passive: true });
     }
 
-    document.addEventListener('astro:page-load', initProZoom);
+    ['astro:page-load', 'DOMContentLoaded'].forEach((ev) => { 
+        document.addEventListener(ev, initProZoom)
+    });
 </script>
