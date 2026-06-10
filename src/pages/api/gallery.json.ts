@@ -17,7 +17,7 @@ export const GET: APIRoute = () => {
 
             const fname = folderEntry.name;
             const displayName = fname.split('_').slice(1).join(' ');
-            const order = parseInt(fname.split('_')[0], 10);  // extract leading number
+            const order = parseInt(fname.split('_')[0]);  // extract leading number
 
             return {
                 name: displayName,

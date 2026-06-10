@@ -7,7 +7,7 @@ const links = [
     { name: "Acasă", href: "/" },
     { name: "Echipă", href: "/echipa" },
     { name: "Activitate", href: "/activitate" },
-    { name: "Rezultate", href: "/rezultate" },
+    { name: "Rezultatele", href: "/rezultate" },
     { name: "Sponsori", href: "/sponsori" },
     { name: "Galerie", href: "/galerie" },
     { name: "Contact", href: "/contact" }
@@ -19,6 +19,7 @@ const links = [
     </div>
 
     <div class = 'links-container'>
+        <div class="gtranslate_wrapper"></div>
         <!-- genereaza dinamic linkurile -> se poate atribui din index activeLink prop -->
         {
             links.map((link, index) => {
@@ -50,11 +51,10 @@ const links = [
         }
     }
     
-    document.addEventListener('astro:page-load', () => {
+    document.addEventListener('DOMContentLoaded', () => {
         update_background();
         window.addEventListener("scroll", update_background);
     });
 </script>
 
 <!-- navbar.css -->
-<style></style>

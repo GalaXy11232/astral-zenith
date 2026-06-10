@@ -1,0 +1,319 @@
+---
+// HexBackground.astro
+// Drop this component anywhere in your layout — it attaches itself
+// as a fixed full-screen canvas behind all page content.
+// All visual parameters are in the CONFIG block in the <script> below.
+---
+<canvas id="hex-bg-canvas"></canvas>
+
+<style>
+    #hex-bg-canvas {
+        position: fixed;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        z-index: -1;
+        display: block;
+        pointer-events: none;
+    }
+</style>
+
+<script>
+// ─────────────────────────────────────────────────────────────────────────────
+// CONFIG — change anything here without touching the engine below
+// ─────────────────────────────────────────────────────────────────────────────
+const CONFIG = {
+
+    // Canvas background color (CSS color string or hex number)
+    backgroundColor: '#0d0d12',
+
+    // Fog: makes distant shapes fade into the background (set to null to disable)
+    fog: {
+        color: '#0d0d12',
+        near: 10,
+        far: 60,
+    },
+
+    // ── Shape ──────────────────────────────────────────────────────────────
+    shape: {
+        // 'hexagon' | 'triangle' | 'square' | 'pentagon' | 'octagon'
+        // Internally maps to CylinderGeometry(r, r, h, sides)
+        type: 'hexagon',
+        // Radius of the shape (x/y size)
+        radius: 1.0,
+        // Thickness (z depth of the slab)
+        thickness: 0.18,
+        // Whether to render as wireframe
+        wireframe: false,
+    },
+
+    // ── Colors ─────────────────────────────────────────────────────────────
+    colors: {
+        // Array of hex colors — each hexagon picks one randomly
+        palette: [
+            0x7c3aed,   // violet-700
+            0x6d28d9,   // violet-800
+            0x5b21b6,   // violet-900
+            0x4c1d95,   // purple-950
+            0x8b5cf6,   // violet-500  (lighter accent)
+            0x3b0764,   // deep purple
+        ],
+        // Opacity of the shapes (0.0 – 1.0)
+        opacity: 0.85,
+        // Flat shading = matte, no specular. Set false for slightly shiny look.
+        flatShading: true,
+    },
+
+    // ── Lighting ───────────────────────────────────────────────────────────
+    lights: {
+        ambient: { color: 0xffffff, intensity: 0.4 },
+        directional: [
+            { color: 0xa855f7, intensity: 1.2, position: [5, 10, 5] },   // purple key
+            { color: 0x6366f1, intensity: 0.5, position: [-5, -5, 3] },  // indigo fill
+        ],
+    },
+
+    // ── Population ─────────────────────────────────────────────────────────
+    population: {
+        count: 80,           // total number of shapes
+        spread: {
+            x: 30,           // half-width of spawn box
+            y: 20,           // half-height of spawn box
+            z: 12,           // half-depth of spawn box (depth variation)
+        },
+        zBase: -10,          // centre depth (negative = away from camera)
+    },
+
+    // ── Motion ─────────────────────────────────────────────────────────────
+    motion: {
+        // Rotation speed range [min, max] radians/frame
+        rotationSpeed: { min: 0.001, max: 0.006 },
+        // Drift speed range [min, max] units/frame on each axis
+        driftSpeed: { min: 0.002, max: 0.012 },
+        // Mouse parallax strength (0 = off, 1 = strong)
+        parallax: 0.04,
+    },
+
+    // ── Camera ─────────────────────────────────────────────────────────────
+    camera: {
+        fov: 60,
+        near: 0.1,
+        far: 100,
+        z: 20,   // how far back the camera sits
+    },
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+// ENGINE — generally no need to edit below this line
+// ─────────────────────────────────────────────────────────────────────────────
+
+const SHAPE_SIDES: Record<string, number> = {
+    triangle: 3,
+    square:   4,
+    pentagon: 5,
+    hexagon:  6,
+    octagon:  8,
+};
+
+// Random helpers
+const rand  = (min: number, max: number) => Math.random() * (max - min) + min;
+const pick  = <T>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)];
+const sign  = () => (Math.random() < 0.5 ? 1 : -1);
+
+// Dynamic THREE import (avoids SSR issues in Astro)
+async function loadThree() {
+    // @ts-ignore — Astro/Vite will bundle this from node_modules if installed,
+    // or you can swap to a CDN import via the importmap below.
+    const THREE = await import('three');
+    return THREE;
+}
+
+async function initBackground() {
+    const canvas = document.getElementById('hex-bg-canvas') as HTMLCanvasElement | null;
+    if (!canvas) return;
+
+    let THREE: any;
+    try {
+        THREE = await loadThree();
+    } catch {
+        console.warn('[HexBG] three.js not found in node_modules. Add it: npm i three');
+        return;
+    }
+
+    // ── Renderer ────────────────────────────────────────────────────────────
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setSize(window.innerWidth, window.innerHeight);
+
+    // ── Scene & fog ─────────────────────────────────────────────────────────
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(CONFIG.backgroundColor);
+    if (CONFIG.fog) {
+        scene.fog = new THREE.Fog(CONFIG.fog.color, CONFIG.fog.near, CONFIG.fog.far);
+    }
+
+    // ── Camera ──────────────────────────────────────────────────────────────
+    const camera = new THREE.PerspectiveCamera(
+        CONFIG.camera.fov,
+        window.innerWidth / window.innerHeight,
+        CONFIG.camera.near,
+        CONFIG.camera.far,
+    );
+    camera.position.z = CONFIG.camera.z;
+
+    // ── Lights ──────────────────────────────────────────────────────────────
+    const ambLight = new THREE.AmbientLight(
+        CONFIG.lights.ambient.color,
+        CONFIG.lights.ambient.intensity,
+    );
+    scene.add(ambLight);
+
+    for (const dl of CONFIG.lights.directional) {
+        const light = new THREE.DirectionalLight(dl.color, dl.intensity);
+        light.position.set(...(dl.position as [number, number, number]));
+        scene.add(light);
+    }
+
+    // ── Geometry ────────────────────────────────────────────────────────────
+    const sides = SHAPE_SIDES[CONFIG.shape.type] ?? 6;
+    // CylinderGeometry(radiusTop, radiusBottom, height, radialSegments)
+    // With equal radii and radialSegments=N this is a flat N-gon slab.
+    const geometry = new THREE.CylinderGeometry(
+        CONFIG.shape.radius,
+        CONFIG.shape.radius,
+        CONFIG.shape.thickness,
+        sides,
+        1,
+        false,
+    );
+    // Rotate so the flat face is towards the camera (cylinder stands upright by default)
+    geometry.rotateX(Math.PI / 2);
+
+    // ── Hexagons ────────────────────────────────────────────────────────────
+    interface HexData {
+        mesh: any;
+        vx: number; vy: number; vz: number;   // drift velocities
+        rx: number; ry: number; rz: number;   // rotation speeds
+        // wrap bounds
+        bx: number; by: number; bz: number;
+    }
+
+    const hexes: HexData[] = [];
+    const { spread, zBase, count } = CONFIG.population;
+
+    for (let i = 0; i < count; i++) {
+        const material = new THREE.MeshStandardMaterial({
+            color:       pick(CONFIG.colors.palette),
+            opacity:     CONFIG.colors.opacity,
+            transparent: CONFIG.colors.opacity < 1,
+            flatShading: CONFIG.colors.flatShading,
+            wireframe:   CONFIG.shape.wireframe,
+        });
+
+        const mesh = new THREE.Mesh(geometry, material);
+        mesh.position.set(
+            rand(-spread.x, spread.x),
+            rand(-spread.y, spread.y),
+            zBase + rand(-spread.z, spread.z),
+        );
+        mesh.rotation.set(
+            rand(0, Math.PI * 2),
+            rand(0, Math.PI * 2),
+            rand(0, Math.PI * 2),
+        );
+
+        // Random scale variation for visual depth
+        const s = rand(0.4, 1.4);
+        mesh.scale.set(s, s, s);
+
+        scene.add(mesh);
+
+        const { rotationSpeed: rs, driftSpeed: ds } = CONFIG.motion;
+        hexes.push({
+            mesh,
+            vx: sign() * rand(ds.min, ds.max),
+            vy: sign() * rand(ds.min, ds.max),
+            vz: sign() * rand(ds.min, ds.max) * 0.3,
+            rx: sign() * rand(rs.min, rs.max),
+            ry: sign() * rand(rs.min, rs.max),
+            rz: sign() * rand(rs.min, rs.max),
+            bx: spread.x + CONFIG.shape.radius * 2,
+            by: spread.y + CONFIG.shape.radius * 2,
+            bz: spread.z,
+        });
+    }
+
+    // ── Mouse parallax ──────────────────────────────────────────────────────
+    let mouseX = 0;
+    let mouseY = 0;
+    const onMouse = (e: MouseEvent) => {
+        mouseX = (e.clientX / window.innerWidth  - 0.5) * 2;
+        mouseY = (e.clientY / window.innerHeight - 0.5) * 2;
+    };
+    window.addEventListener('mousemove', onMouse);
+
+    // ── Resize ──────────────────────────────────────────────────────────────
+    const onResize = () => {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+    };
+    window.addEventListener('resize', onResize);
+
+    // ── Animation loop ──────────────────────────────────────────────────────
+    let rafId: number;
+    const animate = () => {
+        rafId = requestAnimationFrame(animate);
+
+        // Parallax: smoothly nudge camera position towards mouse
+        const p = CONFIG.motion.parallax;
+        camera.position.x += (mouseX * p - camera.position.x) * 0.05;
+        camera.position.y += (-mouseY * p - camera.position.y) * 0.05;
+        camera.lookAt(scene.position);
+
+        // Update each hexagon
+        for (const h of hexes) {
+            const m = h.mesh;
+            m.position.x += h.vx;
+            m.position.y += h.vy;
+            m.position.z += h.vz;
+            m.rotation.x += h.rx;
+            m.rotation.y += h.ry;
+            m.rotation.z += h.rz;
+
+            // Wrap when drifted out of bounds (seamless reappearance)
+            if (m.position.x >  h.bx) m.position.x = -h.bx;
+            if (m.position.x < -h.bx) m.position.x =  h.bx;
+            if (m.position.y >  h.by) m.position.y = -h.by;
+            if (m.position.y < -h.by) m.position.y =  h.by;
+            if (m.position.z >  zBase + h.bz) m.position.z = zBase - h.bz;
+            if (m.position.z <  zBase - h.bz) m.position.z = zBase + h.bz;
+        }
+
+        renderer.render(scene, camera);
+    };
+
+    animate();
+
+    // ── Cleanup on Astro page transitions ───────────────────────────────────
+    const cleanup = () => {
+        cancelAnimationFrame(rafId);
+        window.removeEventListener('mousemove', onMouse);
+        window.removeEventListener('resize', onResize);
+        renderer.dispose();
+        geometry.dispose();
+        for (const h of hexes) h.mesh.material.dispose();
+        document.removeEventListener('astro:before-swap', cleanup);
+    };
+    document.addEventListener('astro:before-swap', cleanup);
+}
+
+// Run on every Astro page load (works with <ClientRouter>)
+document.addEventListener('astro:page-load', initBackground);
+// Fallback for first direct load
+if (document.readyState !== 'loading') {
+    initBackground();
+} else {
+    document.addEventListener('DOMContentLoaded', initBackground);
+}
+</script>

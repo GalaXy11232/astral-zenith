@@ -72,6 +72,7 @@ a img {
 }
 
 .navbar-link {
+    text-transform: capitalize;
     font-size: 1.25rem;
     font-weight: normal;
     text-decoration: none;
@@ -101,4 +102,9 @@ a img {
 .active::after { 
     opacity: 1;
     transform: translateY(2px);
+}
+
+.glink img {
+    width: 32px !important;
+    height: 32px !important;
 }

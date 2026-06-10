@@ -52,7 +52,7 @@ import GalleryImageVisualizer from "../components/gallery_image_visualizer.astro
 </style>
 
 <script>
-// ─── types ────────────────────────────────────────────────────────────────────
+
 interface FolderData {
     name: string;
     folderRaw: string;
@@ -60,7 +60,7 @@ interface FolderData {
     images: string[];
 }
 
-// ─── lazy loader ──────────────────────────────────────────────────────────────
+// lazy loader
 function createLazyObserver(): IntersectionObserver {
     return new IntersectionObserver((entries, observer) => {
         entries.forEach(entry => {
@@ -81,7 +81,7 @@ function createLazyObserver(): IntersectionObserver {
     });
 }
 
-// ─── DOM builders ─────────────────────────────────────────────────────────────
+
 function buildImage(src: string, identifier: string, index: number, observer: IntersectionObserver): HTMLImageElement {
     const img = document.createElement('img');
     img.alt = 'Gallery image';
@@ -91,7 +91,7 @@ function buildImage(src: string, identifier: string, index: number, observer: In
     img.dataset.identifier = identifier;
     img.dataset.index = String(index);
 
-    // lazy: store real src, show shimmer until in view
+    // lazy: show shimmer until in view
     img.dataset.src = src;
     img.dataset.lazy = 'true';
 
@@ -132,7 +132,7 @@ function buildSection(folder: FolderData, observer: IntersectionObserver): HTMLE
     return section;
 }
 
-// ─── open full view (same logic as before, centralised) ───────────────────────
+
 function openFullView(img: HTMLImageElement) {
     const visualizer = document.getElementById('image-visualizer') as HTMLImageElement | null;
     if (!visualizer) return;
@@ -151,7 +151,7 @@ function openFullView(img: HTMLImageElement) {
     container.style.background = '#111d';
 }
 
-// ─── main initialiser ─────────────────────────────────────────────────────────
+
 async function initGallery() {
     const root = document.getElementById('gallery-root');
     if (!root) return;
@@ -185,14 +185,6 @@ async function initGallery() {
 
     console.log(`Rendered ${folders.length} folders.`);
 }
-
-// ─── lifecycle hooks ──────────────────────────────────────────────────────────
-document.addEventListener('astro:page-load', () => {
-    // reset so re-navigation re-inits
-    const root = document.getElementById('gallery-root');
-    if (root) delete root.dataset.initialized;
-    initGallery();
-});
 
 // fallback for non-Astro-routed first load
 if (document.readyState === 'loading') {

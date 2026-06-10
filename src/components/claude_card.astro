@@ -1,0 +1,306 @@
+---
+/**
+ * SponsorCard.astro
+ *
+ * Props:
+ *   name        — sponsor's display name (used for alt text & aria)
+ *   logo        — URL to the sponsor's logo image
+ *   website     — full URL the card links to
+ *   tier?       — optional tier label: 'gold' | 'silver' | 'bronze' | string
+ *                 (controls the corner-accent color; any string renders as plain label)
+ */
+
+interface Props {
+    name: string;
+    logo: string;
+    website: string;
+    tier?: 'gold' | 'silver' | 'bronze' | string;
+}
+
+const { name, logo, website, tier } = Astro.props;
+
+const tierColors: Record<string, string> = {
+    gold:   '#c9a84c',
+    silver: '#9aa0a8',
+    bronze: '#a0644a',
+};
+const accentColor = tierColors[tier ?? ''] ?? 'var(--primary, #7c3aed)';
+---
+
+<a
+    href={website}
+    target="_blank"
+    rel="noopener noreferrer"
+    class="sponsor-card"
+    aria-label={`Visit ${name}'s website`}
+    style={`--accent: ${accentColor};`}
+>
+    <!-- Corner notch accent -->
+    <span class="corner-notch" aria-hidden="true"></span>
+
+    <!-- Scan-line texture overlay -->
+    <span class="scanlines" aria-hidden="true"></span>
+
+    <!-- Tier badge -->
+    {tier && (
+        <span class="tier-badge" aria-label={`${tier} sponsor`}>
+            {tier}
+        </span>
+    )}
+
+    <!-- Logo area -->
+    <div class="logo-stage">
+        <img
+            src={logo}
+            alt={`${name} logo`}
+            class="sponsor-logo"
+            draggable="false"
+            loading="lazy"
+            decoding="async"
+        />
+    </div>
+
+    <!-- Hover reveal footer -->
+    <div class="visit-strip">
+        <span class="visit-label">visit website</span>
+        <svg class="visit-arrow" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+            <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5"
+                  stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+    </div>
+
+    <!-- Ambient glow (CSS only, no JS) -->
+    <span class="glow" aria-hidden="true"></span>
+</a>
+
+<style>
+    /* ── Token system ──────────────────────────────────────────────────── */
+    .sponsor-card {
+        --card-size:     200px;
+        --card-bg:       #111118;
+        --card-border:   rgba(255, 255, 255, 0.08);
+        --strip-h:       44px;
+        --radius:        14px;
+        --notch:         22px;
+        --transition:    0.38s cubic-bezier(0.22, 1, 0.36, 1);
+
+        /* layout */
+        position:        relative;
+        display:         flex;
+        flex-direction:  column;
+        width:           var(--card-size);
+        height:          var(--card-size);
+        border-radius:   var(--radius);
+        overflow:        hidden;
+        text-decoration: none;
+        outline:         none;
+        cursor:          pointer;
+
+        /* base surface */
+        background:      var(--card-bg);
+        border:          1px solid var(--card-border);
+
+        /* prevent text selection on drag */
+        user-select:     none;
+        -webkit-user-select: none;
+    }
+
+    /* ── Scan-line texture ─────────────────────────────────────────────── */
+    .scanlines {
+        position:   absolute;
+        inset:      0;
+        z-index:    1;
+        background: repeating-linear-gradient(
+            0deg,
+            transparent,
+            transparent 3px,
+            rgba(0, 0, 0, 0.18) 3px,
+            rgba(0, 0, 0, 0.18) 4px
+        );
+        pointer-events: none;
+        opacity:    0.5;
+        transition: opacity var(--transition);
+    }
+    .sponsor-card:hover .scanlines,
+    .sponsor-card:focus-visible .scanlines {
+        opacity: 0.25;
+    }
+
+    /* ── Corner notch ──────────────────────────────────────────────────── */
+    /* A cut-corner effect achieved with clip-path on a pseudo element */
+    .corner-notch {
+        position:   absolute;
+        top:        0;
+        right:      0;
+        z-index:    4;
+        width:      var(--notch);
+        height:     var(--notch);
+        background: var(--accent);
+        clip-path:  polygon(100% 0, 100% 100%, 0 0);
+        transition: transform var(--transition), opacity var(--transition);
+        opacity:    0.9;
+    }
+    .sponsor-card:hover .corner-notch,
+    .sponsor-card:focus-visible .corner-notch {
+        transform: scale(1.3);
+        opacity:   1;
+    }
+
+    /* ── Tier badge ────────────────────────────────────────────────────── */
+    .tier-badge {
+        position:    absolute;
+        bottom:      calc(var(--strip-h) + 8px);
+        left:        50%;
+        transform:   translateX(-50%);
+        z-index:     3;
+        font-family: ui-monospace, 'Cascadia Code', monospace;
+        font-size:   9px;
+        font-weight: 600;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color:       var(--accent);
+        opacity:     0.7;
+        transition:  opacity var(--transition), bottom var(--transition);
+    }
+    .sponsor-card:hover .tier-badge,
+    .sponsor-card:focus-visible .tier-badge {
+        opacity: 0;
+        bottom:  calc(var(--strip-h) + 2px);
+    }
+
+    /* ── Logo stage ────────────────────────────────────────────────────── */
+    .logo-stage {
+        position:        relative;
+        z-index:         2;
+        flex:            1;
+        display:         flex;
+        align-items:     center;
+        justify-content: center;
+        padding:         28px 24px 0;
+        transition:      transform var(--transition), padding var(--transition);
+    }
+    .sponsor-card:hover .logo-stage,
+    .sponsor-card:focus-visible .logo-stage {
+        transform: translateY(-4px) scale(1.04);
+    }
+
+    .sponsor-logo {
+        max-width:  100%;
+        max-height: 80px;
+        width:      auto;
+        height:     auto;
+        object-fit: contain;
+        /* desaturate at rest, full color on hover */
+        filter:     grayscale(60%) brightness(0.9);
+        transition: filter var(--transition);
+        display:    block;
+    }
+    .sponsor-card:hover .sponsor-logo,
+    .sponsor-card:focus-visible .sponsor-logo {
+        filter: grayscale(0%) brightness(1.05);
+    }
+
+    /* ── Visit strip ───────────────────────────────────────────────────── */
+    .visit-strip {
+        position:        relative;
+        z-index:         3;
+        display:         flex;
+        align-items:     center;
+        justify-content: center;
+        gap:             6px;
+        height:          var(--strip-h);
+        /* slide up from below at rest */
+        transform:       translateY(100%);
+        transition:      transform var(--transition),
+                         background var(--transition);
+        background:      var(--accent);
+        flex-shrink:     0;
+    }
+    .sponsor-card:hover .visit-strip,
+    .sponsor-card:focus-visible .visit-strip {
+        transform: translateY(0%);
+    }
+
+    .visit-label {
+        font-family:     ui-monospace, 'Cascadia Code', monospace;
+        font-size:       11px;
+        font-weight:     600;
+        letter-spacing:  0.12em;
+        text-transform:  uppercase;
+        color:           #fff;
+    }
+
+    .visit-arrow {
+        width:  14px;
+        height: 14px;
+        color:  #fff;
+        /* slight hop on hover */
+        transform:  translateX(0);
+        transition: transform var(--transition);
+        flex-shrink: 0;
+    }
+    .sponsor-card:hover .visit-arrow,
+    .sponsor-card:focus-visible .visit-arrow {
+        transform: translateX(3px);
+    }
+
+    /* ── Ambient glow ──────────────────────────────────────────────────── */
+    .glow {
+        position:       absolute;
+        inset:          0;
+        z-index:        0;
+        border-radius:  var(--radius);
+        background:     radial-gradient(
+            ellipse 70% 60% at 50% 110%,
+            color-mix(in srgb, var(--accent) 30%, transparent),
+            transparent 70%
+        );
+        opacity:        0;
+        transition:     opacity var(--transition);
+        pointer-events: none;
+    }
+    .sponsor-card:hover .glow,
+    .sponsor-card:focus-visible .glow {
+        opacity: 1;
+    }
+
+    /* ── Focus ring ────────────────────────────────────────────────────── */
+    .sponsor-card:focus-visible {
+        outline:        2px solid var(--accent);
+        outline-offset: 3px;
+    }
+
+    /* ── Lift shadow on hover ──────────────────────────────────────────── */
+    .sponsor-card {
+        box-shadow:  0 0 0 0 transparent,
+                     0 2px 8px rgba(0, 0, 0, 0.4);
+        transition:  box-shadow var(--transition),
+                     transform var(--transition);
+    }
+    .sponsor-card:hover,
+    .sponsor-card:focus-visible {
+        transform:   translateY(-3px);
+        box-shadow:  0 0 0 1px var(--accent),
+                     0 12px 28px rgba(0, 0, 0, 0.55);
+    }
+
+    /* ── Reduced motion ────────────────────────────────────────────────── */
+    @media () {
+        .sponsor-card,
+        .sponsor-card *,
+        .sponsor-card::before,
+        .sponsor-card::after {
+            transition: none !important;
+            animation:  none !important;
+        }
+        /* Still show the strip without animation */
+        .visit-strip {
+            transform:  translateY(0%) !important;
+            opacity:    0;
+        }
+        .sponsor-card:hover .visit-strip,
+        .sponsor-card:focus-visible .visit-strip {
+            opacity: 1;
+        }
+    }
+</style>
