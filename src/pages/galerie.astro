@@ -6,6 +6,7 @@ import GalleryImageVisualizer from "../components/gallery_image_visualizer.astro
 
 <BaseLayout title="Galerie">
     <NavBar activeLink={5} />
+
     <GalleryImageVisualizer />
     <div class="gallery" id="gallery-root">
         <div class="gallery-loading">Se încarcă galeria...</div>
@@ -187,9 +188,8 @@ async function initGallery() {
 }
 
 // fallback for non-Astro-routed first load
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initGallery);
-} else {
-    initGallery();
-}
+['astro:page-load', 'DOMContentLoaded'].forEach((ev) => {
+    console.log("Nigga")
+    document.addEventListener(ev, initGallery);
+});
 </script>
