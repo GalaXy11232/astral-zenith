@@ -2,25 +2,31 @@
 const { name, logo, website, tier, scale_factor = 1 } = Astro.props;
 
 const tierColors: Record<string, string> = {
-    gold:   '#c9a84c',
-    silver: '#9aa0a8',
+    gold:     '#c9a84c',
+    silver:   '#9aa0a8',
     platinum: '#4cafd4',
 };
 const accentColor = tierColors[tier ?? ''] ?? 'var(--primary, #7c3aed)';
 ---
 
-<div class="col-6 col-sm-4 col-md-3">
+<div class="sponsor-col">
     <a
         href={website}
-        target={website == '#' ? '_self' : '_blank'}
+        target={website === '#' ? '_self' : '_blank'}
+        rel="noopener noreferrer"
         class="sponsor-card"
+        aria-label={website !== '#' ? `Vizitează website-ul ${name}` : name}
         style={`--accent: ${accentColor};`}
     >
-        <span class="corner-notch" aria-hidden="true"></span>
+        <span
+            class="corner-notch"
+            aria-hidden="true"
+            style={`display: ${website === '#' ? 'none' : 'block'}`}
+        ></span>
 
-        {
-            <span class="tier-badge" translate = 'no'> {tier} </span>
-        }
+        {tier && (
+            <span class="tier-badge" translate="no">{tier}</span>
+        )}
 
         <div class="logo-container">
             <img
@@ -28,38 +34,49 @@ const accentColor = tierColors[tier ?? ''] ?? 'var(--primary, #7c3aed)';
                 alt={`${name} logo`}
                 class="sponsor-logo"
                 loading="lazy"
-                style = {`transform: scale(${scale_factor});`}
+                decoding="async"
+                draggable="false"
+                style={`transform: scale(${scale_factor});`}
             />
         </div>
 
-        <!-- Hover reveal footer -->
-        {(website != '#') ? (
+        {website !== '#' ? (
             <div class="visit-strip">
                 <span class="visit-label">Vizitează website-ul</span>
                 <svg class="visit-arrow" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-                    <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5"
-                        stroke-linecap="round" stroke-linejoin="round"/>
+                    <path
+                        d="M3 8h10M9 4l4 4-4 4"
+                        stroke="currentColor"
+                        stroke-width="1.5"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                    />
                 </svg>
             </div>
-        ) 
-            :
-        (<span style = 'padding-top: 40px;'></span>)
-    }
+        ) : (
+            <div class="visit-strip-placeholder"></div>
+        )}
     </a>
 </div>
 
-
 <style>
-    .sponsor-card {
-        --card-size:     200px;
-        --card-bg:       #111118;
-        --card-border:   rgba(255, 255, 255, 0.08);
-        --strip-h:       44px;
-        --radius:        14px;
-        --notch:         22px;
-        --transition:    0.5s cubic-bezier(0.175, 0.885, 0.32, 1);  /*0.38s cubic-bezier(0.22, 1, 0.36, 1); */
+    .sponsor-col {
+        display:         flex;
+        justify-content: center;
+        align-items:     center;
+        padding:         0.5rem;
+    }
 
-        /* layout */
+    /* ── Card ────────────────────────────────────────────────────────────── */
+    .sponsor-card {
+        --card-size:   clamp(140px, 20vw, 200px); /* responsive: 140px → 200px */
+        --card-bg:     #111118;
+        --card-border: rgba(255, 255, 255, 0.08);
+        --strip-h:     44px;
+        --radius:      14px;
+        --notch:       22px;
+        --transition:  0.5s cubic-bezier(0.175, 0.885, 0.32, 1);
+
         position:        relative;
         display:         flex;
         flex-direction:  column;
@@ -70,16 +87,24 @@ const accentColor = tierColors[tier ?? ''] ?? 'var(--primary, #7c3aed)';
         text-decoration: none;
         outline:         none;
         cursor:          pointer;
+        flex-shrink:     0;
 
-        /* base surface */
-        background:      var(--card-bg);
-        border:          1px solid var(--card-border);
+        background:  var(--card-bg);
+        border:      1px solid var(--card-border);
+        box-shadow:  0 0 0 0 transparent, 0 2px 8px rgba(0, 0, 0, 0.4);
+        transition:  box-shadow var(--transition), transform var(--transition);
 
-        /* prevent text selection on drag */
-        user-select:     none;
+        user-select:         none;
         -webkit-user-select: none;
     }
 
+    .sponsor-card:hover,
+    .sponsor-card:focus-visible {
+        transform:  translateY(-3px);
+        box-shadow: 0 0 0 1px var(--accent), 0 12px 28px rgba(0, 0, 0, 0.55);
+    }
+
+    /* ── Corner notch ───────────────────────────────────────────────────── */
     .corner-notch {
         position:   absolute;
         top:        0;
@@ -89,8 +114,8 @@ const accentColor = tierColors[tier ?? ''] ?? 'var(--primary, #7c3aed)';
         height:     var(--notch);
         background: var(--accent);
         clip-path:  polygon(100% 0, 100% 100%, 0 0);
-        transition: transform var(--transition), opacity var(--transition);
         opacity:    0.9;
+        transition: transform var(--transition), opacity var(--transition);
     }
     .sponsor-card:hover .corner-notch,
     .sponsor-card:focus-visible .corner-notch {
@@ -98,21 +123,22 @@ const accentColor = tierColors[tier ?? ''] ?? 'var(--primary, #7c3aed)';
         opacity:   1;
     }
 
-    /* ── Tier badge ────────────────────────────────────────────────────── */
+    /* ── Tier badge ─────────────────────────────────────────────────────── */
     .tier-badge {
-        position:    absolute;
-        bottom:      calc(var(--strip-h) + 8px);
-        left:        50%;
-        transform:   translateX(-50%);
-        z-index:     3;
-        font-family: ui-monospace, 'Cascadia Code', monospace;
-        font-size:   9px;
-        font-weight: 600;
+        position:       absolute;
+        bottom:         calc(var(--strip-h) + 8px);
+        left:           50%;
+        transform:      translateX(-50%);
+        z-index:        3;
+        font-family:    ui-monospace, 'Cascadia Code', monospace;
+        font-size:      9px;
+        font-weight:    600;
         letter-spacing: 0.18em;
         text-transform: uppercase;
-        color:       var(--accent);
-        opacity:     0.7;
-        transition:  opacity var(--transition), bottom var(--transition);
+        white-space:    nowrap;
+        color:          var(--accent);
+        opacity:        0.7;
+        transition:     opacity var(--transition), bottom var(--transition);
     }
     .sponsor-card:hover .tier-badge,
     .sponsor-card:focus-visible .tier-badge {
@@ -120,7 +146,7 @@ const accentColor = tierColors[tier ?? ''] ?? 'var(--primary, #7c3aed)';
         bottom:  calc(var(--strip-h) + 2px);
     }
 
-    /* ── Logo stage ────────────────────────────────────────────────────── */
+    /* ── Logo container ─────────────────────────────────────────────────── */
     .logo-container {
         position:        relative;
         z-index:         2;
@@ -128,8 +154,10 @@ const accentColor = tierColors[tier ?? ''] ?? 'var(--primary, #7c3aed)';
         display:         flex;
         align-items:     center;
         justify-content: center;
-        padding:         28px 24px 0;
-        transition:      transform var(--transition), padding var(--transition);
+        /* clamp padding so logos don't get crushed on small cards */
+        padding:         clamp(12px, 3vw, 28px) clamp(10px, 2.5vw, 24px) 0;
+        transition:      transform var(--transition);
+        overflow:        hidden; /* keep scaled logo inside card bounds */
     }
     .sponsor-card:hover .logo-container,
     .sponsor-card:focus-visible .logo-container {
@@ -137,98 +165,83 @@ const accentColor = tierColors[tier ?? ''] ?? 'var(--primary, #7c3aed)';
     }
 
     .sponsor-logo {
-        max-width:  100%;
-        max-height: 80px;
-        width:      auto;
-        height:     auto;
-        object-fit: contain;
-        /* desaturate at rest, full color on hover */
-        filter:     grayscale(60%) brightness(0.9);
-        transition: filter var(--transition);
-        display:    block;
+        max-width:   100%;
+        max-height:  clamp(50px, 8vw, 80px);
+        width:       auto;
+        height:      auto;
+        object-fit:  contain;
+        display:     block;
+        filter:      grayscale(60%) brightness(0.9);
+        transition:  filter var(--transition);
     }
     .sponsor-card:hover .sponsor-logo,
     .sponsor-card:focus-visible .sponsor-logo {
         filter: grayscale(0%) brightness(1.05);
     }
 
-    /* ── Visit strip ───────────────────────────────────────────────────── */
+    /* ── Visit strip ────────────────────────────────────────────────────── */
     .visit-strip {
-        position:        relative;
-        z-index:         3;
-        display:         flex;
+        position:   relative;
+        z-index:    3;
+        display:    flex;
         align-items:     center;
         justify-content: center;
-        gap:             6px;
-        height:          var(--strip-h);
-        /* slide up from below at rest */
-        transform:       translateY(100%);
-        transition:      transform var(--transition),
-                         background var(--transition);
-        background:      var(--accent);
-        flex-shrink:     0;
+        gap:        6px;
+        height:     var(--strip-h);
+        flex-shrink: 0;
+        background: var(--accent);
+        transform:  translateY(100%);
+        transition: transform var(--transition), background var(--transition);
     }
     .sponsor-card:hover .visit-strip,
     .sponsor-card:focus-visible .visit-strip {
         transform: translateY(0%);
     }
 
+
+    .visit-strip-placeholder {
+        height:     var(--strip-h);
+        flex-shrink: 0;
+    }
+
     .visit-label {
-        font-family:     ui-monospace, 'Cascadia Code', monospace;
-        font-size:       11px;
-        font-weight:     600;
-        letter-spacing:  0.12em;
-        text-transform:  uppercase;
-        color:           #fff;
+        font-family:    ui-monospace, 'Cascadia Code', monospace;
+        font-size:      10px;
+        font-weight:    600;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        white-space:    nowrap;
+        color:          #fff;
     }
 
     .visit-arrow {
-        width:  14px;
-        height: 14px;
-        color:  #fff;
-        /* slight hop on hover */
+        width:      13px;
+        height:     13px;
+        color:      #fff;
+        flex-shrink: 0;
         transform:  translateX(0);
         transition: transform var(--transition);
-        flex-shrink: 0;
     }
     .sponsor-card:hover .visit-arrow,
     .sponsor-card:focus-visible .visit-arrow {
         transform: translateX(3px);
     }
 
-    /* ── Focus ring ────────────────────────────────────────────────────── */
+    /* ── Focus ring ─────────────────────────────────────────────────────── */
     .sponsor-card:focus-visible {
         outline:        2px solid var(--accent);
         outline-offset: 3px;
     }
 
-    /* ── Lift shadow on hover ──────────────────────────────────────────── */
-    .sponsor-card {
-        box-shadow:  0 0 0 0 transparent,
-                     0 2px 8px rgba(0, 0, 0, 0.4);
-        transition:  box-shadow var(--transition),
-                     transform var(--transition);
-    }
-    .sponsor-card:hover,
-    .sponsor-card:focus-visible {
-        transform:   translateY(-3px);
-        box-shadow:  0 0 0 1px var(--accent),
-                     0 12px 28px rgba(0, 0, 0, 0.55);
-    }
-
-    /* ── Reduced motion ────────────────────────────────────────────────── */
     @media () {
         .sponsor-card,
-        .sponsor-card *,
-        .sponsor-card::before,
-        .sponsor-card::after {
+        .sponsor-card * {
             transition: none !important;
             animation:  none !important;
         }
-        /* Still show the strip without animation */
         .visit-strip {
-            transform:  translateY(0%) !important;
-            opacity:    0;
+            transform: translateY(0%) !important;
+            opacity:   0;
         }
         .sponsor-card:hover .visit-strip,
         .sponsor-card:focus-visible .visit-strip {

@@ -2,11 +2,13 @@
 import BaseLayout from "../layouts/BaseLayout.astro";
 import NavBar from "../components/NavBar.astro";
 import GalleryImageVisualizer from "../components/gallery_image_visualizer.astro";
+import Hexbackground from "../components/hexbackground.astro";
 ---
 
 <BaseLayout title="Galerie">
     <NavBar activeLink={5} />
 
+    <Hexbackground />
     <GalleryImageVisualizer />
     <div class="gallery" id="gallery-root">
         <div class="gallery-loading">Se încarcă galeria...</div>

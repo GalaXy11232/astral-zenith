@@ -1,142 +1,147 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro"
 import NavBar from "../components/NavBar.astro"
-
 import SponsorCard from "../components/sponsor_card.astro"
 ---
 
+<BaseLayout title="Sponsori">
+    <NavBar activeLink={4} />
 
-<BaseLayout title = "Sponsori">
-    <NavBar activeLink = {4} />
+    <div class="sponsor-page">
 
-     <div class="container py-5">
-        <div class="title-container">
-            <span class="title-underline">
-                Sponsori Platinum
-            </span>
-        </div>
+        <!-- Platinum -->
+        <section class="sponsor-section">
+            <div class="title-container">
+                <span class="title-underline">Sponsori Platinum</span>
+            </div>
+            <div class="cards-grid">
+                <SponsorCard
+                    name="Electrica Serv"
+                    logo="/assets/sponsori/electricaserv.webp"
+                    website="https://www.electricaserv.ro/"
+                    tier="platinum"
+                />
+                <SponsorCard
+                    name="ATI Energy"
+                    logo="/assets/sponsori/ATI.webp"
+                    website="https://atienergy.ro/"
+                    tier="platinum"
+                />
+                <SponsorCard
+                    name="Schrack Technik"
+                    logo="/assets/sponsori/schrack.webp"
+                    website="https://www.schrack.ro/"
+                    tier="platinum"
+                />
+                <SponsorCard
+                    name="Vatra Barsei"
+                    logo="/assets/sponsori/Vatra Barsei.webp"
+                    website="#"
+                    tier="platinum"
+                    scale_factor={4}
+                />
+                <SponsorCard
+                    name="ING"
+                    logo="/assets/sponsori/ing.webp"
+                    website="https://www.ing.ro/"
+                    tier="platinum"
+                />
+            </div>
+        </section>
 
-        <div class="row justify-content-center g-4">
-            <SponsorCard 
-                name = "Electrica Serv"
-                logo = "/assets/sponsori/electricaserv.webp"
-                website = "https://www.electricaserv.ro/"
-                tier = 'platinum'
-            />
-            
-            <SponsorCard 
-                name = "ATI Energy"
-                logo = "/assets/sponsori/ATI.webp"
-                website = "https://atienergy.ro/"
-                tier = 'platinum'
-            />
+        <!-- Gold -->
+        <section class="sponsor-section">
+            <div class="title-container">
+                <span class="title-underline">Sponsori Gold</span>
+            </div>
+            <div class="cards-grid">
+                <SponsorCard
+                    name="RMC Debitare Laser"
+                    logo="/assets/sponsori/Laser_RMC.webp"
+                    website="https://www.laser-rmc.ro"
+                    tier="gold"
+                />
+                <SponsorCard
+                    name="Sharp Solutions"
+                    logo="/assets/sponsori/Sharp_Solutions.svg"
+                    website="https://sharpsolutions.ro/"
+                    tier="gold"
+                    scale_factor={2.25}
+                />
+                <SponsorCard
+                    name="Meat Technic Service"
+                    logo="/assets/sponsori/Meat_tech.webp"
+                    website="https://mtsgroup.ro/"
+                    tier="gold"
+                />
+                <SponsorCard
+                    name="Laropharm"
+                    logo="/assets/sponsori/Laropharm.webp"
+                    website="https://www.laropharm.ro/"
+                    tier="gold"
+                />
+                <SponsorCard
+                    name="Online Electro"
+                    logo="/assets/sponsori/online concept.webp"
+                    website="https://online-electro.ro/"
+                    tier="gold"
+                />
+                <SponsorCard
+                    name="Don' Dino"
+                    logo="/assets/sponsori/dondino.webp"
+                    website="https://www.instagram.com/dondinosector1?igsh=MW1ycmZhZHdueXpmaQ%3D%3D"
+                    tier="gold"
+                    scale_factor={2}
+                />
+            </div>
+        </section>
 
-            <SponsorCard 
-                name = "Schrack Technik"
-                logo = "/assets/sponsori/schrack.webp"
-                website = "https://www.schrack.ro/"
-                tier = 'platinum'
-            />
+        <!-- Silver -->
+        <section class="sponsor-section">
+            <div class="title-container">
+                <span class="title-underline">Sponsori Silver</span>
+            </div>
+            <div class="cards-grid">
+                <SponsorCard
+                    name="Direct Pharma"
+                    logo="/assets/sponsori/directpharma.webp"
+                    website="https://www.directpharma.ro/"
+                    tier="silver"
+                />
+                <SponsorCard
+                    name="SERA Print House"
+                    logo="/assets/sponsori/seraprint.webp"
+                    website="https://seraprint.ro/"
+                    tier="silver"
+                />
+                <SponsorCard
+                    name="Polymaker"
+                    logo="/assets/sponsori/polymaker.svg"
+                    website="https://polymaker.com/"
+                    tier="silver"
+                />
+            </div>
+        </section>
 
-            <SponsorCard 
-                name = "Vatra Barsei"
-                logo = "/assets/sponsori/Vatra Barsei.webp"
-                website = "#"
-                tier = 'platinum'
-                scale_factor = 4
-            />
-
-            <SponsorCard 
-                name = "ING"
-                logo = "/assets/sponsori/ing.webp"
-                website = "https://www.ing.ro/"
-                tier = 'platinum'
-            />
-        </div>
-    </div>
-
-    <div class="container py-5">
-        <div class="title-container">
-            <span class="title-underline">
-                Sponsori Gold
-            </span>
-        </div>
-
-        <div class="row justify-content-center g-4">
-            <SponsorCard 
-                name = "RMC Debitare Laser"
-                logo = "/assets/sponsori/Laser_RMC.webp"
-                website = "https://www.laser-rmc.ro"
-                tier = 'gold'
-            />
-            
-            <SponsorCard 
-                name = "Sharp Solutions"
-                logo = "/assets/sponsori/Sharp_Solutions.svg"
-                website = "https://sharpsolutions.ro/"
-                tier = 'gold'
-                scale_factor = 2.25
-            />
-            
-            <SponsorCard 
-                name = "Meat Technic Service"
-                logo = "/assets/sponsori/Meat_tech.webp"
-                website = "https://mtsgroup.ro/"
-                tier = 'gold'
-            />
-            
-            <SponsorCard 
-                name = "Laropharm"
-                logo = "/assets/sponsori/Laropharm.webp"
-                website = "https://www.laropharm.ro/"
-                tier = 'gold'
-            />
-            
-            <SponsorCard 
-                name = "Online Electro"
-                logo = "/assets/sponsori/online concept.webp"
-                website = "https://online-electro.ro/"
-                tier = 'gold'
-            />
-            
-            <SponsorCard 
-                name = "Don' Dino"
-                logo = "/assets/sponsori/dondino.webp"
-                website = "https://www.instagram.com/dondinosector1?igsh=MW1ycmZhZHdueXpmaQ%3D%3D"
-                tier = 'gold'
-                scale_factor = 2
-            />
-        </div>
-    </div>
-
-     <div class="container py-5">
-        <div class="title-container">
-            <span class="title-underline">
-                Sponsori Silver
-            </span>
-        </div>
-
-        <div class="row justify-content-center g-4">
-            <SponsorCard 
-                name = "Direct Pharma"
-                logo = "/assets/sponsori/directpharma.webp"
-                website = "https://www.directpharma.ro/"
-                tier = 'silver'
-            />
-            
-            <SponsorCard 
-                name = "SERA Print House"
-                logo = "/assets/sponsori/seraprint.webp"
-                website = "https://seraprint.ro/"
-                tier = 'silver'
-            />
-            
-            <SponsorCard 
-                name = "Polymaker"
-                logo = "/assets/sponsori/polymaker.svg"
-                website = "https://polymaker.com/"
-                tier = 'silver'
-            />
-        </div>
     </div>
 </BaseLayout>
+
+<style>
+    .sponsor-page { padding: 2rem 1rem 4rem; }
+    .sponsor-section { margin-bottom: 5rem; }
+    .sponsor-section:last-child { margin-bottom: 2rem; }
+
+    .cards-grid {
+        display:               grid;
+        grid-template-columns: repeat(auto-fill, minmax(160px, 200px));
+        gap:                   1.5rem;
+        justify-content:       center; /* centers the whole grid within the section */
+        place-items:           center;
+    }
+
+    @media (max-width: 400px) {
+        .cards-grid {
+            gap: 1rem;
+        }
+    }
+</style>

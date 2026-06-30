@@ -169,6 +169,7 @@
             document.querySelectorAll('.img-switcher-btn').forEach((item) => {
                 item.classList.add('hidden');
             });
+            document.querySelector('.full-img')?.classList.add('hidden');
         });
 
         // setup left/right buttons for image visualizer
@@ -184,6 +185,7 @@
                 document.querySelectorAll('.img-switcher-btn').forEach((item) => {
                     item.classList.remove('hidden');
                 });
+                document.querySelector('.full-img')?.classList.remove('hidden');
 
             left_img.addEventListener('click', () => {
                 active_index -= 1;

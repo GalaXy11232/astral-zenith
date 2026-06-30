@@ -1,0 +1,262 @@
+---
+interface Props {
+    title:            string;
+    date:             string;
+    thumbnail:        string;
+    thumbnailAlt?:    string;
+    thumbnailHeight?: string;
+    /**
+     * Controls which part of the thumbnail is visible when the image
+     * is cropped to fit the fixed-height box. Accepts any valid CSS
+     * `object-position` value:
+     *   "center"        — default, good for most photos
+     *   "top"           — shows the top of the image (faces in group shots)
+     *   "bottom"        — shows the bottom
+     *   "50% 20%"       — 50% horizontal, 20% from the top
+     *   "left center"   — left edge, vertically centered
+     */
+    thumbnailFocus?:  string;
+    previewLines?:    number;
+    readMoreLabel?:   string;
+    readLessLabel?:   string;
+}
+
+const {
+    title,
+    date,
+    thumbnail,
+    thumbnailAlt    = title,
+    thumbnailHeight = '280px',
+    thumbnailFocus  = 'center',
+    previewLines    = 3,
+    readMoreLabel   = 'Citește mai mult…',
+    readLessLabel   = 'Citește mai puțin…',
+} = Astro.props;
+
+// Each instance gets a unique ID so multiple cards on the same page
+// don't share toggle state.
+const uid = `activity-${Math.random().toString(36).slice(2, 8)}`;
+---
+
+<div style = "margin: 5rem 3rem;">
+    <article class="activity-card">
+        <div class="thumbnail-wrap" style={`--thumb-h: ${thumbnailHeight};`}>
+            <img
+                src={thumbnail}
+                alt={thumbnailAlt}
+                class="thumbnail-img"
+                loading="lazy"
+                decoding="async"
+                draggable="false"
+                style={`object-position: ${thumbnailFocus};`}
+            />
+        </div>
+
+
+        <div class="card-body">
+
+            <div class="card-meta">
+                <span class="card-date">{date}</span>
+            </div>
+
+            <h2 class="card-title">{title}</h2>
+
+            <!--
+                The slot content is the article body (paragraphs).
+                We wrap it in a clamp container whose max-height is driven
+                by a CSS custom property set from the previewLines prop.
+                A data attribute carries the two label strings so the
+                script below can swap them without any framework JS.
+            -->
+            <div
+                class="card-content"
+                id={uid}
+                style={`--preview-lines: ${previewLines};`}
+                data-read-more={readMoreLabel}
+                data-read-less={readLessLabel}
+                data-expanded="false"
+            >
+                <div class="card-content-inner">
+                    <slot />
+                </div>
+            </div>
+
+            <button
+                class="toggle-btn"
+                aria-controls={uid}
+                aria-expanded="false"
+            >
+                {readMoreLabel}
+            </button>
+
+        </div>
+    </article>
+</div>
+
+<style>
+    .activity-card {
+        background:    #f5f3ee;     
+        border-radius: 18px;
+        overflow:      hidden;
+        max-width:     760px;
+        width:         100%;
+        margin:        0 auto;       
+        box-shadow:    0 2px 12px rgba(0, 0, 0, 0.07),
+                       0 0  0 1px rgba(0, 0, 0, 0.04);
+    }
+
+    .thumbnail-wrap {
+        width:     100%;
+        height:    var(--thumb-h, 280px);   
+        overflow:  hidden;
+        background: #ddd;                  
+        flex-shrink: 0;
+        display:   flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .thumbnail-img {
+        width:      100%;
+        height:     100%;
+        object-fit: cover;
+        display:    block;
+        animation:       thumb-in 0.4s ease both;
+    }
+
+    @keyframes thumb-in {
+        from { opacity: 0; transform: scale(1.02); }
+        to   { opacity: 1; transform: scale(1);    }
+    }
+
+    .card-body {
+        padding: 1.5rem 1.75rem 1.75rem;
+    }
+
+    .card-meta {
+        margin-bottom: 0.25rem;
+    }
+    .card-date {
+        font-size:      0.8rem;
+        font-weight:    400;
+        color:          #666;
+        letter-spacing: 0.01em;
+    }
+
+    .card-title {
+        font-size:     1.15rem;
+        font-weight:   700;
+        color:         #1a1a1a;
+        margin:        0 0 1rem;
+        line-height:   1.3;
+    }
+
+    /* ── Expandable content block ───────────────────────────────────────── */
+    /*
+     * The clamp is done via max-height:
+     *   line-height (1.7) × font-size (1rem = 16px) × N lines
+     *   = ~27.2px × N
+     * We add a small extra to not cut a line exactly in half.
+     *
+     * When expanded, max-height is set to a large safe value in JS.
+     * Using `overflow: hidden` + `max-height` transition gives a smooth
+     * accordion without needing to know the real content height.
+     */
+    .card-content {
+        text-align: justify;
+        text-justify: inter-word;
+        overflow:   hidden;
+        max-height: calc(1.7em * var(--preview-lines, 3) + 0.4em);
+        transition: max-height 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+        -webkit-mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
+                mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
+    }
+
+    .card-content[data-expanded="true"] {
+        -webkit-mask-image: none;
+                mask-image: none;
+    }
+
+
+    .card-content-inner :global(p) {
+        font-size:     0.95rem;
+        line-height:   1.7;
+        color:         #333;
+        margin:        0 0 0.85rem;
+        text-indent:   1.2em;  /* matches the screenshot's paragraph indent */
+    }
+    .card-content-inner :global(p:last-child) {
+        margin-bottom: 0;
+    }
+
+    .toggle-btn {
+        display:        inline-block;
+        margin-top:     0.9rem;
+        background:     none;
+        border:         none;
+        padding:        0;
+        font-size:      0.9rem;
+        font-weight:    500;
+        color:          #7c3aed;   
+        cursor:         pointer;
+        letter-spacing: 0.01em;
+        transition:     opacity 0.2s;
+        font-family:    inherit;
+    }
+    .toggle-btn:hover {
+        opacity: 0.7;
+    }
+    .toggle-btn:focus-visible {
+        outline:        2px solid #7c3aed;
+        outline-offset: 3px;
+        border-radius:  3px;
+    }
+
+    @media (max-width: 520px) {
+        .card-body {
+            padding: 1.1rem 1.1rem 1.4rem;
+        }
+        .card-title {
+            font-size: 1rem;
+        }
+    }
+
+    @media () {
+        .card-content { transition: none !important; }
+        .thumbnail-img { animation: none !important; }
+    }
+</style>
+
+<script>
+    function initActivityCards() {
+        document.querySelectorAll<HTMLElement>('.card-content').forEach(content => {
+            const btn = content.parentElement?.querySelector<HTMLButtonElement>('.toggle-btn');
+            if (!btn || (content as any)._acInit) return;
+            (content as any)._acInit = true;
+
+            const labelMore = content.dataset.readMore ?? 'Citește mai mult…';
+            const labelLess = content.dataset.readLess ?? 'Citește mai puțin…';
+
+            btn.addEventListener('click', () => {
+                const expanded = content.dataset.expanded === 'true';
+
+                if (!expanded) {
+                    const inner = content.querySelector<HTMLElement>('.card-content-inner');
+                    const fullH = inner ? inner.scrollHeight : 9999;
+
+                    content.style.maxHeight  = fullH + 'px';
+                    content.dataset.expanded = 'true';
+                    btn.textContent          = labelLess;
+                    btn.setAttribute('aria-expanded', 'true');
+                } else {
+                    content.style.maxHeight  = '';
+                    content.dataset.expanded = 'false';
+                    btn.textContent          = labelMore;
+                    btn.setAttribute('aria-expanded', 'false');
+                }
+            });
+        });
+    }
+
+    document.addEventListener('astro:page-load', initActivityCards);
+</script>

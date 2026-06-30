@@ -9,6 +9,10 @@
     box-sizing: border-box;
 }
 
+/* Font overrides */
+body { font-family: 'Prompt', sans-serif; font-size: 100%;}
+h1, h2, h3 { font-family: 'Prompt', monospace; }
+
 .hidden { display: none !important; }
 
 .title-container {
