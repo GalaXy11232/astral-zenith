@@ -1,0 +1,5 @@
+[
+    { "name": "Ioana Preda", "department": "Mecanică", "image": "/assets/echipa/Oameni/Preda Ioana.webp", "tooltip": "UPB, FIMM" },
+    { "name": "Serghei Țirulnic", "department": "Mecanică", "image": "/assets/echipa/Oameni/Tirulnic Serghei.webp", "tooltip": "UPB, AC" },
+    { "name": "Ionuț Ghiță", "department": "Mecanică", "image": "/assets/echipa/Oameni/Ghita Ionut.webp", "tooltip": "UPB, FIMM" }
+]

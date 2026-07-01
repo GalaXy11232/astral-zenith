@@ -1,0 +1,27 @@
+---
+---
+
+<section class="team-grid-container">
+    <div class="team-grid">
+        <slot /> 
+    </div>
+</section>
+
+<style>
+    .team-grid-container {
+        /* background-color: #d1c4e9;  */
+        /* padding: 4rem 2rem;
+        min-height: 100vh; */
+        display: flex;
+        justify-content: center;
+    }
+
+    .team-grid {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center; 
+        gap: 2rem; 
+        max-width: 1400px; 
+        width: 100%;
+    }
+</style>

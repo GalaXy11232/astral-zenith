@@ -1,0 +1,72 @@
+---
+import MemberCard from "../components/membru_card.astro";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import NavBar from "../components/NavBar.astro";
+
+import MembersGrid from "../components/membri_grid.astro";
+
+import teamMembers from "./api/members.json";
+import volunteers from "./api/volunteers.json";
+import mentors from "./api/mentors.json";
+---
+
+
+<BaseLayout title = "Echipa">
+    <NavBar activeLink={1} />
+
+    <div style = "padding-top: 5rem;"></div>
+     <div class="title-container">
+        <span class="title-underline">Membrii echipei</span>
+    </div>
+    <div style = "padding-bottom: 5rem;"></div>
+
+    <MembersGrid>
+        {teamMembers.map((member) => (
+            <MemberCard 
+                name={member.name} 
+                department={member.department} 
+                image={member.image} 
+                tooltip = {member.tooltip}
+            />
+        ))}
+    </MembersGrid>
+
+    <div style = "padding-top: 5rem;"></div>
+    <div style = "padding-top: 5rem;"></div>
+     <div class="title-container">
+        <span class="title-underline">Voluntarii echipei</span>
+    </div>
+    <div style = "padding-bottom: 5rem;"></div>
+
+    <MembersGrid>
+        {volunteers.map((vol) => (
+            <MemberCard 
+                name={vol.name} 
+                department={vol.department} 
+                image={vol.image} 
+                tooltip = {vol.tooltip}
+            />
+        ))}
+    </MembersGrid>
+
+    <div style = "padding-top: 5rem;"></div>
+    <div style = "padding-top: 5rem;"></div>
+     <div class="title-container">
+        <span class="title-underline">Mentorii echipei</span>
+    </div>
+    <div style = "padding-bottom: 5rem;"></div>
+    
+    <MembersGrid>
+        {mentors.map((mentor) => (
+            <MemberCard 
+                name={mentor.name} 
+                department={mentor.department} 
+                image={mentor.image} 
+                tooltip = {mentor.tooltip}
+            />
+        ))}
+    </MembersGrid>
+    
+    <div style = "padding-bottom: 5rem;"></div>
+
+</BaseLayout>

@@ -1,0 +1,16 @@
+[
+    { "name": "Robert Ciocan", "department": "Team Leader & Mecanică", "image": "/assets/echipa/Oameni/Ciocan Robert.webp" },
+    { "name": "Lucian Bobîrsc", "department": "Mecanică", "image": "/assets/echipa/Oameni/Bobirsc Lucian.webp" },
+    { "name": "Andrei Lazăr", "department": "Mecanică", "image": "/assets/echipa/Oameni/Lazar Andrei.webp" },
+    { "name": "Matei Ruță", "department": "Mecanică", "image": "/assets/echipa/Oameni/Ruta Matei.webp" },
+    { "name": "Victor Crăciun", "department": "Mecanică", "image": "/assets/echipa/Oameni/Craciun Victor.webp" },
+    { "name": "Răzvan Dragomir", "department": "Mecanică", "image": "/assets/echipa/Oameni/Dragomir Razvan.webp" },
+    { "name": "Filip Tiron", "department": "Lider Programare", "image": "/assets/echipa/Oameni/Tiron Filip.webp" },
+    { "name": "Daniel Păun", "department": "Programare", "image": "/assets/echipa/Oameni/Paun Daniel.webp" },
+    { "name": "Catinca Drăghiescu", "department": "Lider PR & Marketing", "image": "/assets/echipa/Oameni/Draghiescu Catinca.webp" },
+    { "name": "Diaconu Liliana", "department": "PR & Marketing", "image": "/assets/echipa/Oameni/Diaconu Lili.webp" },
+    { "name": "Rebeca Malek", "department": "PR & Marketing", "image": "/assets/echipa/Oameni/Malek Rebeca.webp" },
+    { "name": "Petcu Iasmina", "department": "Lider Grafică", "image": "/assets/echipa/Oameni/Petcu Iasmina.webp" },
+    { "name": "Bacîș Mihai", "department": "Grafică", "image": "/assets/echipa/Oameni/Bacis Mihai.webp" },
+    { "name": "Ilie Isabela", "department": "Grafică", "image": "/assets/echipa/Oameni/Ilie Isabela.webp" }
+]

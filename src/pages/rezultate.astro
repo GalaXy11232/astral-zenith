@@ -1,0 +1,98 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro"
+import NavBar from "../components/NavBar.astro"
+
+import ResultCard from "../components/result_card.astro";
+import ResultsTimeline from "../components/results_timeline.astro";
+---
+
+
+<BaseLayout title = "Rezultatele Noastre">
+    <NavBar activeLink = {3}/>
+     
+    <div class="title-container">
+        <span class="title-underline">Sponsori Platinum</span>
+    </div>
+    
+    <ResultsTimeline>
+        <ResultCard
+            date = 'Aprilie 2025'
+            title = "Finalist Alliance Captain"
+            image = '/assets/rezultate/Spring Starts with Flowers.png'
+        >
+            Am participat la Demo-ul "Spring starts with Flowers" organizat de echipele Neurobotix(#19054) 
+            și Robo-Sapiens(#19117), iar în baza unei performanțe remarcabile a robotului și a echipajului nostru, 
+            am reușit să încheiem concursul în poziția de "Finalist Alliance Captain", premiu ce ne-a dat încredere 
+            în puterile noastre înaintea extrasezonului și a viitorului an de competiție.
+        </ResultCard>
+
+
+        <ResultCard
+            date = 'Februarie 2025'
+            title = "13ᵗʰ Place Quals (5/6 wins)"
+            image = '/assets/rezultate/FIRST_DIVE-intothedeep-PatchLogo.png'
+        >
+            Noul sezon FTC Into The Deep ne-a adus o performanță remarcabilă în cadrul Regionalei Sud 2025, 
+            organizată la Pitești, unde am încheiat calificările cu 5 victorii din 6 meciuri jucate, 
+            clasându-ne pe locul 13, din care vom rămâne nu doar cu un rezultat foarte bun, dar și cu o 
+            experiență pe care niciunul dintre noi nu o va uita prea curând. 
+        </ResultCard>
+
+
+        <ResultCard
+            date = 'Septembrie 2024'
+            title = "Finalist Alliance"
+            image = '/assets/rezultate/Tabara_Timisoara_-_transparenta.png'
+        >
+            În cadrul taberei de vară Open Robotics Intelligent Grid de la Timișoara, organizată de Facultatea de Vest 
+            din Timișoara în colaborare cu echipa de robotică CSH, am ajuns până în finale, plasându-ne 
+            în clasament pe locul II. 
+        </ResultCard>
+
+
+        <ResultCard
+            date = 'Ianuarie 2024'
+            title = "Motivate Award III"
+            image = '/assets/rezultate/Center_Stage__2_.png'
+        >
+            În cadrul sezonului 2023-2024 al competiției internaționale de robotică FIRST Tech Challenge, la etapa regională 
+            din București, am obținut premiul Motivate Award, locul III. Acesta indică implicarea deosebită a echipei 
+            noastre în comunitatea concursului prin promovarea valorilor FIRST, cum ar fi Gracious Professionalism. 
+        </ResultCard>
+
+
+        <ResultCard
+            date = 'Septembrie 2023'
+            title = "Winning alliance"
+            image = '/assets/rezultate/Tabara_Timisoara_-_transparenta.png'
+        >
+            În cadrul taberei de vară Open Robotics Intelligent Grid de la Timișoara, organizată de Facultatea de Vest din 
+            Timișoara în colaborare cu echipa de robotică CSH, am făcut parte din alianța câștigătoare, întorcându-ne 
+            acasă cu premiul cel mare.
+        </ResultCard>
+
+        <ResultCard
+            date = 'Ianuarie 2022'
+            title = "Design Award III"
+            image = '/assets/rezultate/Freight_Frenzy__3_.png'
+        >
+            În anul sezonul 2021-2022 al competiției internaționale de robotică FIRST Tech Challenge, 
+            echipa noastră, sub numele de SovaTech, a primit premiul Design Award, locul III, 
+            la etapa regională din București, pentru integrarea elementelor de design industrial, 
+            în mod funcțional și estetic, în aspectul robotului realizat. 
+        </ResultCard>
+
+        <ResultCard
+            date = 'Ianuarie 2021'
+            title = "Think Award II"
+            image = '/assets/rezultate/Ultimate_Goal.png'
+        >
+            În cadrul sezonului 2020-2021 al competiției internaționale de robotică FIRST Tech Challenge, 
+            clubul nostru, cu numele de SovaTech, a obținut premiul Think Award, locul II, la etapa 
+            regională din București, acordat pentru caietul tehnic creat care a prezentat în mod exemplar 
+            robotul și strategia de joc. 
+        </ResultCard>
+
+    </ResultsTimeline>
+    
+</BaseLayout>

@@ -1,0 +1,114 @@
+---
+---
+
+<div class="results-timeline">
+    <div class="results-timeline__line" aria-hidden="true"></div>
+    <div class="results-timeline__items">
+        <slot />
+    </div>
+</div>
+
+<style>
+    .results-timeline {
+        position: relative;
+        max-width: 64rem;
+        margin-inline: auto;
+        padding: 3rem 1rem;
+    }
+
+    .results-timeline__line {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 50%;
+        width: 4px;
+        transform: translateX(-50%);
+        background: linear-gradient(180deg, #c026d3, #a855f7 50%, #c026d3);
+        border-radius: 999px;
+        box-shadow: 0 0 12px rgba(168, 85, 247, 0.45);
+    }
+
+    .results-timeline__items {
+        display: flex;
+        flex-direction: column;
+        gap: 3.5rem;
+    }
+
+
+    .results-timeline__items > :global(*) {
+        position: relative;
+    }
+
+    .results-timeline__items > :global(*)::after {
+        content: "";
+        position: absolute;
+        top: 2.65rem;
+        width: 1.1rem;
+        height: 1.1rem;
+        background: linear-gradient(135deg, #e879f9, #a855f7);
+        clip-path: polygon(
+            50% 0%,
+            61% 35%,
+            100% 50%,
+            61% 65%,
+            50% 100%,
+            39% 65%,
+            0% 50%,
+            39% 35%
+        );
+        z-index: 1;
+        transform: scale(1.5);
+    }
+
+
+    @media (min-width: 980px) {
+        .results-timeline__items > :global(*) {
+        width: calc(50% - 2.5rem);
+        }
+
+        .results-timeline__items > :global(*:nth-child(odd)) {
+        align-self: flex-start;
+        }
+
+        .results-timeline__items > :global(*:nth-child(even)) {
+        align-self: flex-end;
+        }
+
+        .results-timeline__items > :global(*:nth-child(odd))::after {
+        right: -2.85rem;
+        }
+
+        .results-timeline__items > :global(*:nth-child(even))::after {
+        left: -2.85rem;
+        }
+
+        
+        .results-timeline__items
+        > :global(*:nth-child(even) .result-card__date) {
+        right: auto;
+        left: 1.5rem;
+        }
+
+        .results-timeline__items
+        > :global(*:nth-child(even) .result-card__panel::before) {
+        right: auto;
+        left: -0.6rem;
+        }
+    }
+
+
+    @media (max-width: 979px) {
+        .results-timeline__line {
+        left: 1.4rem;
+        }
+
+        .results-timeline__items > :global(*) {
+        width: 100%;
+        padding-left: 3rem;
+        }
+
+        .results-timeline__items > :global(*)::after {
+        left: 0.85rem;
+        }
+    }
+</style>
