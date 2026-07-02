@@ -1,26 +1,4 @@
 ---
-interface Props {
-    title:            string;
-    date:             string;
-    thumbnail:        string;
-    thumbnailAlt?:    string;
-    thumbnailHeight?: string;
-    /**
-     * Controls which part of the thumbnail is visible when the image
-     * is cropped to fit the fixed-height box. Accepts any valid CSS
-     * `object-position` value:
-     *   "center"        — default, good for most photos
-     *   "top"           — shows the top of the image (faces in group shots)
-     *   "bottom"        — shows the bottom
-     *   "50% 20%"       — 50% horizontal, 20% from the top
-     *   "left center"   — left edge, vertically centered
-     */
-    thumbnailFocus?:  string;
-    previewLines?:    number;
-    readMoreLabel?:   string;
-    readLessLabel?:   string;
-}
-
 const {
     title,
     date,

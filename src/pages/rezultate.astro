@@ -1,17 +1,36 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro"
 import NavBar from "../components/NavBar.astro"
+import Hexbackground from "../components/hexbackground.astro";
 
 import ResultCard from "../components/result_card.astro";
 import ResultsTimeline from "../components/results_timeline.astro";
+
+import StatsCard from "../components/stats_card.astro";
+
+import teamMembers from "./api/members.json";
+import volunteers from "./api/volunteers.json";
+import mentors from "./api/mentors.json";
 ---
 
 
 <BaseLayout title = "Rezultatele Noastre">
     <NavBar activeLink = {3}/>
+    <Hexbackground />
      
+    <div class="stats-grid">
+        <StatsCard end = {14} label = "Sponsori & Parteneri" icon = "/assets/icons/Sponsori__2_.webp" duration = {850} />
+        <StatsCard end = {23} label = "Evenimente organizate" icon = "/assets/icons/Evenimente_organizate.webp" duration = {900} />
+        <StatsCard end = {67} label = "Participare evenimente" icon = "/assets/icons/Participare_evenimente.webp" duration = {950} />
+        <StatsCard end = {8700} label = "Tineri în comunitate" icon = "/assets/icons/Comunitate__2_.webp" duration = {1000} />
+        <StatsCard end = {15} label = "Concursuri" icon = "/assets/icons/Concursuri__1_.webp" duration = {1050} />
+        <StatsCard end = {Object.keys(teamMembers).length} label = "Membri" icon = "/assets/icons/Membri.webp" duration = {1100} />
+        <StatsCard end = {Object.keys(volunteers).length} label = "Voluntari" icon = "/assets/icons/Membri.webp" duration = {1150} />
+        <StatsCard end = {Object.keys(mentors).length} label = "Mentori" icon = "/assets/icons/Membri.webp" duration = {1200} />
+    </div>
+
     <div class="title-container">
-        <span class="title-underline">Sponsori Platinum</span>
+        <span class="title-underline">Rezultatele echipei</span>
     </div>
     
     <ResultsTimeline>
@@ -96,3 +115,31 @@ import ResultsTimeline from "../components/results_timeline.astro";
     </ResultsTimeline>
     
 </BaseLayout>
+
+<style is:global>
+    .page {
+        padding: 3rem 1.5rem;
+    }
+
+    .stats-grid {
+        max-width: 72rem;
+        margin: auto;
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1.5rem;
+        padding: 3rem 1rem;
+    }
+
+    @media (max-width: 1160px) {
+        .stats-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    @media (max-width: 520px) {
+        .stats-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+</style>
