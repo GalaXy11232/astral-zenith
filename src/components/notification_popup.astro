@@ -1,0 +1,357 @@
+---
+export interface Props {
+    text: string;
+    image: string;
+    link: string;
+    imageAlt?: string;
+    side?: "left" | "right";
+    intensity?: "subtle" | "normal" | "bold";
+    delay?: number;
+    badgeColor?: string;
+
+    imageZoom?: number;
+    imagePosX?: string;
+    imagePosY?: string;
+
+    top?: string;
+    bottom?: string;
+    translateY?: string;
+}
+
+const {
+    text,
+    image,
+    link,
+    imageAlt = "",
+    side = "right",
+    intensity = "normal",
+    delay = 700,
+    badgeColor = "#9333ea",
+    imageZoom = 1,
+    imagePosX = "50%",
+    imagePosY = "50%",
+    top = "50%",
+    bottom = "auto",
+    translateY = "-50%",
+} = Astro.props;
+---
+
+<aside
+    class="notif"
+    data-side={side}
+    data-intensity={intensity}
+    data-delay={delay}
+    role="status"
+    aria-live="polite"
+    style={`
+        --theme-color: ${badgeColor};
+        --img-zoom: ${imageZoom};
+        --img-pos-x: ${imagePosX};
+        --img-pos-y: ${imagePosY};
+        --notif-top: ${top};
+        --notif-bottom: ${bottom};
+        --notif-translate-y: ${translateY};
+    `}
+>
+    <button type="button" class="notif__close" aria-label="Închide notificarea">
+        <svg viewBox="0 0 24 24" width="13" height="13" aria-hidden="true">
+            <path
+                d="M5 5L19 19M19 5L5 19"
+                stroke="currentColor"
+                stroke-width="2.4"
+                stroke-linecap="round"
+            ></path>
+        </svg>
+    </button>
+
+    <a class="notif__link" href={link}>
+        <span class="notif__image">
+            <img src={image} alt={imageAlt} />
+        </span>
+
+        <span class="notif__content">
+            <span class="notif__badge">
+                <span class="notif__dot" aria-hidden="true"></span>
+                {intensity === "bold" ? "Noutate!!!" : "Noutate"}
+            </span>
+            <span class="notif__text">{text}</span>
+            
+            <span class="notif__cta">
+                Vezi acum
+                <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true">
+                    <path
+                        d="M5 12h14M13 6l6 6-6 6"
+                        stroke="currentColor"
+                        stroke-width="2.2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        fill="none"
+                    ></path>
+                </svg>
+            </span>
+        </span>
+    </a>
+</aside>
+
+<style>
+    @import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@600;700&display=swap");
+
+    .notif {
+        position: fixed;
+        /* Dynamic Positioning */
+        top: var(--notif-top);
+        bottom: var(--notif-bottom);
+        z-index: 70;
+        width: clamp(260px, 88vw, 360px);
+        font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+        opacity: 0;
+        pointer-events: none;
+        transition:
+            transform 0.55s cubic-bezier(0.16, 1, 0.3, 1),
+            opacity 0.45s ease;
+    }
+
+    .notif.is-visible {
+        opacity: 1;
+        pointer-events: auto;
+    }
+
+    /* Right Side Animation logic with Dynamic Y-Translation */
+    .notif[data-side="right"] {
+        right: 0;
+        transform: translate(120%, var(--notif-translate-y));
+    }
+
+    .notif[data-side="right"].is-visible {
+        transform: translate(0, var(--notif-translate-y));
+    }
+
+    /* Left Side Animation logic with Dynamic Y-Translation */
+    .notif[data-side="left"] {
+        left: 0;
+        transform: translate(-120%, var(--notif-translate-y));
+    }
+
+    .notif[data-side="left"].is-visible {
+        transform: translate(0, var(--notif-translate-y));
+    }
+
+    /* --- INTENSITY STYLES --- */
+    .notif[data-intensity="subtle"] .notif__link {
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    .notif[data-intensity="normal"] .notif__link {
+        box-shadow: 
+            0 0 20px color-mix(in srgb, var(--theme-color) 35%, transparent),
+            0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+
+    .notif[data-intensity="bold"] .notif__link {
+        box-shadow: 0 8px 24px color-mix(in srgb, var(--theme-color) 25%, transparent);
+    }
+
+    .notif[data-intensity="bold"] .notif__link::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        border-radius: inherit;
+        border: 2px solid color-mix(in srgb, var(--theme-color) 60%, transparent);
+        z-index: -1;
+        animation: shockwave 4s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+        pointer-events: none;
+    }
+
+    .notif[data-intensity="bold"] .notif__badge {
+        animation: badge-wobble 2s ease-in-out infinite;
+        transform-origin: center;
+    }
+
+    /* --- BASE LAYOUT --- */
+    .notif__link {
+        position: relative;
+        display: flex;
+        align-items: center;
+        gap: 0.9rem;
+        padding: 1.1rem 1.2rem;
+        text-decoration: none;
+        background: linear-gradient(155deg, #ffffff 0%, #fcfafc 55%, #f5f0f9 100%);
+        border: 1px solid color-mix(in srgb, var(--theme-color) 15%, transparent);
+        transition: transform 0.3s ease;
+    }
+
+    .notif__link:hover {
+        transform: translateY(-2px);
+    }
+
+    .notif[data-side="right"] .notif__link {
+        flex-direction: row-reverse;
+        border-radius: 1.25rem 0 0 1.25rem;
+    }
+
+    .notif[data-side="left"] .notif__link {
+        flex-direction: row;
+        border-radius: 0 1.25rem 1.25rem 0;
+    }
+
+    /* --- IMAGE UPGRADES --- */
+    .notif__image {
+        position: relative;
+        flex: 0 0 auto;
+        width: 4.2rem; 
+        height: 4.2rem; 
+        border-radius: 50%;
+        overflow: hidden; 
+        background-color: #f3f4f6; 
+        box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.06);
+    }
+
+    .notif__image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover; 
+        object-position: var(--img-pos-x) var(--img-pos-y);
+        transform: scale(var(--img-zoom));
+    }
+
+    .notif__content {
+        display: flex;
+        flex-direction: column;
+        gap: 0.35rem;
+        min-width: 0;
+    }
+
+    .notif__badge {
+        display: inline-flex;
+        align-self: flex-start;
+        align-items: center;
+        gap: 0.35rem;
+        padding: 0.2rem 0.55rem;
+        border-radius: 999px;
+        background: color-mix(in srgb, var(--theme-color) 12%, transparent);
+        color: var(--theme-color);
+        font-family: "Space Grotesk", system-ui, sans-serif;
+        font-weight: 700;
+        font-size: 0.68rem;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+    }
+
+    .notif__dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: var(--theme-color);
+        animation: notif-dot 1.8s ease-in-out infinite;
+    }
+
+    .notif__text {
+        font-size: 0.92rem;
+        line-height: 1.4;
+        font-weight: 500;
+        color: #3b0764;
+    }
+
+    .notif__cta {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.3rem;
+        margin-top: 0.15rem;
+        font-family: "Space Grotesk", system-ui, sans-serif;
+        font-weight: 700;
+        font-size: 0.82rem;
+        color: var(--theme-color);
+        transition: gap 0.25s ease;
+    }
+
+    .notif__link:hover .notif__cta {
+        gap: 0.55rem;
+    }
+
+    /* --- CLOSE BUTTON --- */
+    .notif__close {
+        position: absolute;
+        top: -10px;
+        z-index: 2;
+        width: 26px; height: 26px;
+        border: none; border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #ffffff;
+        color: var(--theme-color);
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+        cursor: pointer;
+        transition: all 0.25s ease;
+    }
+
+    .notif__close:hover {
+        transform: scale(1.1);
+        background: var(--theme-color);
+        color: #ffffff;
+    }
+
+    .notif[data-side="right"] .notif__close { left: -10px; }
+    .notif[data-side="left"] .notif__close { right: -10px; }
+
+    /* --- KEYFRAMES --- */
+    @keyframes shockwave {
+        0%, 80% { transform: scale(1); opacity: 0; }
+        85% { transform: scale(1); opacity: 1; }
+        100% { transform: scale(calc(1.08 * 1.25), calc(1.15 * 1.25)); opacity: 0; }
+    }
+
+    @keyframes badge-wobble {
+        0%, 100% { transform: rotate(0deg); }
+        25% { transform: rotate(-3.5deg); }
+        75% { transform: rotate(3.5deg); }
+    }
+
+    @keyframes notif-dot {
+        0%, 100% { transform: scale(1); opacity: 1; }
+        50% { transform: scale(0.7); opacity: 0.4; }
+    }
+
+    @media (max-width: 420px) {
+        .notif {
+            width: clamp(230px, 92vw, 320px);
+        }
+        .notif__link {
+            padding: 0.9rem 1rem;
+        }
+        .notif__image {
+            width: 3.6rem;
+            height: 3.6rem;
+        }
+    }
+</style>
+
+<script>
+    function initNotifications() {
+        document.querySelectorAll(".notif").forEach((el: any) => {
+            if (el.dataset.initialized === "true") return;
+            el.dataset.initialized = "true";
+
+            const delay = Number(el.dataset.delay || "0");
+            const closeBtn = el.querySelector(".notif__close");
+
+            const show = () => el.classList.add("is-visible");
+
+            const hide = () => {
+                el.classList.remove("is-visible");
+                el.addEventListener("transitionend", () => el.remove(), {
+                    once: true,
+                });
+            };
+
+            window.setTimeout(show, delay);
+
+            closeBtn?.addEventListener("click", (event: any) => {
+                event.preventDefault();
+                hide();
+            });
+        });
+    }
+
+    document.addEventListener('astro:page-load', initNotifications);
+</script>

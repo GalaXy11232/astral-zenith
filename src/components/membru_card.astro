@@ -11,7 +11,13 @@ const tooltipText = tooltip ? TOOLTIP_ABBREVIATIONS[tooltip] ?? "" : "";
 
 <article class="member-card">
     <div class="image-wrapper">
-        <img src={image} alt={`Portrait of ${name}`} loading="lazy" />
+        <img 
+            src={image} 
+            alt={`Portrait of ${name}`} 
+            loading="lazy" 
+
+            onerror = "this.src = '/assets/icons/membru no photo zenith.png'"
+        />
     </div>
     <div class="info">
         <h3 class="name" translate="no">{name}</h3>

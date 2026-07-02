@@ -2,12 +2,109 @@
 import BaseLayout from "../layouts/BaseLayout.astro"
 import NavBar from "../components/NavBar.astro"
 import Hexbackground from "../components/hexbackground.astro"
+import NotificationPopup from "../components/notification_popup.astro"
 ---
-
+<script is:inline type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js" />
 
 <BaseLayout title = "Acasa">
     <NavBar activeLink = {0}/>
+    <NotificationPopup 
+        text="ana se afla la 2 mile distanta de tine si vrea sa aveti niste interactiuni indecente"
+        image="/rafa.jpg"
+        link="/echipa"
+        intensity="bold"
+        top = "30%"
+    />
+
+    <!-- <model-viewer 
+        src="/untitled.glb"
+        alt="A 3D model of my object" 
+        camera-controls
+        shadow-intensity="1"
+        style="width: 100%; height: 500px;"
+    /> -->
     
     <Hexbackground />
-    <div style = "margin-bottom: 1000px"></div>
+    <div style = "margin-bottom: 100px"></div>
+
+    <div class="title-container">
+        <span class="title-underline">Valorile noastre</span>
+    </div>
+    <section class="targets">
+        <div class="swiper mySwiper swiper-coverflow swiper-3d swiper-initialized swiper-horizontal swiper-watch-progress">
+            <div class="swiper-wrapper" style="cursor: grab; transition-duration: 0ms; transform: translate3d(-487px, 0px, 0px); transition-delay: 0ms;" id="swiper-wrapper-fbfb0de524431075a" aria-live="polite">
+            <div class="swiper-slide" role="group" aria-label="1 / 5" style="transition-duration: 0ms; transform: translate3d(0px, 0px, -180px) rotateX(0deg) rotateY(90deg) scale(1); z-index: -1;">
+                <div class="obiectiv">
+                <h2 class="titlu">Colaborare</h2>
+                <p class="paragraf">
+                    Mediul de lucru colaborativ ne permite schimbul liber de idei,
+                    împărtășirea cunoștințelor și dezvoltarea prieteniilor.
+                    Meseriile viitorului se vor baza pe muncă în echipă, iar clubul
+                    nostru promovează acest soft skill.
+                </p>
+                </div>
+            <div class="swiper-slide-shadow-left swiper-slide-shadow-coverflow" style="opacity: 1.8; transition-duration: 0ms;"></div>
+            <div class="swiper-slide-shadow-right swiper-slide-shadow-coverflow" style="opacity: 0; transition-duration: 0ms;"></div>
+        </div>
+
+            <div class="swiper-slide swiper-slide-visible swiper-slide-prev" role="group" aria-label="2 / 5" style="transition-duration: 0ms; transform: translate3d(0px, 0px, -90px) rotateX(0deg) rotateY(45deg) scale(1); z-index: 0;">
+                <div class="obiectiv">
+                <h2 class="titlu">Inovație</h2>
+                <p class="paragraf">
+                    Prin intermediul proiectelor noastre vrem să aducem în prezent
+                    generația inginerilor de mâine. Dorim să arătăm importanța și
+                    puterea gândirii inovative și creative, susținute de
+                    cunoștințele exacte.
+                </p>
+                </div>
+            <div class="swiper-slide-shadow-left swiper-slide-shadow-coverflow" style="opacity: 0.9; transition-duration: 0ms;"></div>
+            <div class="swiper-slide-shadow-right swiper-slide-shadow-coverflow" style="opacity: 0; transition-duration: 0ms;"></div>
+        </div>
+            
+            <div class="swiper-slide swiper-slide-visible swiper-slide-fully-visible swiper-slide-active" role="group" aria-label="3 / 5" style="transition-duration: 0ms; transform: translate3d(0px, 0px, 0px) rotateX(0deg) rotateY(0deg) scale(1); z-index: 1;">
+                <div class="obiectiv">
+                <h2 class="titlu">Gracious professionalism</h2>
+                <p class="paragraf">
+                    Încurajarea unei competiții bazate pe respect și corectitudine,
+                    în care scopul principal nu este câștigul, ci ajutor reciproc.
+                    Astfel, performanța devine un pretext pentru dezvoltarea
+                    personală și profesională a participanților.
+                </p>
+                </div>
+            <div class="swiper-slide-shadow-left swiper-slide-shadow-coverflow" style="opacity: 0; transition-duration: 0ms;"></div>
+            <div class="swiper-slide-shadow-right swiper-slide-shadow-coverflow" style="opacity: 0; transition-duration: 0ms;"></div>
+        </div>
+
+            <div class="swiper-slide swiper-slide-visible swiper-slide-next" role="group" aria-label="4 / 5" style="transition-duration: 0ms; transform: translate3d(0px, 0px, -90px) rotateX(0deg) rotateY(-45deg) scale(1); z-index: 0;">
+                <div class="obiectiv">
+                <h2 class="titlu">Responsabilitate</h2>
+                <p class="paragraf">
+                    Această valoare stă la baza planificării și organizării
+                    activităților noastre, dar și la stabilirea obiectivelor pe
+                    termen scurt și lung, obținând astfel rezultatul dorit.
+                    Responsabilitatea în cadrul clubului este esențială, calitate
+                    necesară oricărui adult în devenire.
+                </p>
+                </div>
+            <div class="swiper-slide-shadow-left swiper-slide-shadow-coverflow" style="opacity: 0; transition-duration: 0ms;"></div>
+            <div class="swiper-slide-shadow-right swiper-slide-shadow-coverflow" style="opacity: 0.9; transition-duration: 0ms;"></div>
+        </div>
+
+            <div class="swiper-slide" role="group" aria-label="5 / 5" style="transition-duration: 0ms; transform: translate3d(0px, 0px, -180px) rotateX(0deg) rotateY(-90deg) scale(1); z-index: -1;">
+                <div class="obiectiv">
+                <h2 class="titlu">Perseverență</h2>
+                <p class="paragraf">
+                    Dorința noastră este de a progresa și de a ne îmbunătăți
+                    activitatea, învățând ceva util din fiecare zi. Doar prin
+                    perseverență vom putea ajunge la performanța dorită și tocmai de
+                    aceea considerăm că aceasta este una dintre valorile definitorii
+                    ale echipei noastre.
+                </p>
+                </div>
+            <div class="swiper-slide-shadow-left swiper-slide-shadow-coverflow" style="opacity: 0; transition-duration: 0ms;"></div>
+            <div class="swiper-slide-shadow-right swiper-slide-shadow-coverflow" style="opacity: 1.8; transition-duration: 0ms;"></div>
+        </div>
+        </div>
+        <span class="swiper-notification" aria-live="assertive" aria-atomic="true"></span></div>
+    </section>
 </BaseLayout>

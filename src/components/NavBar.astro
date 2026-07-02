@@ -1,5 +1,5 @@
 ---
-const home_button_src = "/assets/Logo_mov.png";
+const home_button_src = "/assets/Logo_alb.png";
 
 // selected link prop
 const { activeLink = -1 } = Astro.props;
@@ -10,30 +10,53 @@ const links = [
     { name: "Rezultatele", href: "/rezultate" },
     { name: "Sponsori", href: "/sponsori" },
     { name: "Galerie", href: "/galerie" },
-    { name: "Contact", href: "/contact" }
+    // { name: "Contact", href: "/contact" }
 ]
 ---
+<div class = 'mobile-background-blur' />
 <nav>
     <div class = 'home-container'>
         <a class = 'navbar-home scale-hover' href="/"> <img style = "width: calc(var(--min-height) - 5px);" src = {home_button_src} alt="Home" /> </a>
     </div>
-
+    
     <div class = 'links-container'>
         <div class="gtranslate_wrapper"></div>
+        <a class="hamburger-btn" onclick = 'switch_menu_visibility()' >&#8801;</a>
         <!-- genereaza dinamic linkurile -> se poate atribui din index activeLink prop -->
-        {
-            links.map((link, index) => {
-                return (<a 
-                    class = {`navbar-link scale-hover ${activeLink === index ? "active" : ""}`}
-                    href = {link.href}
-                > 
-                    {link.name} 
-                </a>);
-            })
-        }
+        <div class="links-wrapper">
+            {
+                links.map((link, index) => {
+                    return (<a 
+                        class = {`navbar-link scale-hover ${activeLink === index ? "active" : ""}`}
+                        href = {link.href}
+                    > 
+                        {link.name} 
+                    </a>);
+                })
+            }
+        </div>
     </div>
 </nav>
 
+<div class="mobile-nav">
+    <div class="mobile-xbtn-container">
+        <a class = 'mobile-xbtn' onclick = 'switch_menu_visibility()'>x</a>
+    </div>
+    <div style = "display: flex; justify-content: center; width: 100%; height: 100%;">
+        <div class="mobile-links-wrapper">
+            {
+                links.map((link, index) => {
+                    return (<a 
+                        class = {`mobile-navbar-link scale-hover ${activeLink === index ? "mobile-active" : ""}`}
+                        href = {link.href}
+                    > 
+                        {link.name} 
+                    </a>);
+                })
+            }
+        </div>
+    </div>
+</div>
 
 <div class = 'nav-margin'></div>
 
@@ -57,6 +80,34 @@ const links = [
             window.addEventListener("scroll", update_background);
         });
     });
+</script>
+
+<script is:inline>
+    function switch_menu_visibility(force_value = null) {
+        let mobilenav = document.querySelector('.mobile-nav');
+        let bgblur = document.querySelector('.mobile-background-blur');
+        let wd = mobilenav.style.width;
+
+        if (force_value)
+            mobilenav.style.width = force_value;
+        else {
+            mobilenav.style.width = wd == '0px' ? '100%' : '0px';
+            bgblur.style.opacity = wd == '0px' ? '1' : '0';
+        }
+    }
+
+    function onload_menu_setup() {
+        let mobilenav = document.querySelector('.mobile-nav');
+        let bgblur = document.querySelector('.mobile-background-blur');
+        
+        mobilenav.style.width = '0px'; 
+        bgblur.style.opacity = '0';
+        bgblur.addEventListener('transitionend', () => {
+            bgblur.style.pointerEvents = bgblur.style.opacity == '0' ? 'none' : 'all';
+        });
+    }
+
+    document.addEventListener('astro:page-load', onload_menu_setup);
 </script>
 
 <!-- navbar.css -->
