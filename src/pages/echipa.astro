@@ -2,6 +2,7 @@
 import MemberCard from "../components/membru_card.astro";
 import BaseLayout from "../layouts/BaseLayout.astro";
 import NavBar from "../components/NavBar.astro";
+import Hexbackground from "../components/hexbackground.astro";
 
 import MembersGrid from "../components/membri_grid.astro";
 
@@ -13,8 +14,10 @@ import mentors from "./api/mentors.json";
 
 <BaseLayout title = "Echipa">
     <NavBar activeLink={1} />
+    <Hexbackground />
 
-     <div class="title-container">
+
+    <div class="title-container">
         <span class="title-underline">Membrii echipei</span>
     </div>
     <div style = "padding-bottom: 5rem;"></div>

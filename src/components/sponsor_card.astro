@@ -2,9 +2,12 @@
 const { name, logo, website, tier, scale_factor = 1 } = Astro.props;
 
 const tierColors: Record<string, string> = {
+    bronze:   '#5c302d',
     gold:     '#c9a84c',
     silver:   '#9aa0a8',
     platinum: '#4cafd4',
+    diamond:  '#4d16d9',
+    partener: "#ffffff"
 };
 const accentColor = tierColors[tier ?? ''] ?? 'var(--primary, #7c3aed)';
 ---
@@ -42,7 +45,13 @@ const accentColor = tierColors[tier ?? ''] ?? 'var(--primary, #7c3aed)';
 
         {website !== '#' ? (
             <div class="visit-strip">
-                <span class="visit-label">Vizitează website-ul</span>
+                <span 
+                    class="visit-label" 
+                    style = {`color: ${tier == 'partener' ? '#000' : '#fff'}`}
+                >
+                    Vizitează website-ul
+                </span>
+                
                 <svg class="visit-arrow" viewBox="0 0 16 16" fill="none" aria-hidden="true">
                     <path
                         d="M3 8h10M9 4l4 4-4 4"
@@ -211,7 +220,7 @@ const accentColor = tierColors[tier ?? ''] ?? 'var(--primary, #7c3aed)';
         letter-spacing: 0.1em;
         text-transform: uppercase;
         white-space:    nowrap;
-        color:          #fff;
+        /* color:          #fff; */
     }
 
     .visit-arrow {

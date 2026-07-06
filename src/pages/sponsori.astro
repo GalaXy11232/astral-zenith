@@ -2,12 +2,30 @@
 import BaseLayout from "../layouts/BaseLayout.astro"
 import NavBar from "../components/NavBar.astro"
 import SponsorCard from "../components/sponsor_card.astro"
+import HexBackground from "../components/hexbackground.astro"
 ---
 
 <BaseLayout title="Sponsori">
     <NavBar activeLink={4} />
+    <HexBackground />
 
     <div class="sponsor-page">
+
+        <!-- Diamond -->
+        <section class="sponsor-section">
+            <div class="title-container">
+                <span class="title-underline">Sponsori Diamond</span>
+            </div>
+            <div class="cards-grid">
+                <SponsorCard
+                    name="Direct Pharma"
+                    logo="/assets/sponsori/directpharma.webp"
+                    website="https://www.directpharma.ro/"
+                    tier="diamond"
+                />
+
+            </div>
+        </section>
 
         <!-- Platinum -->
         <section class="sponsor-section">
@@ -120,6 +138,45 @@ import SponsorCard from "../components/sponsor_card.astro"
                     website="https://polymaker.com/"
                     tier="silver"
                 />
+            </div>
+        </section>
+
+        <!-- Bronze -->
+        <section class="sponsor-section">
+            <div class="title-container">
+                <span class="title-underline">Sponsori Bronze</span>
+            </div>
+            <div class="cards-grid">
+                <SponsorCard
+                    name="Direct Pharma"
+                    logo="/assets/sponsori/directpharma.webp"
+                    website="https://www.directpharma.ro/"
+                    tier="bronze"
+                />
+               
+            </div>
+        </section>
+
+        <!-- Parteneri -->
+        <section class="sponsor-section">
+            <div class="title-container">
+                <span class="title-underline">Partenerii nostri</span>
+            </div>
+            <div class="cards-grid">
+                <SponsorCard
+                    name="Universitatea Copiilor"
+                    logo="/assets/parteneri/Sigla_Asociatia_Universitatea_Copiilor.png"
+                    website="https://www.directpharma.ro/"
+                    tier="partener"
+                />
+
+                <SponsorCard
+                    name="Colegiul Național „Grigore Moisil”"
+                    logo="/assets/parteneri/Sigla_CNGM.png"
+                    website="https://www.directpharma.ro/"
+                    tier="partener"
+                />
+               
             </div>
         </section>
 

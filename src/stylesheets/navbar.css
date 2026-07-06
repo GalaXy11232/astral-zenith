@@ -132,8 +132,8 @@ a img {
 
     .mobile-links-wrapper {
         display: flex;
-        margin-left: 4rem;
-        width: 100%;
+        margin-left: 3rem;
+        width: 100%; height: 100%;
         flex-direction: column;
         gap: 1rem;
     }
@@ -141,12 +141,11 @@ a img {
     .mobile-navbar-link {
         display: block;
         text-transform: capitalize;
-        font-size: 1.25rem;
         font-weight: normal;
         text-decoration: none;
         transition: .25s cubic-bezier(0.445, 0.05, 0.55, 0.95); /* Ease-in-out sine */
         padding-left: 20px;
-        font-size: min(300%, 8vw);
+        font-size: min(200%, 8vw);
     }
     .mobile-navbar-link:hover {
         /* font-weight: bold; */
@@ -201,7 +200,7 @@ a img {
 
 
 /* hamburger menu */
-@media (max-width: 960px) {
+@media (max-width: 1080px) {
     .links-wrapper { display: none; }
     .hamburger-btn { display: inline; vertical-align: middle; }
     .nav-margin { margin-bottom: 8rem; }

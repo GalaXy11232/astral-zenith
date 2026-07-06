@@ -8,12 +8,17 @@ import NotificationPopup from "../components/notification_popup.astro"
 
 <BaseLayout title = "Acasa">
     <NavBar activeLink = {0}/>
+
+    <div style = "margin-bottom: 1000px"></div>
     <NotificationPopup 
-        text="ana se afla la 2 mile distanta de tine si vrea sa aveti niste interactiuni indecente"
-        image="/rafa.jpg"
+        text="Șobi se află la 2 mile distanță de tine și vrea să aveți niște interacțiuni indecente."
+        image="/sobi.png"
+        side = 'left'
         link="/echipa"
         intensity="bold"
-        top = "30%"
+        top = "20%"
+        imagePosX="15%"
+        imageZoom={1.2}
     />
 
     <!-- <model-viewer 

@@ -10,10 +10,11 @@ const links = [
     { name: "Rezultatele", href: "/rezultate" },
     { name: "Sponsori", href: "/sponsori" },
     { name: "Galerie", href: "/galerie" },
-    // { name: "Contact", href: "/contact" }
+    { name: "Știri", href: "/news" },
+    { name: "Contact", href: "/contact" }
 ]
 ---
-<div class = 'mobile-background-blur' />
+<div class = 'mobile-background-blur' onclick = 'switch_menu_visibility("0px")' />
 <nav>
     <div class = 'home-container'>
         <a class = 'navbar-home scale-hover' href="/"> <img style = "width: calc(var(--min-height) - 5px);" src = {home_button_src} alt="Home" /> </a>
@@ -88,8 +89,10 @@ const links = [
         let bgblur = document.querySelector('.mobile-background-blur');
         let wd = mobilenav.style.width;
 
-        if (force_value)
+        if (force_value) {
             mobilenav.style.width = force_value;
+            bgblur.style.opacity = force_value == '0px' ? '0' : '1';
+        }
         else {
             mobilenav.style.width = wd == '0px' ? '100%' : '0px';
             bgblur.style.opacity = wd == '0px' ? '1' : '0';

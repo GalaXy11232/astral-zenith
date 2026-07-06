@@ -1,0 +1,217 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro"
+import NavBar from "../components/NavBar.astro"
+import Hexbackground from "../components/hexbackground.astro"
+
+import Icon from "../components/contact/Icon.astro";
+import ContactMethodCard from "../components/contact/ContactMethodCard.astro";
+import { contactMethods, location } from "../components/contact/contact-data";
+---
+
+<BaseLayout title = "Contact">
+    <NavBar activeLink = {7} />
+    <Hexbackground />
+    <main class="contact-page">
+        <section class="contact-hero">
+            <h1 class="contact-hero__title">Contactează-ne</h1>
+            <p class="contact-hero__eyebrow">
+                pentru orice întrebare ai despre echipă, proiecte sau colaborări
+            </p>
+        </section>
+
+        <section class="contact-methods" aria-label="Metode de contact">
+            <div class="contact-methods__grid">
+            {
+                contactMethods.map((method) => (
+                <ContactMethodCard
+                    label={method.label}
+                    value={method.value}
+                    href={method.href}
+                    icon={method.icon}
+                    external={method.external}
+                />
+                ))
+            }
+            </div>
+        </section>
+
+        <section class="contact-location">
+            <h2 class="contact-location__title">Locație</h2>
+            <div class="contact-location__grid">
+                <div class="contact-location__info">
+                    <span class="contact-location__icon">
+                        <Icon name="mappin" size={26} />
+                    </span>
+
+                    <div class="contact-location__details">
+                        <p class="contact-location__label">Liceul</p>
+                        <p class="contact-location__value">{location.schoolName}</p>
+                        <p class="contact-location__label">Adresă</p>
+                        <p class="contact-location__value">{location.address}</p>
+                    </div>
+                </div>
+
+                <div class="contact-location__map">
+                    <iframe
+                        src={location.mapEmbedUrl}
+                        width="100%"
+                        height="100%"
+                        style="border:0;"
+                        loading="lazy"
+                        referrerpolicy="no-referrer-when-downgrade"
+                        allowfullscreen
+                    ></iframe>
+                </div>
+            </div>
+        </section>
+    </main>
+</BaseLayout>
+
+<style is:global>
+    .contact-page {
+        max-width: 68rem;
+        margin-inline: auto;
+        padding: 2rem 1.5rem 5rem;
+    }
+
+    .contact-hero {
+        text-align: center;
+        max-width: 40rem;
+        margin: 0 auto 3.5rem;
+    }
+
+    .contact-hero__eyebrow {
+        font-family: "Space Grotesk", system-ui, sans-serif;
+        font-weight: 700;
+        font-size: 0.78rem;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: #b15dff;
+        margin: 0 0 0.6rem;
+    }
+
+    .contact-hero__title {
+        font-family: "Space Grotesk", system-ui, sans-serif;
+        font-weight: 700;
+        font-size: clamp(2.2rem, 5vw, 4rem);
+        line-height: 1.1;
+        margin: 0 0 0.9rem;
+        background: linear-gradient(135deg, #9333ea 0%, #c026d3 55%, #a855f7 100%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+    }
+
+    .contact-hero__subtitle {
+        margin: 0;
+        font-size: 1.05rem;
+        line-height: 1.6;
+        color: #cc91ff;
+    }
+
+    .contact-methods {
+        margin-bottom: 4rem;
+    }
+
+    .contact-methods__grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+        gap: 1.35rem;
+    }
+
+    .contact-location__title {
+        font-family: "Space Grotesk", system-ui, sans-serif;
+        font-weight: 700;
+        font-size: 1.6rem;
+        color: #b14aff;
+        margin: 0 0 1.5rem;
+    }
+
+    .contact-location__grid {
+        display: grid;
+        grid-template-columns: minmax(240px, 0.85fr) minmax(280px, 1.15fr);
+        gap: 1.5rem;
+        align-items: stretch;
+    }
+
+    .contact-location__info {
+        display: flex;
+        gap: 1rem;
+        padding: 1.75rem;
+        border-radius: 1.25rem;
+        background: linear-gradient(155deg, #ffffff 0%, #f5f1fb 55%, #efe4fb 100%);
+        border: 1px solid rgba(147, 51, 234, 0.1);
+        box-shadow:
+            0 2px 6px rgba(88, 28, 135, 0.06),
+            0 10px 24px rgba(88, 28, 135, 0.1);
+    }
+
+    .contact-location__icon {
+        flex: 0 0 auto;
+        width: 3.4rem;
+        height: 3.4rem;
+        border-radius: 999px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #7e22ce;
+        background: radial-gradient(circle at 30% 28%, #f6d5fe 0%, #ddd3fb 75%);
+        box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.7);
+    }
+
+    .contact-location__details {
+        min-width: 0;
+    }
+
+    .contact-location__label {
+        margin: 0;
+        font-family: "Space Grotesk", system-ui, sans-serif;
+        font-weight: 700;
+        font-size: 0.72rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: #9333ea;
+    }
+
+    .contact-location__value {
+        margin: 0 0 0.9rem;
+        font-size: 1rem;
+        font-weight: 600;
+        color: #3b0764;
+        width: auto;
+    }
+
+    .contact-location__value:last-child {
+        margin-bottom: 0;
+    }
+
+    .contact-location__map {
+        border-radius: 1.25rem;
+        overflow: hidden;
+        min-height: 260px;
+        border: 1px solid rgba(147, 51, 234, 0.1);
+        box-shadow:
+        0 2px 6px rgba(88, 28, 135, 0.06),
+        0 10px 24px rgba(88, 28, 135, 0.1);
+    }
+
+    .contact-location__map iframe {
+        display: block;
+    }
+
+    @media (max-width: 780px) {
+        .contact-location__grid {
+            grid-template-columns: 1fr;
+        }
+
+        .contact-location__map {
+            min-height: 320px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .contact-location__info {
+            flex-direction: column;
+        }
+    }
+</style>

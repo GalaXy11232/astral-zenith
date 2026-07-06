@@ -1,0 +1,90 @@
+---
+interface Props {
+    src: string;
+    poster?: string;
+}
+
+const { src, poster } = Astro.props;
+
+function toEmbedUrl(url: string): string | null {
+    try {
+        const u = new URL(url);
+        if (u.hostname.includes('youtube.com') || u.hostname.includes('youtu.be')) {
+            let id = '';
+            if (u.hostname.includes('youtu.be')) {
+                id = u.pathname.slice(1);
+            } else if (u.pathname.includes('/embed/')) {
+                return url;
+            } else {
+                id = u.searchParams.get('v') ?? '';
+            }
+            if (!id) return null;
+            const start = u.searchParams.get('t') ?? '';
+            return `https://www.youtube.com/embed/${id}${start ? `?start=${start}` : ''}`;
+        }
+        return null;
+    } catch {
+        return null;
+    }
+}
+
+const embedUrl = toEmbedUrl(src);
+const isYouTube = embedUrl !== null;
+---
+
+<div class="me-vid-wrap" data-src={isYouTube ? embedUrl : src} data-type={isYouTube ? 'youtube' : 'video'}>
+    {isYouTube ? (
+        <div class="me-yt-thumb">
+            {poster
+                ? <img src={poster} alt="Video thumbnail" loading="lazy" decoding="async" draggable="false" />
+                : <div class="me-yt-placeholder">
+                    <svg viewBox="0 0 68 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                        <rect width="68" height="48" rx="10" fill="#ff0000" opacity="0.85"/>
+                        <polygon points="26,14 26,34 46,24" fill="white"/>
+                    </svg>
+                  </div>
+            }
+        </div>
+    ) : (
+        <video src={src} poster={poster} preload="metadata" muted playsinline>
+            <source src={src} />
+        </video>
+    )}
+    <div class="me-media-badge">
+        <div class="me-media-badge-inner">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polygon points="5 3 19 12 5 21 5 3"/>
+            </svg>
+        </div>
+    </div>
+</div>
+
+<style>
+    .me-yt-thumb {
+        width:      100%;
+        height:     100%;
+        position:   relative;
+    }
+
+    .me-yt-thumb img {
+        width:           100%;
+        height:          100%;
+        object-fit:      cover;
+        object-position: center;
+        display:         block;
+    }
+
+    .me-yt-placeholder {
+        width:           100%;
+        height:          100%;
+        display:         flex;
+        align-items:     center;
+        justify-content: center;
+        background:      linear-gradient(135deg, #e9e4f8, #d4c8f0);
+    }
+
+    .me-yt-placeholder svg {
+        width:  54px;
+        height: 38px;
+    }
+</style>

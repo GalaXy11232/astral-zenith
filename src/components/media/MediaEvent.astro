@@ -1,0 +1,500 @@
+---
+interface Props {
+    title: string;
+    cover: string;
+    coverAlt?: string;
+    coverFocus?: string;
+    date?: string;
+}
+
+const { title, cover, coverAlt = title, coverFocus = 'center', date } = Astro.props;
+const uid = `me-${Math.random().toString(36).slice(2, 8)}`;
+---
+
+<section class="me-block" id={uid}>
+
+    <div class="me-banner">
+        <img
+            src={cover}
+            alt={coverAlt}
+            class="me-banner-img"
+            loading="lazy"
+            decoding="async"
+            draggable="false"
+            style={`object-position: ${coverFocus};`}
+        />
+        <div class="me-banner-gradient" aria-hidden="true"></div>
+    </div>
+
+    <div class="me-body">
+        <div class="me-header">
+            {date && <span class="me-date">{date}</span>}
+            <h2 class="me-title">{title}</h2>
+            <div class="me-title-rule" aria-hidden="true"></div>
+        </div>
+        <slot />
+    </div>
+
+</section>
+
+<style>
+    .me-block {
+        --ac:         #7c3aed;
+        --ac-mid:     #a78bfa;
+        --ac-soft:    #ede9fe;
+        --ac-border:  rgba(124, 58, 237, 0.18);
+        --card-bg:    #f5f3ee;
+        --surface:    #ffffff;
+        --text:       #1a1033;
+        --muted:      #6b6485;
+        --radius:     20px;
+        --radius-sm:  12px;
+        --tr:         0.32s cubic-bezier(0.22, 1, 0.36, 1);
+
+        background:    var(--card-bg);
+        border-radius: var(--radius);
+        overflow:      hidden;
+        box-shadow:
+            0 2px 8px rgba(124, 58, 237, 0.06),
+            0 8px 32px rgba(0, 0, 0, 0.07),
+            0 0 0 1px rgba(124, 58, 237, 0.07);
+        max-width:     860px;
+        width:         100%;
+        margin:        0 auto 3rem;
+        transition:    box-shadow var(--tr), transform var(--tr);
+    }
+
+    .me-block:last-child {
+        margin-bottom: 0;
+    }
+
+    .me-block:hover {
+        box-shadow:
+            0 4px 16px rgba(124, 58, 237, 0.1),
+            0 16px 48px rgba(0, 0, 0, 0.1),
+            0 0 0 1.5px rgba(124, 58, 237, 0.2);
+        transform: translateY(-2px);
+    }
+
+    .me-banner {
+        position:     relative;
+        height:       clamp(180px, 26vw, 260px);
+        overflow:     hidden;
+        border-radius: var(--radius) var(--radius) 0 0;
+        background:   #ddd8f0;
+    }
+
+    .me-banner-img {
+        position:   absolute;
+        inset:      0;
+        width:      100%;
+        height:     100%;
+        object-fit: cover;
+        display:    block;
+        transition: transform 5s ease;
+    }
+
+    .me-block:hover .me-banner-img {
+        transform: scale(1);
+    }
+
+    .me-banner-gradient {
+        position:   absolute;
+        inset:      0;
+        background: linear-gradient(
+            to bottom,
+            transparent 30%,
+            rgba(245, 243, 238, 0.6) 80%,
+            rgba(245, 243, 238, 1) 100%
+        );
+        pointer-events: none;
+    }
+
+    .me-body {
+        padding: clamp(18px, 4vw, 32px);
+        display: flex;
+        flex-direction: column;
+        gap: 22px;
+    }
+
+    .me-header {
+        display:        flex;
+        flex-direction: column;
+        gap:            5px;
+    }
+
+    .me-date {
+        font-family:    ui-monospace, 'Cascadia Code', monospace;
+        font-size:      0.72rem;
+        font-weight:    600;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color:          var(--ac);
+        opacity:        0.8;
+    }
+
+    .me-title {
+        font-family:    system-ui, -apple-system, 'Segoe UI', sans-serif;
+        font-size:      clamp(1.1rem, 3vw, 1.5rem);
+        font-weight:    700;
+        color:          var(--text);
+        margin:         0;
+        line-height:    1.25;
+        letter-spacing: -0.02em;
+    }
+
+    .me-title-rule {
+        height:           2px;
+        width:            40px;
+        background:       var(--ac);
+        border-radius:    2px;
+        margin-top:       6px;
+        transition:       width var(--tr);
+    }
+
+    .me-block:hover .me-title-rule {
+        width: 72px;
+    }
+
+    .me-body :global(.me-section-label) {
+        display:        block;
+        font-family:    ui-monospace, 'Cascadia Code', monospace;
+        font-size:      0.68rem;
+        font-weight:    600;
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+        color:          var(--ac);
+        margin-bottom:  10px;
+    }
+
+    .me-body :global(.me-divider) {
+        height:     1px;
+        border:     none;
+        background: rgba(124, 58, 237, 0.12);
+        margin:     0;
+    }
+
+    .me-body :global(.me-grid) {
+        display:               grid;
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        gap:                   10px;
+    }
+
+    .me-body :global(.me-link) {
+        display:         flex;
+        align-items:     flex-start;
+        gap:             11px;
+        padding:         13px 14px;
+        background:      var(--surface);
+        border:          1px solid rgba(124, 58, 237, 0.1);
+        border-radius:   var(--radius-sm);
+        text-decoration: none;
+        color:           var(--text);
+        transition:      background var(--tr), border-color var(--tr), transform var(--tr), box-shadow var(--tr);
+    }
+
+    .me-body :global(.me-link:hover) {
+        background:    var(--ac-soft);
+        border-color:  rgba(124, 58, 237, 0.3);
+        transform:     translateY(-2px);
+        box-shadow:    0 4px 16px rgba(124, 58, 237, 0.1);
+    }
+
+    .me-body :global(.me-link-icon) {
+        flex-shrink:     0;
+        width:           30px;
+        height:          30px;
+        border-radius:   8px;
+        background:      var(--ac-soft);
+        display:         flex;
+        align-items:     center;
+        justify-content: center;
+        margin-top:      1px;
+        transition:      background var(--tr);
+    }
+
+    .me-body :global(.me-link:hover .me-link-icon) {
+        background: rgba(124, 58, 237, 0.2);
+    }
+
+    .me-body :global(.me-link-icon svg) {
+        width:              13px;
+        height:             13px;
+        stroke:             var(--ac);
+        fill:               none;
+        stroke-width:       1.8;
+        stroke-linecap:     round;
+        stroke-linejoin:    round;
+    }
+
+    .me-body :global(.me-link-text) {
+        display:        flex;
+        flex-direction: column;
+        gap:            3px;
+    }
+
+    .me-body :global(.me-link-source) {
+        font-family:    ui-monospace, 'Cascadia Code', monospace;
+        font-size:      0.65rem;
+        font-weight:    600;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color:          var(--ac);
+    }
+
+    .me-body :global(.me-link-label) {
+        font-size:   0.88rem;
+        font-weight: 500;
+        color:       var(--text);
+        line-height: 1.4;
+    }
+
+    .me-body :global(.me-media-grid) {
+        display:               grid;
+        grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+        gap:                   10px;
+    }
+
+    .me-body :global(.me-img-wrap),
+    .me-body :global(.me-vid-wrap) {
+        position:      relative;
+        border-radius: var(--radius-sm);
+        overflow:      hidden;
+        cursor:        pointer;
+        aspect-ratio:  16 / 10;
+        background:    #ddd8f0;
+        box-shadow:    0 2px 8px rgba(0, 0, 0, 0.08);
+        transition:    transform var(--tr), box-shadow var(--tr);
+    }
+
+    .me-body :global(.me-img-wrap:hover),
+    .me-body :global(.me-vid-wrap:hover) {
+        transform:  translateY(-3px);
+        box-shadow: 0 6px 20px rgba(124, 58, 237, 0.15);
+    }
+
+    .me-body :global(.me-img-wrap img),
+    .me-body :global(.me-vid-wrap video) {
+        width:      100%;
+        height:     100%;
+        object-fit: cover;
+        display:    block;
+        transition: transform var(--tr), filter var(--tr);
+    }
+
+    .me-body :global(.me-img-wrap:hover img),
+    .me-body :global(.me-vid-wrap:hover video) {
+        transform: scale(1.05);
+        filter:    brightness(0.82);
+    }
+
+    .me-body :global(.me-media-badge) {
+        position:        absolute;
+        inset:           0;
+        display:         flex;
+        align-items:     center;
+        justify-content: center;
+        opacity:         0;
+        transition:      opacity var(--tr);
+        pointer-events:  none;
+    }
+
+    .me-body :global(.me-img-wrap:hover .me-media-badge),
+    .me-body :global(.me-vid-wrap:hover .me-media-badge) {
+        opacity: 1;
+    }
+
+    .me-body :global(.me-media-badge-inner) {
+        width:           40px;
+        height:          40px;
+        border-radius:   50%;
+        background:      rgba(124, 58, 237, 0.9);
+        display:         flex;
+        align-items:     center;
+        justify-content: center;
+        box-shadow:      0 4px 16px rgba(124, 58, 237, 0.45);
+        backdrop-filter: blur(4px);
+    }
+
+    .me-body :global(.me-media-badge-inner svg) {
+        width:           16px;
+        height:          16px;
+        stroke:          #fff;
+        fill:            none;
+        stroke-width:    2;
+        stroke-linecap:  round;
+        stroke-linejoin: round;
+    }
+
+    @media (max-width: 500px) {
+        .me-body :global(.me-grid),
+        .me-body :global(.me-media-grid) {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @media () {
+        .me-block,
+        .me-block * {
+            transition: none !important;
+            animation:  none !important;
+        }
+    }
+</style>
+
+<script>
+    function initMediaEvents() {
+        document.querySelectorAll<HTMLElement>('.me-block').forEach(block => {
+            if ((block as any)._meInit) return;
+            (block as any)._meInit = true;
+
+            block.querySelectorAll<HTMLElement>('.me-img-wrap').forEach(wrap => {
+                wrap.setAttribute('role', 'button');
+                wrap.setAttribute('tabindex', '0');
+                wrap.setAttribute('aria-label', 'Mărește imaginea');
+                const img = wrap.querySelector('img');
+                if (!img) return;
+                const open = () => openLightbox('img', img.src, img.alt);
+                wrap.addEventListener('click', open);
+                wrap.addEventListener('keydown', e => {
+                    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(); }
+                });
+            });
+
+            block.querySelectorAll<HTMLElement>('.me-vid-wrap').forEach(wrap => {
+                wrap.setAttribute('role', 'button');
+                wrap.setAttribute('tabindex', '0');
+                wrap.setAttribute('aria-label', 'Redă videoclipul');
+
+                const type = wrap.dataset.type as 'youtube' | 'video';
+                const src  = wrap.dataset.src ?? '';
+
+                const open = () => openLightbox(type, src, '');
+                wrap.addEventListener('click', open);
+                wrap.addEventListener('keydown', e => {
+                    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(); }
+                });
+            });
+        });
+    }
+
+    function openLightbox(type: 'img' | 'video' | 'youtube', src: string, alt: string) {
+        let lb = document.getElementById('me-lightbox');
+        if (!lb) {
+            lb = document.createElement('div');
+            lb.id = 'me-lightbox';
+            lb.style.cssText = [
+                'position:fixed', 'inset:0', 'z-index:9000',
+                'background:rgba(13,9,25,0.82)',
+                'backdrop-filter:blur(6px)',
+                'display:flex', 'align-items:center', 'justify-content:center',
+                'padding:24px', 'opacity:0',
+                'transition:opacity .25s ease',
+                'cursor:zoom-out',
+            ].join(';');
+            lb.setAttribute('role', 'dialog');
+            lb.setAttribute('aria-modal', 'true');
+
+            const inner = document.createElement('div');
+            inner.id = 'me-lb-inner';
+            inner.style.cssText = [
+                'position:relative',
+                'max-width:min(92vw,1100px)',
+                'max-height:88vh',
+                'cursor:default',
+                'display:flex',
+                'align-items:center',
+                'justify-content:center',
+            ].join(';');
+            inner.addEventListener('click', e => e.stopPropagation());
+
+            const closeBtn = document.createElement('button');
+            closeBtn.style.cssText = [
+                'position:absolute', 'top:-14px', 'right:-14px',
+                'width:34px', 'height:34px', 'border-radius:50%',
+                'background:#7c3aed', 'border:none', 'cursor:pointer',
+                'display:flex', 'align-items:center', 'justify-content:center',
+                'color:#fff', 'font-size:20px', 'line-height:1', 'z-index:1',
+                'box-shadow:0 4px 16px rgba(124,58,237,0.5)',
+                'transition:transform .2s ease',
+            ].join(';');
+            closeBtn.setAttribute('aria-label', 'Închide');
+            closeBtn.textContent = '×';
+            closeBtn.addEventListener('mouseenter', () => closeBtn.style.transform = 'scale(1.1)');
+            closeBtn.addEventListener('mouseleave', () => closeBtn.style.transform = 'scale(1)');
+            closeBtn.addEventListener('click', closeLightbox);
+
+            inner.appendChild(closeBtn);
+            lb.appendChild(inner);
+            document.body.appendChild(lb);
+            lb.addEventListener('click', closeLightbox);
+        }
+
+        const inner = document.getElementById('me-lb-inner')!;
+        inner.querySelectorAll('img, video, iframe').forEach(el => el.remove());
+
+        if (type === 'img') {
+            const img = document.createElement('img');
+            img.src = src;
+            img.alt = alt;
+            img.style.cssText = [
+                'max-width:100%', 'max-height:88vh',
+                'border-radius:16px', 'display:block',
+                'box-shadow:0 12px 64px rgba(0,0,0,0.6)',
+            ].join(';');
+            inner.appendChild(img);
+        } else if (type === 'youtube') {
+            // YouTube requires an iframe — <video> raises CORS errors on cross-origin streams
+            const frame = document.createElement('iframe');
+            // autoplay=1 starts on open; rel=0 hides suggested videos
+            frame.src = src + (src.includes('?') ? '&' : '?') + 'autoplay=1&rel=0';
+            frame.setAttribute('allowfullscreen', '');
+            frame.setAttribute('allow', 'autoplay; fullscreen; picture-in-picture');
+            frame.setAttribute('loading', 'lazy');
+            frame.style.cssText = [
+                'width:min(92vw,900px)',
+                'aspect-ratio:16/9',
+                'border:none',
+                'border-radius:16px',
+                'display:block',
+                'box-shadow:0 12px 64px rgba(0,0,0,0.6)',
+            ].join(';');
+            inner.appendChild(frame);
+        } else {
+            const vid = document.createElement('video');
+            vid.src = src;
+            vid.controls = true;
+            vid.autoplay = true;
+            vid.style.cssText = [
+                'max-width:100%', 'max-height:88vh',
+                'border-radius:16px', 'display:block',
+                'box-shadow:0 12px 64px rgba(0,0,0,0.6)',
+            ].join(';');
+            inner.appendChild(vid);
+        }
+
+        lb.style.display = 'flex';
+        requestAnimationFrame(() => { lb!.style.opacity = '1'; });
+        document.addEventListener('keydown', onEsc);
+    }
+
+    function closeLightbox() {
+        const lb = document.getElementById('me-lightbox');
+        if (!lb) return;
+        lb.style.opacity = '0';
+        setTimeout(() => {
+            lb.style.display = 'none';
+            const vid = lb.querySelector('video');
+            if (vid) { vid.pause(); vid.src = ''; }
+            lb.querySelectorAll('img, video, iframe').forEach(el => el.remove());
+        }, 260);
+        document.removeEventListener('keydown', onEsc);
+    }
+
+    function onEsc(e: KeyboardEvent) { if (e.key === 'Escape') closeLightbox(); }
+
+    document.addEventListener('astro:page-load', () => {
+        document.querySelectorAll('.me-block').forEach(b => { delete (b as any)._meInit; });
+        initMediaEvents();
+    });
+</script>
