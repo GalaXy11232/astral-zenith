@@ -1,6 +1,7 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro"
 import NavBar from "../components/NavBar.astro"
+import Footer from "../components/footer.astro";
 import SponsorCard from "../components/sponsor_card.astro"
 import HexBackground from "../components/hexbackground.astro"
 ---
@@ -179,8 +180,9 @@ import HexBackground from "../components/hexbackground.astro"
                
             </div>
         </section>
-
     </div>
+
+    <Footer />
 </BaseLayout>
 
 <style>
@@ -202,3 +204,19 @@ import HexBackground from "../components/hexbackground.astro"
         }
     }
 </style>
+
+<script>
+    function sequenceShine() {
+        const DURATION = 7;
+ 
+        document.querySelectorAll<HTMLElement>('.sponsor-section').forEach(section => {
+            const cards = section.querySelectorAll<HTMLElement>('.sponsor-card');
+            cards.forEach((card, i) => {
+                card.style.setProperty('--shine-duration', DURATION + 's');
+                card.style.setProperty('--shine-delay', (DURATION + i * 0.7) + 's');
+            });
+        });
+    }
+ 
+    document.addEventListener('astro:page-load', sequenceShine);
+</script>

@@ -1,11 +1,14 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
 import NavBar from "../components/NavBar.astro";
+import Footer from "../components/footer.astro";
 import ActivityCard from "../components/activity_card.astro";
+import HexBackground from "../components/hexbackground.astro"
 ---
 
 <BaseLayout title = "Activitatea echipei">
     <NavBar activeLink = {2} />
+    <HexBackground />
 
     <div class="title-container">
         <span class="title-underline">Activitatea Noastră</span>
@@ -803,4 +806,5 @@ import ActivityCard from "../components/activity_card.astro";
     </ActivityCard>
     
 
+    <Footer />
 </BaseLayout>

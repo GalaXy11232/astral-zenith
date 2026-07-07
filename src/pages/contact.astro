@@ -1,6 +1,7 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro"
 import NavBar from "../components/NavBar.astro"
+import Footer from "../components/footer.astro";
 import Hexbackground from "../components/hexbackground.astro"
 
 import Icon from "../components/contact/Icon.astro";
@@ -65,6 +66,8 @@ import { contactMethods, location } from "../components/contact/contact-data";
             </div>
         </section>
     </main>
+
+    <Footer onContactPage={true} />
 </BaseLayout>
 
 <style is:global>

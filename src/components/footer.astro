@@ -1,0 +1,260 @@
+---
+export interface Props {
+    onContactPage?: boolean;
+}
+
+const { onContactPage = false } = Astro.props;
+const currentYear = new Date().getFullYear();
+---
+
+<footer class="site-footer">
+    <div class="site-footer__shimmer" aria-hidden="true"></div>
+
+    <button type="button" class="site-footer__totop" aria-label="Înapoi sus">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" aria-hidden="true">
+            <path d="M12 19V5M6 11l6-6 6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+    </button>
+
+    <div class="site-footer__inner">
+        <div class="site-footer__brand">
+            <p class="site-footer__copy">
+                <span class="site-footer__status-dot" aria-hidden="true"></span>
+                © {currentYear} Zenith #19084
+            </p>
+            <p class="site-footer__tagline">Echipa Colegiului Național „Grigore Moisil”, București</p>
+        </div>
+
+        <div class="site-footer__links">
+            <a class="site-footer__link" href="https://github.com/GalaXy11232/" target="_blank" rel="noopener noreferrer">
+                <span class="site-footer__icon">
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" aria-hidden="true">
+                        <path d="M8 9 4 12l4 3M16 9l4 3-4 3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </span>
+                <span class="site-footer__link-text">
+                    De @GalaXy
+                </span>
+                <svg class="site-footer__arrow" viewBox="0 0 24 24" width="14" height="14" fill="none" aria-hidden="true">
+                    <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </a>
+
+            {onContactPage ? (
+                <span class="site-footer__link site-footer__link--static">
+                    <span class="site-footer__icon site-footer__icon--static">
+                        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" aria-hidden="true">
+                            <path d="M5 13 9 17 19 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </span>
+                    <span class="site-footer__link-text site-footer__link-text--static">Ești deja pe pagina cu contacte</span>
+                </span>
+            ) : (
+                <a class="site-footer__link" href="/contact">
+                    <span class="site-footer__icon">
+                        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" aria-hidden="true">
+                            <path d="M3 6.5C3 5.67 3.67 5 4.5 5h15c.83 0 1.5.67 1.5 1.5v11c0 .83-.67 1.5-1.5 1.5h-15C3.67 19 3 18.33 3 17.5v-11Z" stroke="currentColor" stroke-width="1.8"/>
+                            <path d="M4 6.5 12 13l8-6.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </span>
+                    <span class="site-footer__link-text">Toate contactele sunt aici</span>
+                    <svg class="site-footer__arrow" viewBox="0 0 24 24" width="14" height="14" fill="none" aria-hidden="true">
+                        <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </a>
+            )}
+        </div>
+    </div>
+</footer>
+
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@700;800&family=Manrope:wght@500;600;700&display=swap');
+
+    .site-footer {
+        position: relative;
+        background: linear-gradient(160deg, #241335 0%, #170b26 100%);
+        font-family: 'Manrope', sans-serif;
+    }
+
+    .site-footer__shimmer {
+        height: 2px;
+        width: 100%;
+        background: linear-gradient(90deg, transparent, #a855f7 35%, #f2a93b 50%, #a855f7 65%, transparent);
+        background-size: 220% 100%;
+        animation: footer-shimmer 7s linear infinite;
+        margin-top: 2rem;
+    }
+
+    @keyframes footer-shimmer {
+        0% {
+            background-position: 200% 0;
+        }
+        100% {
+            background-position: -200% 0;
+        }
+    }
+
+    .site-footer__totop {
+        position: absolute;
+        top: -18px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 2;
+        width: 36px;
+        height: 36px;
+        border: none;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #a855f7, #6b2fae);
+        color: #ffffff;
+        box-shadow: 0 6px 16px rgba(168, 85, 247, 0.4);
+        cursor: pointer;
+        transition: transform 0.25s ease, box-shadow 0.25s ease;
+    }
+
+    .site-footer__totop:hover {
+        transform: translateX(-50%) translateY(-3px);
+        box-shadow: 0 10px 22px rgba(168, 85, 247, 0.5);
+    }
+
+    .site-footer__inner {
+        max-width: 880px;
+        margin: 0 auto;
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 40px;
+        padding: 36px 24px 32px;
+    }
+
+    .site-footer__copy {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        margin: 0;
+        font-family: 'Poppins', sans-serif;
+        font-weight: 700;
+        font-size: 0.95rem;
+        color: #f1e8ff;
+    }
+
+    .site-footer__status-dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: white;
+    }
+
+
+    .site-footer__tagline {
+        margin: 6px 0 0;
+        font-size: 0.82rem;
+        color: #8d7aad;
+    }
+
+    .site-footer__links {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    .site-footer__link {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        text-decoration: none;
+    }
+
+    .site-footer__link--static {
+        cursor: default;
+    }
+
+    .site-footer__icon {
+        flex: 0 0 auto;
+        width: 26px;
+        height: 26px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(168, 85, 247, 0.12);
+        color: #c084fc;
+        transition: background 0.25s ease, color 0.25s ease;
+    }
+
+    .site-footer__icon--static {
+        background: rgba(141, 122, 173, 0.15);
+        color: #8d7aad;
+    }
+
+    .site-footer__link:hover .site-footer__icon {
+        background: linear-gradient(135deg, #a855f7, #6b2fae);
+        color: #ffffff;
+    }
+
+    .site-footer__link--static:hover .site-footer__icon {
+        background: rgba(141, 122, 173, 0.15);
+        color: #8d7aad;
+    }
+
+    .site-footer__link-text {
+        font-weight: 600;
+        font-size: 0.88rem;
+        color: #cbb9e8;
+        transition: color 0.2s ease;
+    }
+
+    .site-footer__link-text--static {
+        color: #8d7aad;
+        font-style: italic;
+    }
+
+    .site-footer__link:hover .site-footer__link-text {
+        color: #f1e8ff;
+    }
+
+    .site-footer__link--static:hover .site-footer__link-text {
+        color: #8d7aad;
+    }
+
+    .site-footer__arrow {
+        color: #5c4a7a;
+        transition: transform 0.25s ease, color 0.25s ease;
+    }
+
+    .site-footer__link:hover .site-footer__arrow {
+        transform: translateX(4px);
+        color: #c084fc;
+    }
+
+    @media (max-width: 640px) {
+        .site-footer__inner {
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            gap: 26px;
+            padding: 32px 20px 28px;
+        }
+
+        .site-footer__links {
+            align-items: center;
+        }
+    }
+</style>
+
+<script>
+    function initFooterToTop() {
+        const button = document.querySelector<HTMLButtonElement>(".site-footer__totop");
+        if (!button || button.dataset.initialized === "true") return;
+        button.dataset.initialized = "true";
+
+        button.addEventListener("click", () => {
+            window.scrollTo({ top: 0, behavior: "smooth" });
+        });
+    }
+
+    document.addEventListener("astro:page-load", initFooterToTop);
+</script>
