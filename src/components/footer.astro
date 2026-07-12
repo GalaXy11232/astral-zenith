@@ -256,5 +256,7 @@ const currentYear = new Date().getFullYear();
         });
     }
 
-    document.addEventListener("astro:page-load", initFooterToTop);
+    ['DOMContentLoaded', 'astro:page-load'].forEach((ev) => {
+        document.addEventListener(ev, initFooterToTop);
+    });
 </script>

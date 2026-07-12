@@ -52,8 +52,11 @@ import ClientRouter from "astro/components/ClientRouter.astro";
 		console.log("Connected");
 
 		const astro = document.querySelector("astro-dev-toolbar");
+        const body = document.body;
 		if (astro) 
 			astro.style.display = "none";
+
+        body.style.minHeight = '0'; // hardcoded bug fix ca isi lua min-height:100% on load for some reason
 	})
 </script>
 

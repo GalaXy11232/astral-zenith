@@ -2,12 +2,12 @@
 const { name, logo, website, tier, scale_factor = 1, light_icon = true } = Astro.props;
 
 const tierColors: Record<string, string> = {
-    bronze:   '#5c302d',
-    gold:     '#c9a84c',
-    silver:   '#9aa0a8',
+    bronze:   '#b5623a',
+    gold:     '#d4a843',
+    silver:   '#a8b0ba',
     platinum: '#4cafd4',
-    diamond:  '#5D57FF',
-    partener: '#ffffff',
+    diamond:  '#6c63ff',
+    partener: '#c8c0e8',
 };
 const accentColor = tierColors[tier ?? ''] ?? 'var(--primary, #7c3aed)';
 ---
@@ -46,7 +46,7 @@ const accentColor = tierColors[tier ?? ''] ?? 'var(--primary, #7c3aed)';
                 <span class="visit-label" style={`color: ${tier === 'partener' ? '#000' : '#fff'}`}>
                     Vizitează website-ul
                 </span>
-                <svg class="visit-arrow" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <svg class="visit-arrow" style={`color: ${tier === 'partener' ? '#000' : '#fff'}`} viewBox="0 0 16 16" fill="none" aria-hidden="true">
                     <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>
             </div>
@@ -62,13 +62,14 @@ const accentColor = tierColors[tier ?? ''] ?? 'var(--primary, #7c3aed)';
         justify-content: center;
         align-items:     center;
         padding:         0.5rem;
+        width:           clamp(160px, 20vw, 200px);
     }
 
     .sponsor-card {
         --card-size:      clamp(140px, 20vw, 200px);
-        --card-bg:        #111118;
+        --card-bg:        #2e2e36;
         --card-border:    rgba(255, 255, 255, 0.08);
-        --strip-h:        44px;
+        --strip-h:        35px;
         --radius:         14px;
         --notch:          22px;
         --transition:     0.5s cubic-bezier(0.175, 0.885, 0.32, 1);
@@ -122,6 +123,7 @@ const accentColor = tierColors[tier ?? ''] ?? 'var(--primary, #7c3aed)';
         position:       absolute;
         bottom:         calc(var(--strip-h) + 8px);
         left:           50%;
+        bottom: 30px;
         transform:      translateX(-50%);
         z-index:        3;
         font-family:    ui-monospace, 'Cascadia Code', monospace;
@@ -133,6 +135,7 @@ const accentColor = tierColors[tier ?? ''] ?? 'var(--primary, #7c3aed)';
         color:          var(--accent);
         opacity:        0.7;
         transition:     opacity var(--transition), bottom var(--transition);
+        -webkit-text-stroke: .37px var(--accent);
     }
     .sponsor-card:hover .tier-badge,
     .sponsor-card:focus-visible .tier-badge {
@@ -140,9 +143,6 @@ const accentColor = tierColors[tier ?? ''] ?? 'var(--primary, #7c3aed)';
         bottom:  calc(var(--strip-h) + 2px);
     }
 
-
-
-    
     .card-glow {
         position:       absolute;
         inset:          0;
@@ -151,7 +151,7 @@ const accentColor = tierColors[tier ?? ''] ?? 'var(--primary, #7c3aed)';
         border-radius:  var(--radius);
         background:     radial-gradient(
             ellipse 60% 60% at 50% 48%,
-            color-mix(in srgb, var(--accent) 38%, transparent),
+            color-mix(in srgb, var(--accent) 28%, transparent),
             transparent 85%
         );
         animation: glow-breathe 3.8s ease-in-out infinite;
@@ -163,9 +163,6 @@ const accentColor = tierColors[tier ?? ''] ?? 'var(--primary, #7c3aed)';
         50%  { transform: scale(1.18); opacity: 1;   }
         100% { transform: scale(0.82); opacity: 0.5; }
     }
-
-
-
 
     .card-shine {
         position:         absolute;
@@ -195,7 +192,7 @@ const accentColor = tierColors[tier ?? ''] ?? 'var(--primary, #7c3aed)';
             transparent                                              100%
         );
         transform:        rotate(0deg) skewX(-15deg);
-        animation:        card-shine-sweep var(--shine-duration, 6s) ease-in-out infinite;
+        animation:        card-shine-sweep var(--shine-duration, 7s) ease-in-out infinite;
         animation-delay:  var(--shine-delay, 0s);
         will-change:      left;
     }
@@ -228,13 +225,12 @@ const accentColor = tierColors[tier ?? ''] ?? 'var(--primary, #7c3aed)';
         max-width:   100%;
         max-height:  clamp(50px, 8vw, 80px);
         width:       auto;
+        /* margin-bottom: max(auto, 40px) !important; */
         height:      auto;
         object-fit:  contain;
         display:     block;
         transition:  filter var(--transition);
     }
-
-    
 
     .sponsor-card:not([data-light='true']) .sponsor-logo {
         filter: grayscale(55%) brightness(0.85);
@@ -286,7 +282,7 @@ const accentColor = tierColors[tier ?? ''] ?? 'var(--primary, #7c3aed)';
     .visit-arrow {
         width:      13px;
         height:     13px;
-        color:      #fff;
+        /* color:      #fff; */
         flex-shrink: 0;
         transform:  translateX(0);
         transition: transform var(--transition);
@@ -316,4 +312,10 @@ const accentColor = tierColors[tier ?? ''] ?? 'var(--primary, #7c3aed)';
             opacity: 1;
         }
     } */
+
+    @media (max-width: 860px) {
+        .visit-label {
+            font-size: min(10px, 50%) !important;
+        }
+    }
 </style>
