@@ -19,7 +19,6 @@ const currentYear = new Date().getFullYear();
     <div class="site-footer__inner">
         <div class="site-footer__brand">
             <p class="site-footer__copy">
-                <span class="site-footer__status-dot" aria-hidden="true"></span>
                 © {currentYear} Zenith #19084
             </p>
             <p class="site-footer__tagline">Echipa Colegiului Național „Grigore Moisil”, București</p>
@@ -68,30 +67,27 @@ const currentYear = new Date().getFullYear();
 </footer>
 
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@700;800&family=Manrope:wght@500;600;700&display=swap');
+    /* @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@700;800&family=Manrope:wght@500;600;700&display=swap'); */
 
     .site-footer {
         position: relative;
         background: linear-gradient(160deg, #241335 0%, #170b26 100%);
-        font-family: 'Manrope', sans-serif;
+        /* font-family: 'Manrope', sans-serif; */
     }
 
     .site-footer__shimmer {
         height: 2px;
         width: 100%;
-        background: linear-gradient(90deg, transparent, #a855f7 35%, #f2a93b 50%, #a855f7 65%, transparent);
+        background: linear-gradient(90deg, transparent, #a855f7 35%, #ff21c0 50%, #6208ff 65%, transparent);
         background-size: 220% 100%;
-        animation: footer-shimmer 7s linear infinite;
+        animation: footer-shimmer 7s ease-in-out infinite;
         margin-top: 2rem;
     }
 
     @keyframes footer-shimmer {
-        0% {
-            background-position: 200% 0;
-        }
-        100% {
-            background-position: -200% 0;
-        }
+        0% { background-position: 200% 0; }
+        50% { background-position: -200% 0; }
+        100% { background-position: 200% 0; }
     }
 
     .site-footer__totop {
@@ -134,19 +130,11 @@ const currentYear = new Date().getFullYear();
         align-items: center;
         gap: 8px;
         margin: 0;
-        font-family: 'Poppins', sans-serif;
+        /* font-family: 'Poppins', sans-serif; */
         font-weight: 700;
         font-size: 0.95rem;
         color: #f1e8ff;
     }
-
-    .site-footer__status-dot {
-        width: 6px;
-        height: 6px;
-        border-radius: 50%;
-        background: white;
-    }
-
 
     .site-footer__tagline {
         margin: 6px 0 0;

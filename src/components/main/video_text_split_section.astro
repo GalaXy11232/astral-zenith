@@ -1,0 +1,198 @@
+---
+export interface Props {
+    url: string;
+    title: string;
+    text_align?: string;
+    eyebrow?: string;
+    videoPosition?: "left" | "right";
+    videoWidth?: string;
+    aspectRatio?: string;
+}
+
+const {
+    url,
+    title,
+    text_align = 'start',
+    eyebrow = '',
+    videoPosition = "left",
+    videoWidth = "50%",
+    aspectRatio = "16 / 9",
+} = Astro.props;
+
+function getEmbedUrl(source: string) {
+    const watchMatch = source.match(/[?&]v=([^&]+)/);
+    if (source.includes("youtube.com/watch") && watchMatch) {
+        return `https://www.youtube.com/embed/${watchMatch[1]}`;
+    }
+    const shortMatch = source.match(/youtu\.be\/([^?&]+)/);
+    if (shortMatch) {
+        return `https://www.youtube.com/embed/${shortMatch[1]}`;
+    }
+    return source;
+}
+
+function isYouTubeUrl(source: string) {
+    return /(?:youtube\.com\/watch\?[^\s]*[?&]v=|youtu\.be\/)/i.test(source);
+}
+
+function isImageUrl(source: string) {
+    return /\.(avif|webp|jpg|jpeg|png|gif|svg|bmp|tiff|ico)(\?.*)?$/i.test(source) || source.startsWith("data:image/");
+}
+
+const embedUrl = getEmbedUrl(url);
+const isYoutube = isYouTubeUrl(url);
+const isImage = isImageUrl(url);
+const videoOrder = videoPosition === "right" ? 2 : 1;
+const textOrder = videoPosition === "right" ? 1 : 2;
+---
+
+<section class="video-text" style={`--video-basis:${videoWidth}; text-align: ${text_align}`}>
+    <div
+        class="video-text__video"
+        style={`order:${videoOrder};aspect-ratio:${aspectRatio};`}
+    >
+        {isYoutube ? (
+            <iframe
+                src={embedUrl}
+                title={title}
+                loading="lazy"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowfullscreen
+            ></iframe>
+        ) : isImage ? (
+            <img
+                src={url}
+                alt={title}
+                loading="lazy"
+                decoding="async"
+            />
+        ) : null}
+    </div>
+
+    <div class="video-text__content" style={`order:${textOrder};`}>
+        {eyebrow && <p class="video-text__eyebrow">{eyebrow}</p>}
+        <div class="video-text__heading" style = {`text-align: ${text_align}; ${text_align == 'center' ? 'display: block;' : 'display: flex;'}`}>
+            <span class="video-text__bar" aria-hidden="true"></span>
+            <h2 class="video-text__title">{title}</h2>
+        </div>
+            <div class="video-text__body">
+                <slot />
+            </div>
+    </div>
+</section>
+
+<style>
+    .video-text {
+        width: min(92vw, max(1050px, 80dvh));
+        margin-inline: auto;
+        padding: 4rem 1.5rem;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 3rem;
+        /* font-family: system-ui, -apple-system, "Segoe UI", sans-serif; */
+    }
+
+    .video-text__video {
+        position: relative;
+        flex: 1 1 var(--video-basis);
+        min-width: 280px;
+        border-radius: 1.35rem;
+        overflow: hidden;
+        background: #0a0512;
+        border: 1px solid rgba(168, 85, 247, 0.25);
+        box-shadow:
+        0 0 0 1px rgba(147, 51, 234, 0.08),
+        0 24px 60px rgba(88, 28, 135, 0.45),
+        0 0 46px rgba(168, 85, 247, 0.18);
+    }
+
+    .video-text__video iframe,
+    .video-text__video img {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        display: block;
+        border: 0;
+    }
+
+    .video-text__video img {
+        object-fit: cover;
+        object-position: center;
+    }
+
+    .video-text__content {
+        flex: 1 1 300px;
+        min-width: 280px;
+    }
+
+    .video-text__eyebrow {
+        margin: 0 0 0.85rem;
+        font-weight: 700;
+        font-size: 0.78rem;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: #d8b4fe;
+    }
+
+    .video-text__heading {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 1.4rem;
+    }
+
+    .video-text__bar {
+        flex: 0 0 auto;
+        width: 4px;
+        height: 2rem;
+        border-radius: 999px;
+        background: linear-gradient(180deg, #9333ea, #d946ef);
+    }
+
+    .video-text__title {
+        margin: 0;
+        font-weight: 800;
+        font-size: clamp(1.7rem, 3.4vw, 2.35rem);
+        line-height: 1.15;
+        letter-spacing: -0.01em;
+        color: #a855f7;
+    }
+
+    .video-text__body {
+        font-size: 1.02rem;
+        line-height: 1.75;
+        color: rgba(255, 255, 255, 0.82);
+    }
+
+    .video-text__body :global(p) {
+        margin: 0 0 1.1em;
+    }
+
+    .video-text__body :global(p:last-child) {
+        margin-bottom: 0;
+    }
+
+    .video-text__body :global(strong) {
+        color: #ffffff;
+    }
+
+    .video-text__body :global(a) {
+        color: #e9a6ff;
+        text-decoration-color: rgba(232, 121, 249, 0.5);
+        text-underline-offset: 3px;
+    }
+
+    @media (max-width: 950px) {
+        .video-text__video {
+            order: 1 !important;
+            flex-basis: 100%;
+        }
+
+        .video-text__content {
+            order: 2 !important;
+            flex-basis: 100%;
+        }
+    }
+</style>

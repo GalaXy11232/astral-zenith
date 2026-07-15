@@ -1,0 +1,87 @@
+---
+
+---
+<section class="im">
+    <div class="wrapper-h">
+        <div class="static-txt">I'm a</div>
+        <ul class="dynamic-txts">
+            <li><span class="span-h">student.</span></li>
+            <li><span class="span-h">part of the team.</span></li>
+            <li><span class="span-h">winner.</span></li>
+            <li><span class="span-h">friend.</span></li>
+            <li><span class="span-h">part of our future.</span></li>
+        </ul>
+    </div>
+</section>
+
+<style is:global>
+    .im {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding-top: 30px;
+    }
+
+    .wrapper-h {
+        display: flex;
+    }
+
+    .wrapper-h .static-txt {
+        color: #fff;
+        font-size: 60px;
+        font-weight: 600;
+    }
+
+    .wrapper-h .dynamic-txts {
+        margin-left: 15px;
+        line-height: 90px;
+        height: 90px;
+        /* background: var(--bg-light); */
+        overflow: hidden;
+    }
+
+    .dynamic-txts li {
+        list-style: none;
+        position: relative;
+        top: 0;
+        font-size: 60px;
+        animation: slide 15s steps(5) infinite;
+    }
+
+    @keyframes slide {
+        100% {
+            top: -450px;
+        }
+    }
+
+    .dynamic-txts li {
+        position: relative;
+    }
+
+    .dynamic-txts li::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        height: 100%;
+        width: 100%;
+        background-color: transparent;
+        border-left: 2px solid var(--primary);
+        animation: typing 3s steps(22) infinite;
+    }
+
+    @keyframes typing {
+        40%,
+        60% {
+            left: calc(100% + 30px);
+        }
+        100% {
+            left: 0;
+        }
+    }
+
+    @media screen and (max-width: 700px) {
+        .im {
+            display: none;
+        }
+    }
+</style>

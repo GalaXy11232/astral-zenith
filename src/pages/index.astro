@@ -4,11 +4,19 @@ import NavBar from "../components/NavBar.astro"
 import Footer from "../components/footer.astro"
 import Hexbackground from "../components/hexbackground.astro"
 import NotificationPopup from "../components/notification_popup.astro"
-import HeroSection from "../components/hero_section.astro"
+import HeroSection from "../components/main/hero_section.astro"
+
+// import TextTypewriter from "../components/main/text_typewriter.astro";
+import RebrandingSection from "../components/main/rebranding_section.astro"
+
+import TextSection from "../components/main/text_section.astro";
+import VideoSection from "../components/main/video_section.astro";
+import VideoTextSplitSection from "../components/main/video_text_split_section.astro";
 ---
 
 <BaseLayout title = "Acasa">
-    <NavBar activeLink = {0}/>
+    <NavBar activeLink = {0} has_margin = {false}/>
+    <Hexbackground />
 
     <HeroSection 
         motto = 'Visions above ground'
@@ -16,7 +24,44 @@ import HeroSection from "../components/hero_section.astro"
         robotImage = "/assets/render_sq.png"
         modelSrc="/untitled.glb"
     />
-    <div style = "margin-bottom: 1000px"></div>
+
+    <TextSection
+        title = "Despre noi"
+    >
+        Zenith, echipa de robotică a Colegiului Național „Grigore Moisil”, este mai mult decât un club destinat tinerilor pasionați 
+        de tehnologie. Este comunitatea noastră, dedicată inovației și creativității într-unul dintre cele mai fascinante domenii 
+        ale secolului nostru: robotica. Uniți de această pasiune comună, muncim zi de zi pentru a ajunge la un nivel cât mai înalt, 
+        participând la diverse concursuri naționale și internaționale. Pentru noi, Zenith a devenit un spațiu de dezvoltare personală 
+        și profesională, unde fiecare membru își aduce aportul unic, contribuind la succesul colectiv. Fiecare provocare este o 
+        oportunitate de a ne extinde cunoștințele și de a inova, iar sprijinul reciproc și colaborarea ne ajută să depășim orice 
+        obstacol și să evoluăm. 
+
+    </TextSection>
+
+    <VideoSection url = 'https://www.youtube.com/watch?v=Masc7eAALss' />
+
+    <VideoTextSplitSection
+        url = '/assets/echipa/Grup mare fresh.webp'
+        title = "Misiunea clubului"
+        text_align = 'center'
+    >
+        Promovarea domeniului STEAM și a gândirii tehnice în rândul elevilor. 
+    </VideoTextSplitSection>
+
+
+    <TextSection
+        title = "Rebranding"
+    >
+        Povestea noastră începe în anul 2020, când, un grup de tineri din clasele a X-a și a XI-a de la Colegiul Național „Grigore Moisil” 
+        au înființat, cu ajutorul profesorului nostru coordonator, doamna profesor de fizică Mihaela Garabet, echipa SovaTech. 
+        Anii au trecut, iar membrii care au adus inițiativa de a se dezvolta în domeniul STEAM au devenit mentori, lăsând în urma 
+        lor o nouă generație care să perpetueze activitatea clubului. Noua generație, învăţând din greşelile seriei anterioare, a 
+        făcut un pas mai departe, aducând o nouă viziune în club și, astfel, şi-a propus să se reinventeze sub numele Zenith. 
+
+    </TextSection>
+    <RebrandingSection />
+    <div style = 'margin-bottom: 5rem;'></div>
+
     <!-- <NotificationPopup 
         text="Șobi se află la 2 mile distanță de tine și vrea să aveți niște interacțiuni indecente."
         image="/sobi.png"
@@ -28,12 +73,9 @@ import HeroSection from "../components/hero_section.astro"
         imageZoom={1.2}
     /> -->
     
-    <Hexbackground />
-    <div style = "margin-bottom: 100px"></div>
 
-    <div class="title-container">
-        <span class="title-underline">Valorile noastre</span>
-    </div>
+    <TextSection title = "Valorile Noastre" text_align = 'center' />
+    
     <section class="targets">
         <div class="swiper mySwiper swiper-coverflow swiper-3d swiper-initialized swiper-horizontal swiper-watch-progress">
             <div class="swiper-wrapper" style="cursor: grab; transition-duration: 0ms; transform: translate3d(-487px, 0px, 0px); transition-delay: 0ms;" id="swiper-wrapper-fbfb0de524431075a" aria-live="polite">

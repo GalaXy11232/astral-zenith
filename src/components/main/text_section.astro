@@ -1,0 +1,86 @@
+---
+export interface Props {
+    title: string;
+    eyebrow?: string;
+    text_align?: string;
+}
+
+const { title, eyebrow = '', text_align = 'start' } = Astro.props;
+---
+
+<section class="text-section" style = {`text-align: ${text_align}; ${text_align == 'center' ? 'padding: 2rem !important;' : ''}`}>
+    {eyebrow && <p class="text-section__eyebrow">{eyebrow}</p>}
+    <div class="text-section__heading" style = {`text-align: ${text_align}; ${text_align == 'center' ? 'display: block; margin: 0 !important;' : 'display: flex;'}`}>
+        <span class="text-section__bar" aria-hidden="true"></span>
+        <h2 class="text-section__title">{title}</h2>
+    </div>
+    <div class="text-section__body">
+        <slot />
+    </div>
+</section>
+
+<style>
+    .text-section {
+        width: min(92vw, max(1050px, 80dvh));
+        margin-inline: auto;
+        padding: 4.5rem 1.5rem;
+        /* font-family: system-ui, -apple-system, "Segoe UI", sans-serif; */
+    }
+
+    .text-section__eyebrow {
+        margin: 0 0 0.85rem;
+        font-weight: 700;
+        font-size: 0.78rem;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: #d8b4fe;
+    }
+
+    .text-section__heading {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 1.6rem;
+    }
+
+    .text-section__bar {
+        flex: 0 0 auto;
+        width: 4px;
+        height: 2.1rem;
+        border-radius: 999px;
+        background: linear-gradient(180deg, #9333ea, #d946ef);
+    }
+
+    .text-section__title {
+        margin: 0;
+        font-weight: 800;
+        font-size: clamp(1.9rem, 4vw, 2.7rem);
+        line-height: 1.15;
+        letter-spacing: -0.01em;
+        color: #a855f7;
+    }
+
+    .text-section__body {
+        font-size: 1.05rem;
+        line-height: 1.75;
+        color: rgba(255, 255, 255, 0.82);
+    }
+
+    .text-section__body :global(p) {
+        margin: 0 0 1.1em;
+    }
+
+    .text-section__body :global(p:last-child) {
+        margin-bottom: 0;
+    }
+
+    .text-section__body :global(strong) {
+        color: #ffffff;
+    }
+
+    .text-section__body :global(a) {
+        color: #e9a6ff;
+        text-decoration-color: rgba(232, 121, 249, 0.5);
+        text-underline-offset: 3px;
+    }
+</style>

@@ -2,7 +2,7 @@
 import "../stylesheets/global.css";
 import "../stylesheets/navbar.css";
 
-const { title } = Astro.props;
+const { title, user_scalable = true } = Astro.props;
 
 import ClientRouter from "astro/components/ClientRouter.astro";
 ---
@@ -10,7 +10,7 @@ import ClientRouter from "astro/components/ClientRouter.astro";
 	<head>
 		<meta charset="utf-8" />
 		<link rel="icon" href="tab_icon.ico" />
-		<meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+		<meta name="viewport" content=`initial-scale=1.0 ${!user_scalable ? ', user-scalable=no' : ''}` />
 		<meta name="generator" content= {Astro.generator} />
 		<title> {title} </title>
 

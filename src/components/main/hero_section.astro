@@ -57,8 +57,8 @@ const {
                         poster={modelPoster || undefined}
                         alt={robotAlt}
                         camera-controls
-                        shadow-intensity="1"
-                        exposure="0.9"
+                        shadow-intensity="0.5"
+                        exposure="0.4"
                         reveal="manual"
                     ></model-viewer>
 
@@ -200,34 +200,34 @@ const {
     }
 
     .robot-frame {
-        --robot-zoom:     1;
-        --robot-position: 75% 50%;
+        --robot-zoom:     1.5;
+        --robot-position: 30% 50%;
 
         position:      relative;
         width:         clamp(240px, 36vw, 420px);
-        aspect-ratio:  3 / 4;
-        clip-path:     polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
-        background:    rgba(13, 13, 18, 0.6);
+        aspect-ratio:  1/1;
+        /* clip-path:     polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%); */
+        /* background:    rgba(13, 13, 18, 0.6); */
         opacity:       0;
         transform:     scale(0.86);
         animation:
-            hex-pulse    4s ease-in-out infinite,
+            /* hex-pulse    4s ease-in-out infinite, */
             frame-reveal 0.8s 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
     }
 
-    .robot-frame:hover {
+    /* .robot-frame:hover {
         animation-play-state: paused, running;
         filter: drop-shadow(0 0 40px rgba(124, 58, 237, 0.65)) drop-shadow(0 16px 48px rgba(0, 0, 0, 0.4));
-    }
-
-    @keyframes hex-pulse {
+    } */
+ 
+    /* @keyframes hex-pulse {
         0%, 100% { filter: drop-shadow(0 0 20px rgba(124, 58, 237, 0.35)) drop-shadow(0 12px 36px rgba(0, 0, 0, 0.35)); }
         50%       { filter: drop-shadow(0 0 34px rgba(124, 58, 237, 0.6))  drop-shadow(0 12px 36px rgba(0, 0, 0, 0.35)); }
-    }
+    } */
 
     @keyframes frame-reveal {
         to { opacity: 1; transform: scale(1); }
-    }
+    } 
 
     .robot-view {
         position:        absolute;
@@ -237,7 +237,8 @@ const {
         justify-content: center;
         opacity:         0;
         transition:      opacity 0.45s ease;
-        overflow:        hidden;
+        width: 100%;
+        /* overflow:        hidden; */
     }
 
     .robot-view.visible {
@@ -456,7 +457,7 @@ const {
             modelShowing = true;
  
             modelViewer.setAttribute('camera-controls', '');
-            modelViewer.setAttribute('auto-rotate', '');
+            // modelViewer.setAttribute('auto-rotate', '');
  
             if (!modelLoaded) {
                 spinner.style.display = 'flex';
@@ -487,7 +488,7 @@ const {
             modelShowing = false;
  
             modelViewer.removeAttribute('camera-controls');
-            modelViewer.removeAttribute('auto-rotate');
+            // modelViewer.removeAttribute('auto-rotate'); nu vreau auto rotate
         }
  
         toggle.addEventListener('click', () => {

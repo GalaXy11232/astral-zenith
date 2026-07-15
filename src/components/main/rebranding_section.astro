@@ -1,0 +1,120 @@
+---
+
+---
+
+<section class="transformation-section">
+<div class="content-container">
+    
+    
+    <div class="logo-wrapper">
+    <img src="assets/Branding Zenith/Sigla_SovaTech.png" alt="Sovatech Robotics" class="logo" />
+    </div>
+
+    <div class="arrow-wrapper">
+        <img class = 'animated-arrow' src="assets/sageata.svg" alt="arrow">
+    </div>
+
+    <div class="logo-wrapper">
+        <img src="assets/Branding Zenith/Sigla_mov.png" alt="Zenith" class="logo" />
+    </div>
+
+</div>
+</section>
+
+<style>
+.transformation-section {
+    border-radius: 1.35rem;
+    background: linear-gradient(90deg, rgba(235, 110, 0, 0.75), rgba(198, 91, 255, .75));
+    /* border: 1px solid rgba(193, 193, 193, 0.25); */
+    box-shadow:
+        0 0 0 1px rgba(147, 51, 234, 0.08),
+        0 24px 60px rgba(88, 28, 135, 0.45),
+        0 0 46px rgba(168, 85, 247, 0.18);
+
+    padding: 0 2rem 2rem 2rem;
+    width: min(92vw, max(1050px, 80dvh));
+
+    margin: auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+
+.content-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 4rem;
+    max-width: 1200px;
+    width: 100%;
+}
+
+.logo-wrapper {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.logo {
+    max-width: 100%;
+    height: auto;
+    width: 280px; 
+    object-fit: contain;
+}
+
+
+.arrow-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-shrink: 0;
+    transform: scale(.6, .5);
+}
+
+.arrow-wrapper img {
+    --size: 150px;
+    width: var(--size); height: var(--size);
+}
+
+.animated-arrow {
+    animation: bounce-horizontal 2s ease-in-out infinite;
+}
+
+@keyframes bounce-horizontal {
+    0%, 100% {
+        transform: translateX(-15px);
+    }
+    50% {
+        transform: translateX(15px);
+    }
+}
+
+
+@media (max-width: 768px) {
+    .transformation-section {
+        background: linear-gradient(180deg, rgb(173, 81, 0), rgb(198, 91, 255));
+        width: 70vw;
+    }
+    .content-container {
+        flex-direction: column;
+        gap: 0 !important;
+        padding-bottom: 1.67rem;
+    }
+
+    .animated-arrow {
+        animation: bounce-vertical 2s ease-in-out infinite;
+    }
+
+    @keyframes bounce-vertical {
+        0%, 100% {
+            transform: translateY(-125px) rotate(90deg);
+        }
+        50% {
+            transform: translateY(15px) rotate(90deg);
+        }
+    }
+}
+</style>

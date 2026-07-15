@@ -2,7 +2,7 @@
 const home_button_src = "/assets/Logo_alb.png";
 
 // selected link prop
-const { activeLink = -1 } = Astro.props;
+const { activeLink = -1, has_margin = true } = Astro.props;
 const links = [
     { name: "Acasă", href: "/" },
     { name: "Echipă", href: "/echipa" },
@@ -59,7 +59,7 @@ const links = [
     </div>
 </div>
 
-<!-- <div class = 'nav-margin'></div> -->
+{has_margin && <div class = 'nav-margin'></div>}
 
 <script>
     function update_background() {
