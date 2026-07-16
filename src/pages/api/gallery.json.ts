@@ -27,7 +27,7 @@ export const GET: APIRoute = () => {
                 order,  // attach it temporarily
             };
         })
-        .sort((a, b) => a.order - b.order)  // sort numerically
+        .sort((a, b) => b.order - a.order)  // sort numerically
         .map(({ order, ...rest }) => rest);  // strip order before returning
 
     return new Response(JSON.stringify(folders), {
