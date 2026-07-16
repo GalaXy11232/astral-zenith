@@ -6,7 +6,7 @@ import Hexbackground from "../components/hexbackground.astro"
 
 import Icon from "../components/contact/Icon.astro";
 import ContactMethodCard from "../components/contact/ContactMethodCard.astro";
-import { contactMethods, location } from "../components/contact/contact-data";
+import { contactMethods, location } from './api/contact-data';
 ---
 
 <BaseLayout title = "Contact">
@@ -84,7 +84,7 @@ import { contactMethods, location } from "../components/contact/contact-data";
     }
 
     .contact-hero__eyebrow {
-        font-family: "Space Grotesk", system-ui, sans-serif;
+        /* font-family: "Space Grotesk", system-ui, sans-serif; */
         font-weight: 700;
         font-size: 0.78rem;
         letter-spacing: 0.14em;
@@ -94,7 +94,7 @@ import { contactMethods, location } from "../components/contact/contact-data";
     }
 
     .contact-hero__title {
-        font-family: "Space Grotesk", system-ui, sans-serif;
+        /* font-family: "Space Grotesk", system-ui, sans-serif; */
         font-weight: 700;
         font-size: clamp(2.2rem, 5vw, 4rem);
         line-height: 1.1;
@@ -117,13 +117,14 @@ import { contactMethods, location } from "../components/contact/contact-data";
     }
 
     .contact-methods__grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
         gap: 1.35rem;
     }
 
     .contact-location__title {
-        font-family: "Space Grotesk", system-ui, sans-serif;
+        /* font-family: "Space Grotesk", system-ui, sans-serif; */
         font-weight: 700;
         font-size: 1.6rem;
         color: #b14aff;
@@ -168,7 +169,7 @@ import { contactMethods, location } from "../components/contact/contact-data";
 
     .contact-location__label {
         margin: 0;
-        font-family: "Space Grotesk", system-ui, sans-serif;
+        /* font-family: "Space Grotesk", system-ui, sans-serif; */
         font-weight: 700;
         font-size: 0.72rem;
         letter-spacing: 0.08em;

@@ -23,6 +23,22 @@ export const contactMethods = [
         icon: "tiktok",
         external: true,
     },
+    {
+        id: "youtube",
+        label: "YouTube",
+        value: "@Zenith-CNGM",
+        href: "https://www.youtube.com/@Zenith-CNGM",
+        icon: "youtube",
+        external: true,
+    },
+    {
+        id: "facebook",
+        label: "Facebook",
+        value: "Zenith CNGM",
+        href: "https://www.facebook.com/p/Zenith-CNGM-61566425829275/",
+        icon: "facebook",
+        external: true,
+    },
 
     {
         id: "linkedin",
