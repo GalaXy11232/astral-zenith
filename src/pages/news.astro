@@ -22,11 +22,11 @@ import MediaVideo from '../components/media/MediaVideo.astro';
     >
         <span class="me-label">Articole & surse</span>
         <div class="me-grid">
-            <MediaLink 
+            <!-- <MediaLink 
                 href="https://www.ziar.com/news=17680422" 
                 source="Ziar.com" 
                 label="Performanță de elită pentru echipa de robotică Zenith" 
-            />
+            /> -->
             <MediaLink 
                 href="https://www.news.ro/edu-news/performanta-elita-echipa-robotica-zenith-colegiul-national-grigore-moisil-capitala-membrii-echipei-au-obtinut-locul-ii-categoria-inspire-unei-competitii-profil-istanbul-foto-1922402202102026071722502955"  
                 source="News.ro"   
@@ -38,15 +38,44 @@ import MediaVideo from '../components/media/MediaVideo.astro';
                 source="Financial Intelligence"   
                 label="Performanţă de elită pentru echipa de robotică Zenith" 
             />
+            <MediaLink 
+                href="https://rotimes.ro/article/2026-07-02-bucharest-students-win-second-place-at-international-robotics-event"
+                source="RoTimes"   
+                label="Elevi din București au obținut locul doi la o competiție internațională de robotică" 
+            />
+        </div>
+
+        <hr class="me-divider" />
+
+        <span class="me-label">Galerie foto</span>
+        <div class="me-media-grid">
+            <MediaImage src = "public/assets/galerie/67_Istanbul_Premier_Event/IMG_2111.webp" alt = 'poza istanbul' />
+            <MediaImage src = "public/assets/galerie/67_Istanbul_Premier_Event/istanbul.webp" alt = 'poza istanbul' />
+            <MediaImage src = "public/assets/galerie/67_Istanbul_Premier_Event/WhatsApp Image 2026-06-30 at 2.04.47 AM.webp" alt = 'poza istanbul' />
+            <MediaImage src = "public/assets/galerie/67_Istanbul_Premier_Event/WhatsApp Image 2026-06-30 at 2.04.51 AM (2).webp" alt = 'poza istanbul' />
+            <!-- <MediaVideo src="https://www.youtube.com/watch?v=_koqmYqoH6g" poster="/assets/galerie/6_Meet_The_Future,_13_ian._2024/DSC07271.webp" /> -->
+        </div>
+    </MediaEvent>
+
+    <MediaEvent
+        title="Interviu Prima News - Viitor pentru România"
+        date="26 - 28 iunie 2026"
+        cover=""
+    >
+        <span class="me-label">Surse</span>
+        <div class="me-grid">
+            <MediaLink 
+                href = "https://www.youtube.com/watch?v=gfCv_WEXd-U"
+                source="Prima News"   
+                label = "Viitor pentru România: Robotică și viitor | Zenith, Colegiul „Grigore Moisil”" 
+            />
         </div>
 
         <hr class="me-divider" />
 
         <span class="me-label">Galerie foto & video</span>
         <div class="me-media-grid">
-            <MediaImage src="/assets/galerie/7_Hackaton_la_Facultatea_de_Inginerie_Mecanică_și_Mecatronică/WhatsApp Image 2026-03-26 at 22.07.49.webp" alt="Echipa pe teren" focus="center top" />
-            <MediaImage src="/assets/galerie/7_Hackaton_la_Facultatea_de_Inginerie_Mecanică_și_Mecatronică/WhatsApp Image 2026-03-26 at 22.07.57.webp" alt="Robotul în acțiune" />
-            <MediaVideo src="https://www.youtube.com/watch?v=_koqmYqoH6g" poster="/assets/galerie/35_Meet_The_Future,_13_ian._2024/DSC07271.webp" />
+            
         </div>
     </MediaEvent>
 
