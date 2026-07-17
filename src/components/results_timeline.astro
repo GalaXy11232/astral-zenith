@@ -67,11 +67,13 @@
         }
 
         .results-timeline__items > :global(*:nth-child(odd)) {
-        align-self: flex-start;
+            align-self: flex-start;
+            text-align: start !important;
         }
 
         .results-timeline__items > :global(*:nth-child(even)) {
-        align-self: flex-end;
+            align-self: flex-end;
+            text-align: start !important;
         }
 
         .results-timeline__items > :global(*:nth-child(odd))::after {
@@ -79,36 +81,36 @@
         }
 
         .results-timeline__items > :global(*:nth-child(even))::after {
-        left: -2.85rem;
+            left: -2.85rem;
         }
 
         
         .results-timeline__items
         > :global(*:nth-child(even) .result-card__date) {
-        right: auto;
-        left: 1.5rem;
+            right: auto;
+            left: 1.5rem;
         }
 
         .results-timeline__items
         > :global(*:nth-child(even) .result-card__panel::before) {
-        right: auto;
-        left: -0.6rem;
+            right: auto;
+            left: -0.6rem;
         }
     }
 
 
     @media (max-width: 979px) {
         .results-timeline__line {
-        left: 1.4rem;
+            left: 1.4rem;
         }
 
         .results-timeline__items > :global(*) {
-        width: 100%;
-        padding-left: 3rem;
+            width: 100%;
+            padding-left: 3rem;
         }
 
         .results-timeline__items > :global(*)::after {
-        left: 0.85rem;
+            left: 0.85rem;
         }
     }
 </style>

@@ -1,5 +1,5 @@
 ---
-const { date, title,  image, imageAlt} = Astro.props;
+const { date, title,  image, imageAlt, scale_factor = 1} = Astro.props;
 ---
 
 <article class="result-card">
@@ -9,7 +9,7 @@ const { date, title,  image, imageAlt} = Astro.props;
 
     <div class="result-card__panel">
         <div class="result-card__media">
-        <img src={ image} alt={imageAlt ?? title} loading="lazy" />
+        <img style = {`transform: scale(${scale_factor})`} src={image} alt={imageAlt ?? title} loading="lazy" />
         </div>
 
         <div class="result-card__content">
@@ -72,7 +72,7 @@ const { date, title,  image, imageAlt} = Astro.props;
     .result-card__media {
         flex: 0 0 auto;
         width: 6.5rem;
-        height: 6.5rem;
+        height: auto;
         border-radius: 0.75rem;
         overflow: hidden;
         display: flex;
@@ -104,7 +104,8 @@ const { date, title,  image, imageAlt} = Astro.props;
         font-size: 0.95rem;
         line-height: 1.6;
         color: #2c2440;
-        text-align: justify;
+        /* text-align: justify; */
+        /* text-justify: inter-word; */
     }
 
     .result-card__description :global(p) {
