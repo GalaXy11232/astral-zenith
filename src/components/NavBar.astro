@@ -27,12 +27,15 @@ const links = [
         <div class="links-wrapper">
             {
                 links.map((link, index) => {
-                    return (<a 
-                        class = {`navbar-link scale-hover ${activeLink === index ? "active" : ""}`}
-                        href = {link.href}
-                    > 
-                        {link.name} 
-                    </a>);
+                    return (<>
+                        <a 
+                            class = {`navbar-link scale-hover ${activeLink === index ? "active" : ""}`}
+                            href = {link.href}
+                        > 
+                            {link.name} 
+                        </a>
+                        
+                    </>);
                 })
             }
         </div>

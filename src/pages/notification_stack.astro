@@ -1,0 +1,35 @@
+---
+export interface Props {
+    side?: "left" | "right";
+    top?: string;
+    gap?: string;
+}
+
+const { side = "right", top = "24px", gap = "14px" } = Astro.props;
+---
+
+<div class="notif-stack" data-side={side} style={`--stack-top:${top};--stack-gap:${gap}`}>
+    <slot />
+</div>
+
+<style>
+    .notif-stack {
+        position: fixed;
+        top: var(--stack-top);
+        z-index: 70;
+        display: flex;
+        flex-direction: column;
+        gap: var(--stack-gap);
+        pointer-events: none;
+    }
+
+    .notif-stack[data-side="right"] {
+        right: 0;
+        align-items: flex-end;
+    }
+
+    .notif-stack[data-side="left"] {
+        left: 0;
+        align-items: flex-start;
+    }
+</style>

@@ -2,7 +2,8 @@
     --navbar_bg_color: rgba(76, 0, 126, 0.5);
     --navbar_bg_filter: blur(12px) saturate(180%);
     --navlink_underline_color: rgb(104, 0, 184);
-    --glow_color: rgb(183, 89, 255);
+    --navlink_color: rgb(255, 255, 255);
+    --glow_color: rgb(255, 89, 205);
     --home-container_width: 30%;
     --home_width: 125px;
     --min-height: 50px;
@@ -198,6 +199,9 @@ a img {
         transition: .5s cubic-bezier(0.215, 0.610, 0.355, 1);
     }
 
+    .navbar-link, .mobile-navbar-link {
+        color: var(--navlink_color);
+    }
 
 /* hamburger menu */
 @media (max-width: 1080px) {

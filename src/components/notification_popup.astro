@@ -3,6 +3,10 @@ export interface Props {
     text: string;
     image: string;
     link: string;
+    storage_entry: string;
+    // the ones that are added to localstorage shall be ignored when initialized
+    // added to local storage only when the X button is pressed on them
+
     imageAlt?: string;
     side?: "left" | "right";
     intensity?: "subtle" | "normal" | "bold";
@@ -12,16 +16,13 @@ export interface Props {
     imageZoom?: number;
     imagePosX?: string;
     imagePosY?: string;
-
-    top?: string;
-    bottom?: string;
-    translateY?: string;
 }
 
 const {
     text,
     image,
     link,
+    storage_entry,
     imageAlt = "",
     side = "right",
     intensity = "normal",
@@ -30,9 +31,6 @@ const {
     imageZoom = 1,
     imagePosX = "50%",
     imagePosY = "50%",
-    top = "50%",
-    bottom = "auto",
-    translateY = "-50%",
 } = Astro.props;
 ---
 
@@ -41,6 +39,7 @@ const {
     data-side={side}
     data-intensity={intensity}
     data-delay={delay}
+    data-localstorage = {storage_entry}
     role="status"
     aria-live="polite"
     style={`
@@ -48,9 +47,6 @@ const {
         --img-zoom: ${imageZoom};
         --img-pos-x: ${imagePosX};
         --img-pos-y: ${imagePosY};
-        --notif-top: ${top};
-        --notif-bottom: ${bottom};
-        --notif-translate-y: ${translateY};
     `}
 >
     <button type="button" class="notif__close" aria-label="Închide notificarea">
@@ -75,7 +71,7 @@ const {
                 {intensity === "bold" ? "Noutate!!!" : "Noutate"}
             </span>
             <span class="notif__text">{text}</span>
-            
+
             <span class="notif__cta">
                 Vezi acum
                 <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true">
@@ -94,16 +90,11 @@ const {
 </aside>
 
 <style>
-    @import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@600;700&display=swap");
 
     .notif {
-        position: fixed;
-        /* Dynamic Positioning */
-        top: var(--notif-top);
-        bottom: var(--notif-bottom);
-        z-index: 70;
+        position: relative;
         width: clamp(260px, 88vw, 360px);
-        font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+        font-family: system-ui, -apple-system, "Segoe UI", sans-serif; /* asta lasa l */
         opacity: 0;
         pointer-events: none;
         transition:
@@ -116,24 +107,20 @@ const {
         pointer-events: auto;
     }
 
-    /* Right Side Animation logic with Dynamic Y-Translation */
     .notif[data-side="right"] {
-        right: 0;
-        transform: translate(120%, var(--notif-translate-y));
+        transform: translateX(120%);
     }
 
     .notif[data-side="right"].is-visible {
-        transform: translate(0, var(--notif-translate-y));
+        transform: translateX(0);
     }
 
-    /* Left Side Animation logic with Dynamic Y-Translation */
     .notif[data-side="left"] {
-        left: 0;
-        transform: translate(-120%, var(--notif-translate-y));
+        transform: translateX(-120%);
     }
 
     .notif[data-side="left"].is-visible {
-        transform: translate(0, var(--notif-translate-y));
+        transform: translateX(0);
     }
 
     /* --- INTENSITY STYLES --- */
@@ -142,7 +129,7 @@ const {
     }
 
     .notif[data-intensity="normal"] .notif__link {
-        box-shadow: 
+        box-shadow:
             0 0 20px color-mix(in srgb, var(--theme-color) 35%, transparent),
             0 4px 12px rgba(0, 0, 0, 0.05);
     }
@@ -198,18 +185,18 @@ const {
     .notif__image {
         position: relative;
         flex: 0 0 auto;
-        width: 4.2rem; 
-        height: 4.2rem; 
+        width: 4.2rem;
+        height: 4.2rem;
         border-radius: 50%;
-        overflow: hidden; 
-        background-color: #f3f4f6; 
+        overflow: hidden;
+        background-color: #f3f4f6;
         box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.06);
     }
 
     .notif__image img {
         width: 100%;
         height: 100%;
-        object-fit: cover; 
+        object-fit: cover;
         object-position: var(--img-pos-x) var(--img-pos-y);
         transform: scale(var(--img-zoom));
     }
@@ -230,7 +217,7 @@ const {
         border-radius: 999px;
         background: color-mix(in srgb, var(--theme-color) 12%, transparent);
         color: var(--theme-color);
-        font-family: "Space Grotesk", system-ui, sans-serif;
+        /* font-family: "Space Grotesk", system-ui, sans-serif; */
         font-weight: 700;
         font-size: 0.68rem;
         letter-spacing: 0.06em;
@@ -257,7 +244,7 @@ const {
         align-items: center;
         gap: 0.3rem;
         margin-top: 0.15rem;
-        font-family: "Space Grotesk", system-ui, sans-serif;
+        /* font-family: "Space Grotesk", system-ui, sans-serif; */
         font-weight: 700;
         font-size: 0.82rem;
         color: var(--theme-color);
@@ -327,9 +314,26 @@ const {
 </style>
 
 <script>
+    const STORAGE_ENTRY_PREFIX = 'notif-';
+
+    function reenable_notifications() {
+        const notif_entries = Object.keys(localStorage).filter((entry_name) => {
+            return entry_name.startsWith(STORAGE_ENTRY_PREFIX);
+        })
+
+        notif_entries.forEach((el) => localStorage.removeItem(el));
+    }
+
     function initNotifications() {
+        const storage_entries = Object.keys(localStorage);
+
         document.querySelectorAll(".notif").forEach((el: any) => {
             if (el.dataset.initialized === "true") return;
+
+            const lsentry = STORAGE_ENTRY_PREFIX + el.dataset.localstorage;
+            if (storage_entries.includes(lsentry))
+                return;
+
             el.dataset.initialized = "true";
 
             const delay = Number(el.dataset.delay || "0");
@@ -337,21 +341,45 @@ const {
 
             const show = () => el.classList.add("is-visible");
 
+            const collapse = () => {
+                const rect = el.getBoundingClientRect();
+                el.style.height = rect.height + 'px';
+                el.style.overflow = 'hidden';
+                void el.offsetHeight;
+                el.style.transition = 'height 0.3s ease, margin-top 0.3s ease, margin-bottom 0.3s ease';
+                el.style.height = '0px';
+                el.style.marginTop = '0px';
+                el.style.marginBottom = '0px';
+                el.addEventListener('transitionend', () => el.remove(), { once: true });
+            };
+
             const hide = () => {
                 el.classList.remove("is-visible");
-                el.addEventListener("transitionend", () => el.remove(), {
-                    once: true,
-                });
+
+                const onSlideEnd = (event: any) => {
+                    if (event.propertyName !== 'transform') return;
+                    el.removeEventListener('transitionend', onSlideEnd);
+                    collapse();
+                };
+
+                el.addEventListener('transitionend', onSlideEnd);
             };
 
             window.setTimeout(show, delay);
 
             closeBtn?.addEventListener("click", (event: any) => {
+                localStorage.setItem(STORAGE_ENTRY_PREFIX + String(el.dataset.localstorage), 'true');
                 event.preventDefault();
+                hide();
+            });
+
+            el.addEventListener('click', () => {
+                localStorage.setItem(STORAGE_ENTRY_PREFIX + String(el.dataset.localstorage), 'true');
                 hide();
             });
         });
     }
 
+    document.addEventListener('astro:page-load', reenable_notifications);
     document.addEventListener('astro:page-load', initNotifications);
 </script>

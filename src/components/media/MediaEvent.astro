@@ -2,13 +2,16 @@
 interface Props {
     title: string;
     cover: string;
+    uid?: string;
     coverAlt?: string;
     coverFocus?: string;
     date?: string;
 }
 
-const { title, cover, coverAlt = title, coverFocus = 'center', date } = Astro.props;
-const uid = `me-${Math.random().toString(36).slice(2, 8)}`;
+let { title, cover, uid = '', coverAlt = title, coverFocus = 'center', date } = Astro.props;
+
+if (uid == '')
+    uid = `me-${Math.random().toString(36).slice(2, 8)}`;
 ---
 
 <section class="me-block" id={uid}>

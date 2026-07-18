@@ -3,9 +3,11 @@ import BaseLayout from "../layouts/BaseLayout.astro"
 import NavBar from "../components/NavBar.astro"
 import Footer from "../components/footer.astro"
 import Hexbackground from "../components/hexbackground.astro"
-import NotificationPopup from "../components/notification_popup.astro"
-import HeroSection from "../components/main/hero_section.astro"
 
+import NotificationPopup from "../components/notification_popup.astro"
+import NotificationStack from "./notification_stack.astro"
+
+import HeroSection from "../components/main/hero_section.astro"
 // import TextTypewriter from "../components/main/text_typewriter.astro";
 import RebrandingSection from "../components/main/rebranding_section.astro"
 
@@ -17,6 +19,32 @@ import VideoTextSplitSection from "../components/main/video_text_split_section.a
 <BaseLayout title = "Acasa">
     <NavBar activeLink = {0} has_margin = {false}/>
     <Hexbackground />
+
+    <NotificationStack side="left" top="100px">
+        
+        <NotificationPopup 
+            text="Aruncă un ochi asupra performanței noastre la unul dintre cele mai prestigioase evenimente FTC!"
+            image="/assets/stiri/istanbul/event icon.png"
+            storage_entry="istanbul"
+            link="/news/#event-istanbul"
+            side = 'left'
+            intensity="bold"
+            
+            delay={5500}
+        />
+        <NotificationPopup 
+            text="Am creat și un joc despre FTC care sigur o să îți placă!"
+            image="/assets/Super Into the Deep Icon.png"
+            storage_entry="jocintothedeep"
+            link="/#gamenotif-id"
+            side = 'left'
+            intensity="subtle"
+            imageZoom={0.8}
+            imagePosY="-5px"
+            
+            delay={12000}
+        />
+    </NotificatioNStack>
 
     <HeroSection 
         motto = 'Visions above ground'
@@ -49,6 +77,8 @@ import VideoTextSplitSection from "../components/main/video_text_split_section.a
     <VideoSection url = 'https://www.youtube.com/watch?v=Masc7eAALss' />
 
     <!-- jocu lui tuthankamon -->
+    <span id = 'gamenotif-id'></span>
+
      <VideoTextSplitSection
         url = '/assets/Super Into the Deep Bootsplash.png'
         title = "Vezi și jocul nostru!"
@@ -75,17 +105,6 @@ import VideoTextSplitSection from "../components/main/video_text_split_section.a
     <RebrandingSection />
 
     <div style = 'margin-bottom: 5rem;'></div>
-
-    <!-- <NotificationPopup 
-        text="Șobi se află la 2 mile distanță de tine și vrea să aveți niște interacțiuni indecente."
-        image="/sobi.png"
-        side = 'left'
-        link="/echipa"
-        intensity="bold"
-        top = "20%"
-        imagePosX="15%"
-        imageZoom={1.2}
-    /> -->
     
 
     <!-- sliders -->
