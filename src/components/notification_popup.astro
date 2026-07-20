@@ -324,6 +324,21 @@ const {
         notif_entries.forEach((el) => localStorage.removeItem(el));
     }
 
+    function setup_link_scrolling() {
+        const links = document.querySelectorAll('.notif__link');
+
+        links.forEach((link: any) => {
+            if (link.getAttribute('href').startsWith("#")) {
+                link.addEventListener('click', (e: any) => {
+                    e.preventDefault();
+                    
+                    const targetElement = document.querySelector(link.getAttribute('href')) as any;
+                    targetElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                });
+            }
+        });
+    }
+
     function initNotifications() {
         const storage_entries = Object.keys(localStorage);
 
@@ -382,4 +397,5 @@ const {
 
     document.addEventListener('astro:page-load', reenable_notifications);
     document.addEventListener('astro:page-load', initNotifications);
+    document.addEventListener('astro:page-load', setup_link_scrolling);
 </script>

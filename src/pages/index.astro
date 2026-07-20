@@ -19,6 +19,7 @@ import VideoTextSplitSection from "../components/main/video_text_split_section.a
 <BaseLayout title = "Acasa">
     <NavBar activeLink = {0} has_margin = {false}/>
     <Hexbackground />
+    
 
     <NotificationStack side="left" top="100px">
         
@@ -36,13 +37,13 @@ import VideoTextSplitSection from "../components/main/video_text_split_section.a
             text="Am creat și un joc despre FTC care sigur o să îți placă!"
             image="/assets/Super Into the Deep Icon.png"
             storage_entry="jocintothedeep"
-            link="/#gamenotif-id"
+            link="#gamenotif-id"
             side = 'left'
             intensity="subtle"
             imageZoom={0.8}
             imagePosY="-5px"
             
-            delay={12000}
+            delay={120}
         />
     </NotificatioNStack>
 
@@ -77,19 +78,18 @@ import VideoTextSplitSection from "../components/main/video_text_split_section.a
     <VideoSection url = 'https://www.youtube.com/watch?v=Masc7eAALss' />
 
     <!-- jocu lui tuthankamon -->
-    <span id = 'gamenotif-id'></span>
-
      <VideoTextSplitSection
         url = '/assets/Super Into the Deep Bootsplash.png'
         title = "Vezi și jocul nostru!"
         text_align = 'center'
     >
+        <span id = 'gamenotif-id'></span>
         Pasionați de sezonul #9 al competiției FIRST Tech Challenge, „<span style = 'color: rgb(33, 103, 255);'>Into The Deep</span>”, 
         doi dintre membrii echipei au creat un joc captivant și interactiv care simulează întocmai tema concursului și meciurile între echipe, 
         alături de multe alte elemente de conținut adăugate de ei. Jocul este exclusiv pentru controllere (preferabil de PlayStation 3) 
         și poate fi jucat de 1, 2 sau 4 jucători la același calculator.
         <br>
-        <a class = 'link' href = 'https://galaxy11232.itch.io/super-into-the-deep'>Accesează jocul aici!</a>
+        <a class = 'link' target="_blank" href = 'https://galaxy11232.itch.io/super-into-the-deep'>Accesează jocul aici!</a>
     </VideoTextSplitSection>
 
     <TextSection
