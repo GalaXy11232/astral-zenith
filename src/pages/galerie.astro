@@ -25,11 +25,8 @@ import Hexbackground from "../components/hexbackground.astro";
         justify-content: center;
         align-items: center;
         margin: 1rem;
-        flex-wrap: wrap;
+        margin-bottom: 2.5rem;
     }
-
-    .gallery-folder { margin-bottom: 8rem; }
-    .no-mb { margin-bottom: 0 !important; }
 
     /* fara asta mesajele de loading/eroare erau text negru pe fundal #111 */
     .gallery-loading {
@@ -40,34 +37,112 @@ import Hexbackground from "../components/hexbackground.astro";
         font-weight: 500;
     }
 
-    .images {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: center;
-        gap: 2rem;
+    /* --- titlul-buton --- */
+    .folder-toggle {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.85rem;
+        background: none;
+        border: none;
+        padding: 0.2rem;
+        font: inherit;
+        color: inherit;
+        cursor: pointer;
     }
 
-    .square-image {
-        width: 250px; 
-        height: 250px;
-        object-fit: cover;
-        transition: .3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        box-shadow: 0 0 10px black;
-        display: block;
-        background: #222;
+    .folder-toggle:focus-visible {
+        outline: 2px solid var(--glass-text-soft);
+        outline-offset: 6px;
         border-radius: 10px;
     }
 
-    .square-image:hover {
-        transform: scale(1.05);
-        border-radius: 20px;
-        box-shadow: 0 0 20px var(--primary), 0 0 20px var(--primary);
-        cursor: pointer;
+    .folder-chevron {
+        flex: 0 0 auto;
+        width: 1.5rem;
+        height: 1.5rem;
+        color: var(--glass-text-soft);
+        transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
     }
-    
+
+    .folder-chevron svg { display: block; width: 100%; height: 100%; }
+
+    .folder-toggle[aria-expanded="true"] .folder-chevron {
+        transform: rotate(180deg);
+    }
+
+    /* --- panoul care coboara de sub titlu --- */
+    .wheel-panel {
+        width: 100%;
+        height: 0;
+        overflow: hidden;
+        transition: height 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    /* Continutul porneste tras complet in sus, deci pe masura ce panoul creste
+       roata pare ca iese de sub titlu. */
+    .wheel-inner {
+        transform: translateY(-100%);
+        opacity: 0;
+        transition:
+            transform 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+            opacity 0.35s ease;
+    }
+
+    .wheel-panel[data-open="true"] .wheel-inner {
+        transform: translateY(0);
+        opacity: 1;
+    }
+
+    /* --- roata de poze --- */
+    .wheel {
+        position: relative;
+        width: 100%;
+        max-width: 1400px;
+        height: clamp(320px, 52vh, 560px);
+        margin: 0 auto;
+        overflow: hidden;
+        cursor: grab;
+        /* pointer events pe container: drag orizontal fara sa blocheze
+           scroll-ul vertical al paginii */
+        touch-action: pan-y;
+    }
+
+    .wheel:active { cursor: grabbing; }
+
+    .wheel:focus-visible {
+        outline: 2px solid var(--glass-text-soft);
+        outline-offset: 4px;
+        border-radius: 12px;
+    }
+
+    .wheel canvas {
+        display: block;
+        width: 100%;
+        height: 100%;
+    }
+
+    .wheel-hint {
+        text-align: center;
+        font-size: 0.78rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--glass-text-dim);
+        margin: 0.35rem 0 0;
+    }
+
+    /* placeholderele pe care le foloseste vizualizatorul pentru sageti;
+       nu se incarca niciodata, au doar data-src */
+    .wheel-index { display: none; }
+
+    @media (prefers-reduced-motion: reduce) {
+        .wheel-panel,
+        .wheel-inner,
+        .folder-chevron { transition: none; }
+    }
 </style>
 
 <script>
+import { CircularWheel } from '../utils/circular_gallery';
 
 interface FolderData {
     name: string;
@@ -76,78 +151,26 @@ interface FolderData {
     images: string[];
 }
 
-// lazy loader
-function createLazyObserver(): IntersectionObserver {
-    return new IntersectionObserver((entries, observer) => {
-        entries.forEach(entry => {
-            if (!entry.isIntersecting) return;
-            const img = entry.target as HTMLImageElement;
-            const real = img.dataset.src;
-            if (!real) return;
-
-            img.src = real;
-            img.removeAttribute('data-src');
-            img.removeAttribute('data-lazy');
-            observer.unobserve(img);
-        });
-    }, {
-        // start loading when image is 200px away from the viewport
-        rootMargin: '200px',
-        threshold: 0,
-    });
+interface Entry {
+    button: HTMLButtonElement;
+    panel: HTMLElement;
+    wheelEl: HTMLElement;
+    index: HTMLElement;
+    items: { image: string }[];
 }
 
+// O SINGURA roata pentru toata pagina. Fiindca doar un folder e deschis odata,
+// nu mai avem nevoie de pool, de IntersectionObserver sau de reciclare de
+// contexte — exista un singur context WebGL si un singur set de texturi.
+let wheel: CircularWheel | null = null;
+let openEntry: Entry | null = null;
+let collapseTimer = 0;
+let expandTimer = 0;
 
-function buildImage(src: string, identifier: string, index: number, observer: IntersectionObserver): HTMLImageElement {
-    const img = document.createElement('img');
-    img.alt = 'Gallery image';
-    img.className = 'square-image gallery-placed-image';
-    img.decoding = 'async';
-    img.draggable = false;
-    img.dataset.identifier = identifier;
-    img.dataset.index = String(index);
-
-    // lazy: show shimmer until in view
-    img.dataset.src = src;
-    img.dataset.lazy = 'true';
-
-    img.addEventListener('click', () => openFullView(img));
-    observer.observe(img);
-    return img;
-}
-
-function buildSection(folder: FolderData, observer: IntersectionObserver): HTMLElement {
-    const section = document.createElement('section');
-    section.className = 'gallery-folder';
-
-    // title
-    const titleContainer = document.createElement('div');
-    titleContainer.className = 'title-container';
-    const span = document.createElement('span');
-    span.className = 'title-underline';
-    span.textContent = folder.name;
-    titleContainer.appendChild(span);
-    section.appendChild(titleContainer);
-
-    // images wrapper
-    const imagesDiv = document.createElement('div');
-    imagesDiv.className = 'images';
-
-    if (folder.images.length === 0) {
-        const p = document.createElement('p');
-        p.textContent = 'No images found.';
-        imagesDiv.appendChild(p);
-    } else {
-        folder.images.forEach((imageName, index) => {
-            const src = `${folder.url}/${encodeURIComponent(imageName)}`;
-            imagesDiv.appendChild(buildImage(src, folder.name, index, observer));
-        });
-    }
-
-    section.appendChild(imagesDiv);
-    return section;
-}
-
+const CHEVRON = `<svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2.2"
+          stroke-linecap="round" stroke-linejoin="round"/>
+</svg>`;
 
 function openFullView(img: HTMLImageElement) {
     const visualizer = document.getElementById('image-visualizer') as HTMLImageElement | null;
@@ -167,6 +190,177 @@ function openFullView(img: HTMLImageElement) {
     container.style.background = '#111d';
 }
 
+function buildSection(folder: FolderData, i: number): Entry | null {
+    const section = document.createElement('section');
+    section.className = 'gallery-folder';
+
+    const panelId = `wheel-panel-${i}`;
+
+    const titleContainer = document.createElement('div');
+    titleContainer.className = 'title-container';
+
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'folder-toggle';
+    button.setAttribute('aria-expanded', 'false');
+    button.setAttribute('aria-controls', panelId);
+
+    const span = document.createElement('span');
+    span.className = 'title-underline';
+    span.textContent = folder.name;
+    button.appendChild(span);
+
+    const chevron = document.createElement('span');
+    chevron.className = 'folder-chevron';
+    chevron.innerHTML = CHEVRON;
+    button.appendChild(chevron);
+
+    titleContainer.appendChild(button);
+    section.appendChild(titleContainer);
+
+    if (folder.images.length === 0) {
+        const p = document.createElement('p');
+        p.className = 'gallery-loading';
+        p.textContent = 'No images found.';
+        section.appendChild(p);
+        document.getElementById('gallery-root')!.appendChild(section);
+        return null;
+    }
+
+    const sources = folder.images.map(
+        name => `${folder.url}/${encodeURIComponent(name)}`
+    );
+
+    const panel = document.createElement('div');
+    panel.className = 'wheel-panel';
+    panel.id = panelId;
+    panel.dataset.open = 'false';
+
+    const inner = document.createElement('div');
+    inner.className = 'wheel-inner';
+
+    // Placeholdere ascunse: vizualizatorul existent cauta
+    // [data-identifier="..."] ca sa stie ce sa arate la sageata stanga/dreapta.
+    // Nu au src, doar data-src, deci nu descarca nimic.
+    const index = document.createElement('div');
+    index.className = 'wheel-index';
+    sources.forEach((src, imgIndex) => {
+        const img = document.createElement('img');
+        img.dataset.identifier = folder.name;
+        img.dataset.index = String(imgIndex);
+        img.dataset.src = src;
+        img.alt = '';
+        index.appendChild(img);
+    });
+    inner.appendChild(index);
+
+    const wheelEl = document.createElement('div');
+    wheelEl.className = 'wheel';
+    wheelEl.tabIndex = 0;
+    wheelEl.setAttribute('role', 'region');
+    wheelEl.setAttribute('aria-label',
+        `${folder.name} — galerie rotativa. Trage cu mouse-ul sau foloseste sagetile stanga/dreapta.`);
+    inner.appendChild(wheelEl);
+
+    const hint = document.createElement('p');
+    hint.className = 'wheel-hint';
+    hint.textContent = 'trage pentru a roti · click pentru a mări';
+    inner.appendChild(hint);
+
+    panel.appendChild(inner);
+    section.appendChild(panel);
+    document.getElementById('gallery-root')!.appendChild(section);
+
+    const entry: Entry = {
+        button, panel, wheelEl, index,
+        items: sources.map(image => ({ image }))
+    };
+
+    button.addEventListener('click', () => toggle(entry));
+    return entry;
+}
+
+function collapse(entry: Entry) {
+    entry.panel.style.height = entry.panel.scrollHeight + 'px';
+    void entry.panel.offsetHeight; // forteaza reflow ca tranzitia sa porneasca
+    entry.panel.style.height = '0px';
+    entry.panel.dataset.open = 'false';
+    entry.button.setAttribute('aria-expanded', 'false');
+}
+
+function expand(entry: Entry) {
+    entry.panel.style.height = '0px';
+    void entry.panel.offsetHeight; // reflow: fara el prima deschidere ar sari direct la final
+
+    entry.panel.dataset.open = 'true';
+    entry.button.setAttribute('aria-expanded', 'true');
+    entry.panel.style.height = entry.panel.scrollHeight + 'px';
+
+    // Dupa animatie lasam inaltimea libera, ca redimensionarea ferestrei sa nu
+    // taie roata (are inaltimea in vh). Timerul e rezerva pentru cazul in care
+    // transitionend nu se declanseaza (reduced-motion, tab in fundal).
+    const release = () => {
+        if (entry.panel.dataset.open === 'true') entry.panel.style.height = 'auto';
+    };
+
+    const onDone = (e: TransitionEvent) => {
+        if (e.target !== entry.panel || e.propertyName !== 'height') return;
+        entry.panel.removeEventListener('transitionend', onDone);
+        window.clearTimeout(expandTimer);
+        release();
+    };
+
+    entry.panel.addEventListener('transitionend', onDone);
+    window.clearTimeout(expandTimer);
+    expandTimer = window.setTimeout(release, 700);
+}
+
+function open(entry: Entry) {
+    if (openEntry === entry) return;
+
+    if (openEntry) {
+        collapse(openEntry);
+        openEntry = null;
+    }
+
+    // roata se creeaza la prima deschidere si traieste pana la parasirea paginii
+    if (!wheel) wheel = new CircularWheel({ bend: 3, borderRadius: 0.05 });
+
+    window.clearTimeout(collapseTimer);
+    wheel.detach();
+    wheel.attach(entry.wheelEl, entry.items, (i: number) => {
+        const target = entry.index.children[i] as HTMLImageElement | undefined;
+        if (target) openFullView(target);
+    });
+
+    expand(entry);
+    openEntry = entry;
+}
+
+function close(entry: Entry) {
+    collapse(entry);
+    openEntry = null;
+
+    // detasam abia dupa ce panoul s-a strans, altfel panza dispare brusc
+    // in mijlocul animatiei
+    window.clearTimeout(collapseTimer);
+    collapseTimer = window.setTimeout(() => {
+        if (!openEntry) wheel?.detach();
+    }, 500);
+}
+
+function toggle(entry: Entry) {
+    if (openEntry === entry) close(entry);
+    else open(entry);
+}
+
+function teardown() {
+    window.clearTimeout(collapseTimer);
+    window.clearTimeout(expandTimer);
+    wheel?.destroy();
+    wheel = null;
+    openEntry = null;
+}
 
 async function initGallery() {
     const root = document.getElementById('gallery-root');
@@ -190,21 +384,21 @@ async function initGallery() {
     }
 
     root.innerHTML = '';
-    const observer = createLazyObserver();
 
-    // render sections one tick at a time so the browser doesn't block
-    for (const folder of folders) {
-        root.appendChild(buildSection(folder, observer));
-        // yield to browser between sections — keeps UI responsive
-        await new Promise(r => setTimeout(r, 0));
-    }
+    const entries: Entry[] = [];
+    folders.forEach((folder, i) => {
+        const entry = buildSection(folder, i);
+        if (entry) entries.push(entry);
+    });
 
-    console.log(`Rendered ${folders.length} folders.`);
+    // primul folder (cel mai recent) e deschis din start
+    if (entries.length) open(entries[0]);
 }
+
+document.addEventListener('astro:before-swap', teardown);
 
 // fallback for non-Astro-routed first load
 ['astro:page-load', 'DOMContentLoaded'].forEach((ev) => {
-    console.log("Nigga")
     document.addEventListener(ev, initGallery);
 });
 </script>
