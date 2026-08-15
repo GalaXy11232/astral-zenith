@@ -9,8 +9,9 @@ const TOOLTIP_ABBREVIATIONS: Record<string, string> = {
 const tooltipText = tooltip ? TOOLTIP_ABBREVIATIONS[tooltip] ?? "" : "";
 ---
 
-<article class="member-card">
-    <div class="image-wrapper">
+<article class="member-card glass glass-hover">
+    <span class="glass-sheen" aria-hidden="true"></span>
+    <div class="image-wrapper glass-inset">
         <img 
             src={image} 
             alt={`Portrait of ${name}`} 
@@ -30,22 +31,29 @@ const tooltipText = tooltip ? TOOLTIP_ABBREVIATIONS[tooltip] ?? "" : "";
 </article>
 
 <style>
-    :root {
-        --tooltip-color: #f9c0ff;
-        --text-color: #7b28ae
+    .member-card {
+        --tooltip-color: rgba(62, 22, 98, 0.55);
+        --text-color: #f2e4ff;
     }
 
     .facultate-tooltiptext {
-        position: absolute; 
-        left: 0; right: 0; 
+        position: absolute;
+        left: 0; right: 0;
         margin: auto; margin-top: 1em;
-        background-color: var(--tooltip-color); 
+        background: var(--tooltip-color);
+        backdrop-filter: blur(16px) saturate(160%);
+        -webkit-backdrop-filter: blur(16px) saturate(160%);
+        border: 1px solid rgba(255, 255, 255, 0.22);
+        box-shadow:
+            0 8px 24px rgba(0, 0, 0, 0.40),
+            inset 0 1px 0 rgba(255, 255, 255, 0.30);
         color: var(--text-color);
         border-radius: 15px;
-        width: fit-content !important; 
+        width: fit-content !important;
         padding: 5px 2em; font-size: 80%;
         opacity: 1; visibility: hidden;
         transition: .25s ease cubic-bezier(0.47, 0, 0.745, 0.715);
+        z-index: 2;
     }
     .facultate-tooltiptext::after { /* arrow */
         content: "";
@@ -55,15 +63,15 @@ const tooltipText = tooltip ? TOOLTIP_ABBREVIATIONS[tooltip] ?? "" : "";
         margin-left: -5px;
         border-width: 5px;
         border-style: solid;
-        border-color: transparent transparent var(--tooltip-color) transparent;
+        border-color: transparent transparent rgba(255, 255, 255, 0.22) transparent;
     }
     .facultate-tooltip { position: relative; }
-    .facultate-tooltip > i { border-bottom: 1px dotted black; cursor: help;}
+    .facultate-tooltip > i { color: #cfa8f5; border-bottom: 1px dotted rgba(255, 255, 255, 0.45); cursor: help;}
     .facultate-tooltip:hover div { visibility: visible; opacity: 1;}
 
     
+    /* sticla vine din .glass / .glass-hover (global.css) */
     .member-card {
-        background-color: #efedef; 
         border-radius: 24px;
         padding: 24px;
         display: flex;
@@ -72,28 +80,16 @@ const tooltipText = tooltip ? TOOLTIP_ABBREVIATIONS[tooltip] ?? "" : "";
         text-align: center;
         width: 100%;
         max-width: 200px;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
-        
-        
-        transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1), 
-                    box-shadow 0.3s cubic-bezier(0.25, 1, 0.5, 1);
-    }
-
-    
-    .member-card:hover {
-        transform: translateY(-6px);
-        box-shadow: 0 15px 35px rgba(121, 55, 150, 0.15); 
     }
 
     /* --- Image Container --- */
     .image-wrapper {
         width: 100%;
-        
-        aspect-ratio: 3 / 4; 
+
+        aspect-ratio: 3 / 4;
         border-radius: 16px;
         overflow: hidden;
         margin-bottom: 20px;
-        background-color: #d1d1d1; 
     }
 
     .image-wrapper img {
@@ -122,10 +118,10 @@ const tooltipText = tooltip ? TOOLTIP_ABBREVIATIONS[tooltip] ?? "" : "";
         font-family: 'Prompt', sans-serif;
         font-size: 1.2rem;
         font-weight: 600;
-        color: #000000;
+        color: #f6f1ff;
         letter-spacing: -0.01em;
-        
-        text-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+
+        text-shadow: 0 1px 12px rgba(0, 0, 0, 0.45);
     }
 
     .department {
@@ -133,7 +129,7 @@ const tooltipText = tooltip ? TOOLTIP_ABBREVIATIONS[tooltip] ?? "" : "";
         font-family: 'Prompt', sans-serif;
         font-size: 1rem;
         font-weight: 500;
-        color: #793796;
+        color: #d9b3ff;
         line-height: 1.4;
         
         white-space: pre-wrap; 

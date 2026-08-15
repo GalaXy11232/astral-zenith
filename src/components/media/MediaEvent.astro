@@ -14,7 +14,8 @@ if (uid == '')
     uid = `me-${Math.random().toString(36).slice(2, 8)}`;
 ---
 
-<section class="me-block" id={uid}>
+<section class="me-block glass glass-hover" id={uid}>
+    <span class="glass-sheen" aria-hidden="true"></span>
 
     <div class="me-banner">
         <img
@@ -41,42 +42,28 @@ if (uid == '')
 </section>
 
 <style>
+    /* sticla vine din .glass / .glass-hover (global.css) */
     .me-block {
-        --ac:         #7c3aed;
+        --ac:         #c9a6ff;
         --ac-mid:     #a78bfa;
-        --ac-soft:    #ede9fe;
-        --ac-border:  rgba(124, 58, 237, 0.18);
-        --card-bg:    #f5f3ee;
-        --surface:    #ffffff;
-        --text:       #1a1033;
-        --muted:      #6b6485;
+        --ac-soft:    rgba(167, 139, 250, 0.16);
+        --ac-border:  rgba(255, 255, 255, 0.18);
+        --surface:    rgba(255, 255, 255, 0.07);
+        --text:       var(--glass-text);
+        --muted:      var(--glass-text-dim);
         --radius:     20px;
         --radius-sm:  12px;
         --tr:         0.32s cubic-bezier(0.22, 1, 0.36, 1);
 
-        background:    var(--card-bg);
         border-radius: var(--radius);
         overflow:      hidden;
-        box-shadow:
-            0 2px 8px rgba(124, 58, 237, 0.06),
-            0 8px 32px rgba(0, 0, 0, 0.07),
-            0 0 0 1px rgba(124, 58, 237, 0.07);
         max-width:     860px;
         width:         100%;
         margin:        0 auto 3rem;
-        transition:    box-shadow var(--tr), transform var(--tr);
     }
 
     .me-block:last-child {
         margin-bottom: 0;
-    }
-
-    .me-block:hover {
-        box-shadow:
-            0 4px 16px rgba(124, 58, 237, 0.1),
-            0 16px 48px rgba(0, 0, 0, 0.1),
-            0 0 0 1.5px rgba(124, 58, 237, 0.2);
-        transform: translateY(-2px);
     }
 
     .me-banner {
@@ -84,7 +71,7 @@ if (uid == '')
         height:       clamp(180px, 26vw, 260px);
         overflow:     hidden;
         border-radius: var(--radius) var(--radius) 0 0;
-        background:   #ddd8f0;
+        background:   rgba(255, 255, 255, 0.07);
     }
 
     .me-banner-img {
@@ -104,11 +91,12 @@ if (uid == '')
     .me-banner-gradient {
         position:   absolute;
         inset:      0;
+        /* dizolva bannerul in sticla, nu intr-un fundal opac */
         background: linear-gradient(
             to bottom,
-            transparent 60%,
-            rgba(245, 243, 238, 0.6) 90%,
-            rgba(245, 243, 238, 1) 100%
+            transparent 55%,
+            rgba(23, 14, 40, 0.55) 85%,
+            rgba(23, 14, 40, 0.85) 100%
         );
         pointer-events: none;
     }
@@ -173,7 +161,7 @@ if (uid == '')
     .me-body :global(.me-divider) {
         height:     1px;
         border:     none;
-        background: rgba(124, 58, 237, 0.12);
+        background: rgba(255, 255, 255, 0.14);
         margin:     0;
     }
 
@@ -189,7 +177,7 @@ if (uid == '')
         gap:             11px;
         padding:         13px 14px;
         background:      var(--surface);
-        border:          1px solid rgba(124, 58, 237, 0.1);
+        border:          1px solid rgba(255, 255, 255, 0.14);
         border-radius:   var(--radius-sm);
         text-decoration: none;
         color:           var(--text);
@@ -198,9 +186,9 @@ if (uid == '')
 
     .me-body :global(.me-link:hover) {
         background:    var(--ac-soft);
-        border-color:  rgba(124, 58, 237, 0.3);
+        border-color:  rgba(255, 255, 255, 0.30);
         transform:     translateY(-2px);
-        box-shadow:    0 4px 16px rgba(124, 58, 237, 0.1);
+        box-shadow:    0 4px 16px rgba(0, 0, 0, 0.30);
     }
 
     .me-body :global(.me-link-icon) {
@@ -265,15 +253,16 @@ if (uid == '')
         overflow:      hidden;
         cursor:        pointer;
         aspect-ratio:  16 / 10;
-        background:    #ddd8f0;
-        box-shadow:    0 2px 8px rgba(0, 0, 0, 0.08);
+        background:    rgba(255, 255, 255, 0.07);
+        border:        1px solid rgba(255, 255, 255, 0.14);
+        box-shadow:    0 2px 8px rgba(0, 0, 0, 0.28);
         transition:    transform var(--tr), box-shadow var(--tr);
     }
 
     .me-body :global(.me-img-wrap:hover),
     .me-body :global(.me-vid-wrap:hover) {
         transform:  translateY(-3px);
-        box-shadow: 0 6px 20px rgba(124, 58, 237, 0.15);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.38);
     }
 
     .me-body :global(.me-img-wrap img),

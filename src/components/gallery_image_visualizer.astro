@@ -22,8 +22,7 @@
             justify-content: space-between;
         }
 
-        #left-img, #right-img { bottom: 2% };
-
+        #left-img, #right-img { bottom: 2%; }
     }
 
     #image-visualizer {
@@ -74,14 +73,16 @@
 </style>
 
 <script>
-    ['astro:page-load', 'DOMContentLoaded'].forEach((ev) => {
-        document.addEventListener(ev, () => {
-            const full_image = document.querySelector('.full-img') as HTMLDivElement;
+    function initCloseOnOutsideClick() {
+            const full_image = document.querySelector('.full-img') as HTMLDivElement | null;
+            if (!full_image || full_image.dataset.closeInitialized === 'true') return;
+            full_image.dataset.closeInitialized = 'true';
+
             const image_element = document.getElementById('image-visualizer') as HTMLImageElement;
             const left_img = document.getElementById('left-img') as HTMLElement;
             const right_img = document.getElementById('right-img') as HTMLElement;
 
-            document.body.addEventListener('mouseup', (e) => {  
+            document.body.addEventListener('mouseup', (e) => {
                 let target = e.target as HTMLElement;
                 let visible = image_element.getAttribute('data-visible') as string;
                 if (visible == null) {
@@ -97,7 +98,10 @@
                     window.dispatchEvent(new Event('close-image-visualizer'));
                 }
             })
-        });
+    }
+
+    ['astro:page-load', 'DOMContentLoaded'].forEach((ev) => {
+        document.addEventListener(ev, initCloseOnOutsideClick);
     });
 </script>
 
@@ -109,8 +113,17 @@
     type ImageEvent = CustomEvent<EDetail>;
 
     function initProZoom() {
-        const container = document.querySelector('.full-img') as HTMLElement;
+        const container = document.querySelector('.full-img') as HTMLElement | null;
+        if (!container || container.dataset.zoomInitialized === 'true') return;
+        container.dataset.zoomInitialized = 'true';
+
         const img = container.querySelector('img') as HTMLImageElement;
+        const left_img = document.getElementById('left-img') as HTMLElement;
+        const right_img = document.getElementById('right-img') as HTMLElement;
+
+        // starea slideshow-ului curent, reimprospatata la fiecare deschidere
+        let image_array: HTMLImageElement[] = [];
+        let active_index = 0;
 
         let isLocked = false as any;
         let currentScale = 1;
@@ -172,38 +185,36 @@
             document.querySelector('.full-img')?.classList.add('hidden');
         });
 
-        // setup left/right buttons for image visualizer
+        // setup left/right buttons for image visualizer.
+        // Listenerele se leaga O SINGURA DATA aici; handler-ul de 'open' doar
+        // reimprospateaza image_array/active_index.
+        const step = (delta: number) => {
+            if (image_array.length === 0) return;
+
+            active_index = (active_index + delta + image_array.length) % image_array.length;
+
+            // aceeasi regula ca in openFullView: pozele lazy au inca doar data-src
+            const next_image = image_array[active_index];
+            img.src = next_image.dataset.src ?? next_image.src;
+        };
+
+        left_img?.addEventListener('click', () => step(-1));
+        right_img?.addEventListener('click', () => step(1));
+
         window.addEventListener('open-image-visualizer', (_: Event) => {
             var e = _ as ImageEvent;
-            var image_array = document.querySelectorAll(`[data-identifier="${e.detail.identifier}"]`);
-            var active_index = Number(e.detail.index);
-            const left_img = document.getElementById('left-img') as HTMLParagraphElement;
-            const right_img = document.getElementById('right-img') as HTMLParagraphElement;
-            const image_visualizer = document.getElementById('image-visualizer') as HTMLImageElement;
-            
-            if (image_array.length >= 2) 
+            image_array = Array.from(
+                document.querySelectorAll(`[data-identifier="${e.detail.identifier}"]`)
+            ) as HTMLImageElement[];
+            active_index = Number(e.detail.index);
+
+            if (image_array.length >= 2) {
                 document.querySelectorAll('.img-switcher-btn').forEach((item) => {
                     item.classList.remove('hidden');
                 });
-                document.querySelector('.full-img')?.classList.remove('hidden');
+            }
 
-            left_img.addEventListener('click', () => {
-                active_index -= 1;
-                if (active_index < 0) 
-                    active_index += image_array.length;
-                
-                let next_image = image_array[ active_index ] as HTMLImageElement;
-                image_visualizer.src = next_image.src;
-            });
-
-            right_img.addEventListener('click', () => {
-                active_index += 1;
-                if (active_index >= image_array.length) 
-                    active_index -= image_array.length;
-                
-                let next_image = image_array[ active_index ] as HTMLImageElement;
-                image_visualizer.src = next_image.src;
-            });
+            container.classList.remove('hidden');
         });
 
 

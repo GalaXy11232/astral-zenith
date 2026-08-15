@@ -13,11 +13,12 @@ const { label, value, href, icon, external = true } = Astro.props;
 ---
 
 <a
-  class="contact-card"
+  class="contact-card glass glass-hover"
   href={href}
   target={external ? "_blank" : undefined}
   rel={external ? "noopener noreferrer" : undefined}
 >
+  <span class="glass-sheen" aria-hidden="true"></span>
   <span class="contact-card__icon">
     <Icon name={icon} size={24} />
   </span>
@@ -28,6 +29,7 @@ const { label, value, href, icon, external = true } = Astro.props;
 </a>
 
 <style>
+    /* sticla vine din .glass / .glass-hover (global.css) */
     .contact-card {
         display: flex;
         align-items: center;
@@ -38,21 +40,6 @@ const { label, value, href, icon, external = true } = Astro.props;
         padding: 1.35rem 1.4rem;
         border-radius: 1.1rem;
         text-decoration: none;
-        background: linear-gradient(155deg, #ffffff 0%, #f5f1fb 55%, #efe4fb 100%);
-        border: 1px solid rgba(147, 51, 234, 0.1);
-        box-shadow:
-        0 2px 6px rgba(88, 28, 135, 0.06),
-        0 10px 24px rgba(88, 28, 135, 0.1);
-        transition:
-        transform 0.3s ease,
-        box-shadow 0.3s ease;
-    }
-
-    .contact-card:hover {
-        transform: translateY(-4px);
-        box-shadow:
-        0 4px 10px rgba(147, 51, 234, 0.14),
-        0 16px 32px rgba(147, 51, 234, 0.2);
     }
 
     .contact-card__icon {
@@ -63,9 +50,13 @@ const { label, value, href, icon, external = true } = Astro.props;
         display: flex;
         align-items: center;
         justify-content: center;
-        color: #7e22ce;
-        background: radial-gradient(circle at 30% 28%, #f6d5fe 0%, #ddd3fb 75%);
-        box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.7);
+        color: #e9d5ff;
+        background: radial-gradient(circle at 30% 28%,
+            rgba(246, 213, 254, 0.22) 0%,
+            rgba(221, 211, 251, 0.10) 75%);
+        backdrop-filter: blur(6px);
+        -webkit-backdrop-filter: blur(6px);
+        box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.28);
         transition: transform 0.35s ease;
     }
 
@@ -86,13 +77,13 @@ const { label, value, href, icon, external = true } = Astro.props;
         font-size: 0.72rem;
         letter-spacing: 0.08em;
         text-transform: uppercase;
-        color: #9333ea;
+        color: var(--glass-text-soft);
     }
 
     .contact-card__value {
         font-size: 1rem;
         font-weight: 600;
-        color: #3b0764;
+        color: var(--glass-text);
         overflow-wrap: anywhere;
     }
 </style>

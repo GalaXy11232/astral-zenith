@@ -27,7 +27,7 @@ const {
     side = "right",
     intensity = "normal",
     delay = 700,
-    badgeColor = "#9333ea",
+    badgeColor = "#d8b4fe",
     imageZoom = 1,
     imagePosX = "50%",
     imagePosY = "50%",
@@ -60,7 +60,9 @@ const {
         </svg>
     </button>
 
-    <a class="notif__link" href={link}>
+    <a class="notif__link glass glass-purple" href={link}>
+        <span class="glass-sheen" aria-hidden="true"></span>
+
         <span class="notif__image">
             <img src={image} alt={imageAlt} />
         </span>
@@ -125,17 +127,23 @@ const {
 
     /* --- INTENSITY STYLES --- */
     .notif[data-intensity="subtle"] .notif__link {
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        box-shadow:
+            0 8px 32px rgba(0, 0, 0, 0.35),
+            inset 0 1px 0 rgba(255, 255, 255, 0.38);
     }
 
     .notif[data-intensity="normal"] .notif__link {
         box-shadow:
             0 0 20px color-mix(in srgb, var(--theme-color) 35%, transparent),
-            0 4px 12px rgba(0, 0, 0, 0.05);
+            0 8px 32px rgba(0, 0, 0, 0.35),
+            inset 0 1px 0 rgba(255, 255, 255, 0.38);
     }
 
     .notif[data-intensity="bold"] .notif__link {
-        box-shadow: 0 8px 24px color-mix(in srgb, var(--theme-color) 25%, transparent);
+        box-shadow:
+            0 8px 24px color-mix(in srgb, var(--theme-color) 25%, transparent),
+            0 8px 32px rgba(0, 0, 0, 0.35),
+            inset 0 1px 0 rgba(255, 255, 255, 0.38);
     }
 
     .notif[data-intensity="bold"] .notif__link::after {
@@ -155,15 +163,13 @@ const {
     }
 
     /* --- BASE LAYOUT --- */
+    /* sticla + movul vin din .glass / .glass-purple (global.css) */
     .notif__link {
-        position: relative;
         display: flex;
         align-items: center;
         gap: 0.9rem;
         padding: 1.1rem 1.2rem;
         text-decoration: none;
-        background: linear-gradient(155deg, #ffffff 0%, #fcfafc 55%, #f5f0f9 100%);
-        border: 1px solid color-mix(in srgb, var(--theme-color) 15%, transparent);
         transition: transform 0.3s ease;
     }
 
@@ -189,8 +195,8 @@ const {
         height: 4.2rem;
         border-radius: 50%;
         overflow: hidden;
-        background-color: #f3f4f6;
-        box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.06);
+        background-color: rgba(255, 255, 255, 0.10);
+        box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.25);
     }
 
     .notif__image img {
@@ -236,7 +242,7 @@ const {
         font-size: 0.92rem;
         line-height: 1.4;
         font-weight: 500;
-        color: #3b0764;
+        color: var(--glass-text);
     }
 
     .notif__cta {
@@ -266,15 +272,15 @@ const {
         align-items: center;
         justify-content: center;
         background: #ffffff;
-        color: var(--theme-color);
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+        color: #6b21a8;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.35);
         cursor: pointer;
         transition: all 0.25s ease;
     }
 
     .notif__close:hover {
         transform: scale(1.1);
-        background: var(--theme-color);
+        background: #6b21a8;
         color: #ffffff;
     }
 
@@ -316,6 +322,8 @@ const {
 <script>
     const STORAGE_ENTRY_PREFIX = 'notif-';
 
+    // debug helper: wipes every dismissed-notification flag so they all show up again.
+    // NU o lega de astro:page-load — sterge exact ce salveaza butonul X.
     function reenable_notifications() {
         const notif_entries = Object.keys(localStorage).filter((entry_name) => {
             return entry_name.startsWith(STORAGE_ENTRY_PREFIX);
@@ -323,19 +331,25 @@ const {
 
         notif_entries.forEach((el) => localStorage.removeItem(el));
     }
+    (window as any).reenable_notifications = reenable_notifications;
 
     function setup_link_scrolling() {
         const links = document.querySelectorAll('.notif__link');
 
         links.forEach((link: any) => {
-            if (link.getAttribute('href').startsWith("#")) {
-                link.addEventListener('click', (e: any) => {
-                    e.preventDefault();
-                    
-                    const targetElement = document.querySelector(link.getAttribute('href')) as any;
-                    targetElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                });
-            }
+            if (link.dataset.scrollBound === "true") return;
+
+            const href = link.getAttribute('href');
+            if (!href || !href.startsWith("#")) return;
+
+            link.dataset.scrollBound = "true";
+            link.addEventListener('click', (e: any) => {
+                const targetElement = document.querySelector(href);
+                if (!targetElement) return;
+
+                e.preventDefault();
+                targetElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            });
         });
     }
 
@@ -346,15 +360,29 @@ const {
             if (el.dataset.initialized === "true") return;
 
             const lsentry = STORAGE_ENTRY_PREFIX + el.dataset.localstorage;
-            if (storage_entries.includes(lsentry))
+            if (storage_entries.includes(lsentry)) {
+                // scoate-o din DOM, nu doar o lasa invizibila: .notif-stack e un
+                // flex column cu gap, deci un element la opacity:0 tot ocupa
+                // inaltimea lui + gap si impinge notificarea urmatoare in jos
+                el.remove();
                 return;
+            }
 
             el.dataset.initialized = "true";
 
             const delay = Number(el.dataset.delay || "0");
             const closeBtn = el.querySelector(".notif__close");
 
-            const show = () => el.classList.add("is-visible");
+            // transitionend urca din copii (.notif__link are transition pe
+            // transform, .notif__cta pe gap), asa ca fara verificarea asta
+            // un simplu hover in timpul ascunderii declansa collapse()/remove()
+            const ownTransition = (event: any, prop: string) =>
+                event.target === el && event.propertyName === prop;
+
+            const show = () => {
+                if (!el.isConnected) return;
+                el.classList.add("is-visible");
+            };
 
             const collapse = () => {
                 const rect = el.getBoundingClientRect();
@@ -365,14 +393,24 @@ const {
                 el.style.height = '0px';
                 el.style.marginTop = '0px';
                 el.style.marginBottom = '0px';
-                el.addEventListener('transitionend', () => el.remove(), { once: true });
+
+                const onCollapseEnd = (event: any) => {
+                    if (!ownTransition(event, 'height')) return;
+                    el.removeEventListener('transitionend', onCollapseEnd);
+                    el.remove();
+                };
+
+                el.addEventListener('transitionend', onCollapseEnd);
             };
 
             const hide = () => {
+                if (el.dataset.hiding === "true") return;
+                el.dataset.hiding = "true";
+
                 el.classList.remove("is-visible");
 
                 const onSlideEnd = (event: any) => {
-                    if (event.propertyName !== 'transform') return;
+                    if (!ownTransition(event, 'transform')) return;
                     el.removeEventListener('transitionend', onSlideEnd);
                     collapse();
                 };
@@ -380,7 +418,9 @@ const {
                 el.addEventListener('transitionend', onSlideEnd);
             };
 
-            window.setTimeout(show, delay);
+            const showTimer = window.setTimeout(show, delay);
+            document.addEventListener('astro:before-swap',
+                () => window.clearTimeout(showTimer), { once: true });
 
             closeBtn?.addEventListener("click", (event: any) => {
                 localStorage.setItem(STORAGE_ENTRY_PREFIX + String(el.dataset.localstorage), 'true');
@@ -388,14 +428,12 @@ const {
                 hide();
             });
 
-            el.addEventListener('click', () => {
-                localStorage.setItem(STORAGE_ENTRY_PREFIX + String(el.dataset.localstorage), 'true');
-                hide();
-            });
+            // click pe corpul notificarii: o ascunde doar pentru sesiunea curenta.
+            // Doar butonul X scrie in localStorage (vezi comentariul din Props).
+            el.addEventListener('click', hide);
         });
     }
 
-    document.addEventListener('astro:page-load', reenable_notifications);
     document.addEventListener('astro:page-load', initNotifications);
     document.addEventListener('astro:page-load', setup_link_scrolling);
 </script>

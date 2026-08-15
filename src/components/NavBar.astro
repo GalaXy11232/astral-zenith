@@ -66,9 +66,11 @@ const links = [
 
 <script>
     function update_background() {
-        const nav = document.querySelector("nav") as HTMLElement;
+        const nav = document.querySelector("nav") as HTMLElement | null;
+        if (!nav) return;
+
         var yOffset = window.pageYOffset || document.body.scrollTop;
-        
+
         if (yOffset <= 20) {
             nav.style.background = "transparent";
             nav.style.backdropFilter = "none";
@@ -78,11 +80,12 @@ const links = [
         }
     }
     
+    // un singur listener de scroll pe toata durata sesiunii — altfel se acumuleaza
+    // cate unul la fiecare navigare ClientRouter
+    window.addEventListener("scroll", update_background);
+
     ['astro:page-load', 'DOMContentLoaded'].forEach((ev) => {
-        document.addEventListener(ev, () => {
-            update_background();
-            window.addEventListener("scroll", update_background);
-        });
+        document.addEventListener(ev, update_background);
     });
 </script>
 
