@@ -5,6 +5,27 @@
     --purple_hgradient: linear-gradient(90deg, var(--primary), #ba12aa);
 
     --bg-light: #d1c3e6;
+
+    /* ─── Bara de navigare ───────────────────────────────────────────────
+       Erau definite in navbar.css; mutate aici cand culorile au devenit
+       tokeni de tema. Fara ele, `color: var(--navlink_color)` era invalid si
+       linkurile cadeau pe albastrul implicit de link al browserului. */
+    --navbar_bg_color:         rgba(76, 0, 126, 0.5);
+    --navbar_bg_filter:        blur(12px) saturate(180%);
+    --navlink_color:           rgb(255, 255, 255);
+    --navlink_underline_color: rgb(104, 0, 184);
+    --glow_color:              rgb(255, 89, 205);
+    --nav-divider:             rgba(255, 255, 255, 0.22);
+    --nav-btn-bg:              rgba(255, 255, 255, 0.08);
+    --nav-btn-bg-hover:        rgba(255, 255, 255, 0.18);
+    --nav-btn-border:          rgba(255, 255, 255, 0.30);
+    --mobile-nav-bg:           rgb(96, 0, 160);
+
+    /* ─── Footer ─────────────────────────────────────────────────────── */
+    --footer-bg: linear-gradient(160deg, #241335 0%, #170b26 100%);
+
+    /* ─── Sectiunea video + text ──────────────────────────────────────── */
+    --video-basis: 420px;
 }
 
 *, ::after, ::before {
@@ -31,6 +52,9 @@
     --glass-text-soft: #d9b3ff;
     --glass-text-dim:  #b0a3c8;
     --glass-border:    rgba(255, 255, 255, 0.20);
+    --glass-border-hover: rgba(255, 255, 255, 0.34);
+    --glass-inset-bg:  rgba(141, 122, 173, 0.15);
+    --glass-body:      #8d7aad;
 }
 
 .glass {

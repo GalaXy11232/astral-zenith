@@ -1,13 +1,9 @@
 :root {
-    --navbar_bg_color: rgba(76, 0, 126, 0.5);
-    --navbar_bg_filter: blur(12px) saturate(180%);
-    --navlink_underline_color: rgb(104, 0, 184);
-    --navlink_color: rgb(255, 255, 255);
-    --glow_color: rgb(255, 89, 205);
+    /* culorile barei sunt tokeni de tema, definiti in global.css */
     --home-container_width: 30%;
     --home_width: 125px;
-    --min-height: 50px;
-    --navbar_padding: .5rem;
+    --min-height: 62px;
+    --navbar_padding: .7rem;
     --navbar_margin: 1.5rem;
     --height_beneath: calc(
         var(--min-height) + 
@@ -22,15 +18,40 @@ nav {
     z-index: 10;
 
     display: flex;
-    justify-content: space-around;
+    justify-content: space-between;
     align-items: center;
 
 
     min-height: var(--min-height);
     transition: 0.25s cubic-bezier(0.445, 0.05, 0.55, 0.95);    
+}
 
-    /* backdrop-filter: blur(12px) saturate(180%);
-    -webkit-backdrop-filter: blur(12px) saturate(180%); */
+/*
+ * Fundalul barei sta pe un strat separat, nu pe <nav>, ca sa poata fi estompat
+ * catre baza fara sa se estompeze si logourile sau linkurile. Masca lasa bara
+ * plina pana la 76% din inaltime si o stinge lin pe ultima portiune, ca sa nu
+ * mai existe o muchie taiata drept.
+ */
+nav::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+
+    background: var(--navbar_bg_color);
+    backdrop-filter: var(--navbar_bg_filter);
+    -webkit-backdrop-filter: var(--navbar_bg_filter);
+
+    -webkit-mask-image: linear-gradient(to bottom, #000 76%, transparent 100%);
+            mask-image: linear-gradient(to bottom, #000 76%, transparent 100%);
+
+    opacity: 0;
+    transition: opacity 0.25s cubic-bezier(0.445, 0.05, 0.55, 0.95);
+    pointer-events: none;
+}
+
+nav.is-scrolled::before {
+    opacity: 1;
 }
 
 .gallery-placed-image {
@@ -41,7 +62,7 @@ nav {
 
 .nav-margin {
     /* margin-bottom: calc(var(--min-height) + var(--navbar_padding)); */
-    margin-bottom: 6.7rem;
+    margin-bottom: 7.6rem;
 }
 
 a img {
@@ -55,10 +76,12 @@ a img {
 .scale-hover { transition: .25s cubic-bezier(0.175, 0.885, 0.32, 1.275) } /* Ease-out back */
 .scale-hover:hover, .active { transform: scale(1.05); }
 
+/* lipite de marginea din stanga: latime pe continut, nu 30% cu continutul centrat */
 .home-container { 
     display: flex; 
-    justify-content: center;
-    width: var(--home-container_width); 
+    align-items: center;
+    justify-content: flex-start;
+    flex: 0 0 auto;
     padding: .25rem 0;
 }
 
@@ -66,7 +89,7 @@ a img {
     display: flex; 
     justify-content: flex-end; 
     align-items: center;
-    width: calc(100% - var(--home-container_width)); 
+    flex: 1 1 auto;
     gap: 1rem;
     margin-right: 1rem;
 }
@@ -77,13 +100,41 @@ a img {
 }
 
 .navbar-home {
-    margin-left: 1rem;
+    margin-left: .5rem;
+}
+
+/* Sigla scolii, dupa logoul Zenith. Duce catre acelasi site ca in pagina de
+   sponsori (moisil.ro). */
+.navbar-school {
+    display: flex;
+    align-items: center;
+    margin-left: .85rem;
+    padding-left: .85rem;
+    border-left: 1px solid var(--nav-divider);
+}
+
+.navbar-school img {
+    height: calc(var(--min-height) - 12px);
+    width: auto;
+    display: block;
+}
+
+@media (max-width: 520px) {
+    .navbar-school {
+        margin-left: .5rem;
+        padding-left: .5rem;
+    }
+
+    .navbar-school img {
+        height: calc(var(--min-height) - 20px);
+    }
 }
 
 .navbar-link {
-    text-transform: capitalize;
-    font-size: 1.25rem;
-    font-weight: normal;
+    text-transform: uppercase;
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: .07em;
     text-decoration: none;
     transition: .25s cubic-bezier(0.445, 0.05, 0.55, 0.95); /* Ease-in-out sine */
 }
@@ -113,10 +164,51 @@ a img {
     transform: translateY(2px);
 }
 
-.glink img {
-    width: 32px !important;
-    height: 32px !important;
+/* Widgetul GTranslate ramane in pagina — el aduce motorul de traducere si
+   functia doGTranslate — dar nu se mai vede: il inlocuieste .lang-toggle.
+   Ascundem prin pozitionare, NU prin display: BaseLayout seteaza
+   display:flex inline la fiecare navigare si ne-ar suprascrie regula. */
+.gtranslate_wrapper {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    overflow: hidden !important;
+    clip-path: inset(50%);
+    opacity: 0 !important;
+    pointer-events: none !important;
 }
+
+/* --- comutator de limba: un singur buton, cu steagul limbii in care intri --- */
+.lang-toggle {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    border-radius: 50%;
+    border: 1px solid var(--nav-btn-border);
+    background: var(--nav-btn-bg);
+    overflow: hidden;
+    cursor: pointer;
+}
+
+.lang-toggle:hover {
+    background: var(--nav-btn-bg-hover);
+    border-color: var(--glass-border-hover);
+}
+
+.lang-toggle:focus-visible {
+    outline: 2px solid var(--glow_color);
+    outline-offset: 2px;
+}
+
+.lang-flag { display: none; width: 100%; height: 100%; }
+.lang-flag svg { display: block; width: 100%; height: 100%; }
+
+.lang-toggle[data-target="ro"] .lang-flag--ro { display: block; }
+.lang-toggle[data-target="en"] .lang-flag--en { display: block; }
 
     .mobile-nav {
         position: fixed;
@@ -127,7 +219,7 @@ a img {
         height: 100dvh;
         width: 0;
 
-        background: rgb(96, 0, 160);
+        background: var(--mobile-nav-bg);
         transition: width 1.4s cubic-bezier(0.215, 0.610, 0.355, 1);
     }
 
@@ -141,8 +233,9 @@ a img {
 
     .mobile-navbar-link {
         display: block;
-        text-transform: capitalize;
-        font-weight: normal;
+        text-transform: uppercase;
+        font-weight: 700;
+        letter-spacing: .07em;
         text-decoration: none;
         transition: .25s cubic-bezier(0.445, 0.05, 0.55, 0.95); /* Ease-in-out sine */
         padding-left: 20px;
@@ -178,7 +271,8 @@ a img {
     }
 
     .hamburger-btn {
-        color: gray;
+        color: var(--navlink_color);
+        opacity: .75;
         display: none;
         text-decoration: none;
         font-size: 300%;

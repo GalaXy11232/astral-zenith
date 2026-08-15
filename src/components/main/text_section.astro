@@ -33,7 +33,7 @@ const { title, eyebrow = '', text_align = 'start' } = Astro.props;
         font-size: 0.78rem;
         letter-spacing: 0.16em;
         text-transform: uppercase;
-        color: #d8b4fe;
+        color: var(--glass-text-soft);
     }
 
     .text-section__heading {
@@ -75,11 +75,11 @@ const { title, eyebrow = '', text_align = 'start' } = Astro.props;
     }
 
     .text-section__body :global(strong) {
-        color: #ffffff;
+        color: var(--glass-text);
     }
 
     .text-section__body :global(a) {
-        color: #e9a6ff;
+        color: var(--glass-text-soft);
         text-decoration-color: rgba(232, 121, 249, 0.5);
         text-underline-offset: 3px;
     }

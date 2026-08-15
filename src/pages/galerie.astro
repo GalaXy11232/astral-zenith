@@ -25,7 +25,7 @@ import Hexbackground from "../components/hexbackground.astro";
         justify-content: center;
         align-items: center;
         margin: 1rem;
-        margin-bottom: 2.5rem;
+        margin-bottom: 3.5rem;
     }
 
     /* fara asta mesajele de loading/eroare erau text negru pe fundal #111 */
@@ -81,6 +81,10 @@ import Hexbackground from "../components/hexbackground.astro";
     /* Continutul porneste tras complet in sus, deci pe masura ce panoul creste
        roata pare ca iese de sub titlu. */
     .wheel-inner {
+        /* padding, nu margine pe ultimul copil: scrollHeight — pe care se
+           bazeaza animatia panoului — nu socoteste marginea de jos a ultimului
+           element, si butonul ramanea taiat de overflow: hidden */
+        padding-bottom: 2.5rem;
         transform: translateY(-100%);
         opacity: 0;
         transition:
@@ -130,13 +134,80 @@ import Hexbackground from "../components/hexbackground.astro";
         margin: 0.35rem 0 0;
     }
 
-    /* placeholderele pe care le foloseste vizualizatorul pentru sageti;
-       nu se incarca niciodata, au doar data-src */
-    .wheel-index { display: none; }
+    /* Aceleasi elemente <img> servesc doua scopuri: in modul roata sunt doar
+       evidenta pe care o citeste vizualizatorul la sagetile stanga/dreapta
+       (ascunse, fara src, deci nu descarca nimic), iar in modul grila devin
+       chiar grila. Asa nu exista doua seturi de imagini de tinut sincronizate. */
+    .folder-grid { display: none; }
+
+    [data-view="grid"] .folder-grid {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 2rem;
+        padding: 0.5rem 0;
+    }
+
+    [data-view="grid"] .wheel { display: none; }
+
+    .square-image {
+        width: 250px;
+        height: 250px;
+        object-fit: cover;
+        transition: .3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        box-shadow: 0 0 10px black;
+        display: block;
+        background: #222;
+        border-radius: 10px;
+    }
+
+    .square-image:hover {
+        transform: scale(1.05);
+        border-radius: 20px;
+        box-shadow: 0 0 20px var(--primary), 0 0 20px var(--primary);
+        cursor: pointer;
+    }
+
+    /* --- comutatorul roata / grila --- */
+    .view-toggle {
+        /* flex, nu inline-flex: `margin: auto` nu centreaza elementele inline.
+           width: fit-content il tine stramt in loc sa se intinda pe tot randul. */
+        display: flex;
+        width: fit-content;
+        align-items: center;
+        gap: 0.6rem;
+        margin: 1.4rem auto 0;
+        padding: 0.8rem 1.75rem;
+        border-radius: 999px;
+        font: inherit;
+        font-size: 0.92rem;
+        font-weight: 600;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--glass-text);
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        cursor: pointer;
+        transition: background 0.25s ease, border-color 0.25s ease;
+    }
+
+    .view-toggle:hover {
+        background: rgba(255, 255, 255, 0.16);
+        border-color: rgba(255, 255, 255, 0.34);
+    }
+
+    .view-toggle:focus-visible {
+        outline: 2px solid var(--glass-text-soft);
+        outline-offset: 3px;
+    }
+
+    .view-toggle svg { width: 1.2rem; height: 1.2rem; display: block; }
 
     @media (prefers-reduced-motion: reduce) {
         .wheel-panel,
         .wheel-inner,
+        .square-image,
+        .view-toggle,
         .folder-chevron { transition: none; }
     }
 </style>
@@ -154,23 +225,56 @@ interface FolderData {
 interface Entry {
     button: HTMLButtonElement;
     panel: HTMLElement;
+    inner: HTMLElement;
     wheelEl: HTMLElement;
-    index: HTMLElement;
+    grid: HTMLElement;
+    hint: HTMLElement;
+    viewToggle: HTMLButtonElement;
     items: { image: string }[];
 }
 
+type ViewMode = 'wheel' | 'grid';
+
 // O SINGURA roata pentru toata pagina. Fiindca doar un folder e deschis odata,
-// nu mai avem nevoie de pool, de IntersectionObserver sau de reciclare de
-// contexte — exista un singur context WebGL si un singur set de texturi.
+// nu avem nevoie de pool, de IntersectionObserver pentru sectiuni sau de
+// reciclare de contexte — exista un singur context WebGL si un singur set de
+// texturi.
 let wheel: CircularWheel | null = null;
 let openEntry: Entry | null = null;
 let collapseTimer = 0;
 let expandTimer = 0;
 
+// Modul e GLOBAL pe durata vizitei: daca alegi grila, ramai in grila si cand
+// deschizi alt folder. Se reseteaza pe roata la fiecare intrare in pagina
+// (vezi initGallery) — modulele ES raman in cache intre navigarile ClientRouter,
+// deci fara resetare alegerea ar fi supravietuit iesirii din tab.
+const DEFAULT_VIEW: ViewMode = 'wheel';
+let viewMode: ViewMode = DEFAULT_VIEW;
+let lazyObserver: IntersectionObserver | null = null;
+
+const entries: Entry[] = [];
+
 const CHEVRON = `<svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
     <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2.2"
           stroke-linecap="round" stroke-linejoin="round"/>
 </svg>`;
+
+const ICON_GRID = `<svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <rect x="3" y="3" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="2"/>
+    <rect x="14" y="3" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="2"/>
+    <rect x="3" y="14" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="2"/>
+    <rect x="14" y="14" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="2"/>
+</svg>`;
+
+const ICON_WHEEL = `<svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/>
+    <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"/>
+</svg>`;
+
+const HINT = {
+    wheel: 'trage pentru a roti · click pentru a mări',
+    grid: 'click pe o poză pentru a o mări'
+};
 
 function openFullView(img: HTMLImageElement) {
     const visualizer = document.getElementById('image-visualizer') as HTMLImageElement | null;
@@ -190,7 +294,29 @@ function openFullView(img: HTMLImageElement) {
     container.style.background = '#111d';
 }
 
+// Incarca pozele grilei abia cand se apropie de ecran. In modul roata imaginile
+// n-au src deloc, deci nu costa nimic.
+function getLazyObserver(): IntersectionObserver {
+    if (lazyObserver) return lazyObserver;
+
+    lazyObserver = new IntersectionObserver((records, observer) => {
+        records.forEach(record => {
+            if (!record.isIntersecting) return;
+            const img = record.target as HTMLImageElement;
+            const real = img.dataset.src;
+            if (!real) { observer.unobserve(img); return; }
+
+            img.src = real;
+            observer.unobserve(img);
+        });
+    }, { rootMargin: '400px', threshold: 0 });
+
+    return lazyObserver;
+}
+
 function buildSection(folder: FolderData, i: number): Entry | null {
+    const root = document.getElementById('gallery-root')!;
+
     const section = document.createElement('section');
     section.className = 'gallery-folder';
 
@@ -223,7 +349,7 @@ function buildSection(folder: FolderData, i: number): Entry | null {
         p.className = 'gallery-loading';
         p.textContent = 'No images found.';
         section.appendChild(p);
-        document.getElementById('gallery-root')!.appendChild(section);
+        root.appendChild(section);
         return null;
     }
 
@@ -238,21 +364,7 @@ function buildSection(folder: FolderData, i: number): Entry | null {
 
     const inner = document.createElement('div');
     inner.className = 'wheel-inner';
-
-    // Placeholdere ascunse: vizualizatorul existent cauta
-    // [data-identifier="..."] ca sa stie ce sa arate la sageata stanga/dreapta.
-    // Nu au src, doar data-src, deci nu descarca nimic.
-    const index = document.createElement('div');
-    index.className = 'wheel-index';
-    sources.forEach((src, imgIndex) => {
-        const img = document.createElement('img');
-        img.dataset.identifier = folder.name;
-        img.dataset.index = String(imgIndex);
-        img.dataset.src = src;
-        img.alt = '';
-        index.appendChild(img);
-    });
-    inner.appendChild(index);
+    inner.dataset.view = viewMode;
 
     const wheelEl = document.createElement('div');
     wheelEl.className = 'wheel';
@@ -262,22 +374,81 @@ function buildSection(folder: FolderData, i: number): Entry | null {
         `${folder.name} — galerie rotativa. Trage cu mouse-ul sau foloseste sagetile stanga/dreapta.`);
     inner.appendChild(wheelEl);
 
+    // Aceleasi <img> sunt si evidenta citita de vizualizator la sageti, si
+    // grila propriu-zisa. Pornesc fara src, doar cu data-src.
+    const grid = document.createElement('div');
+    grid.className = 'folder-grid';
+    sources.forEach((src, imgIndex) => {
+        const img = document.createElement('img');
+        img.className = 'square-image';
+        img.alt = `${folder.name} — poza ${imgIndex + 1}`;
+        img.decoding = 'async';
+        img.draggable = false;
+        img.dataset.identifier = folder.name;
+        img.dataset.index = String(imgIndex);
+        img.dataset.src = src;
+        img.addEventListener('click', () => openFullView(img));
+        grid.appendChild(img);
+    });
+    inner.appendChild(grid);
+
     const hint = document.createElement('p');
     hint.className = 'wheel-hint';
-    hint.textContent = 'trage pentru a roti · click pentru a mări';
+    hint.textContent = HINT[viewMode];
     inner.appendChild(hint);
+
+    const viewToggle = document.createElement('button');
+    viewToggle.type = 'button';
+    viewToggle.className = 'view-toggle';
+    inner.appendChild(viewToggle);
 
     panel.appendChild(inner);
     section.appendChild(panel);
-    document.getElementById('gallery-root')!.appendChild(section);
+    root.appendChild(section);
 
     const entry: Entry = {
-        button, panel, wheelEl, index,
+        button, panel, inner, wheelEl, grid, hint, viewToggle,
         items: sources.map(image => ({ image }))
     };
 
     button.addEventListener('click', () => toggle(entry));
+    viewToggle.addEventListener('click', () => {
+        setView(viewMode === 'wheel' ? 'grid' : 'wheel');
+    });
+
+    paintToggle(entry);
     return entry;
+}
+
+/** Butonul arata unde te DUCI, nu unde esti. */
+function paintToggle(entry: Entry) {
+    const goingToGrid = viewMode === 'wheel';
+    entry.viewToggle.innerHTML =
+        (goingToGrid ? ICON_GRID : ICON_WHEEL) +
+        `<span>${goingToGrid ? 'Grilă' : 'Roată'}</span>`;
+    entry.viewToggle.setAttribute('aria-label',
+        goingToGrid ? 'Comută la vizualizare grilă' : 'Comută la vizualizare roată');
+}
+
+function mountView(entry: Entry) {
+    if (viewMode === 'wheel') {
+        if (!wheel) wheel = new CircularWheel({ bend: 3, borderRadius: 0.05 });
+        window.clearTimeout(collapseTimer);
+        wheel.attach(entry.wheelEl, entry.items, (i: number) => {
+            const target = entry.grid.children[i] as HTMLImageElement | undefined;
+            if (target) openFullView(target);
+        });
+    } else {
+        // grila: pornim incarcarea lenesa a pozelor acestei sectiuni
+        const observer = getLazyObserver();
+        Array.from(entry.grid.children).forEach(img => observer.observe(img));
+    }
+}
+
+function unmountView(entry: Entry) {
+    wheel?.detach();
+    const observer = lazyObserver;
+    if (observer) Array.from(entry.grid.children).forEach(img => observer.unobserve(img));
 }
 
 function collapse(entry: Entry) {
@@ -290,15 +461,20 @@ function collapse(entry: Entry) {
 
 function expand(entry: Entry) {
     entry.panel.style.height = '0px';
-    void entry.panel.offsetHeight; // reflow: fara el prima deschidere ar sari direct la final
+    void entry.panel.offsetHeight; // fara el prima deschidere ar sari direct la final
 
     entry.panel.dataset.open = 'true';
     entry.button.setAttribute('aria-expanded', 'true');
     entry.panel.style.height = entry.panel.scrollHeight + 'px';
+    releaseHeightAfter(entry);
+}
 
-    // Dupa animatie lasam inaltimea libera, ca redimensionarea ferestrei sa nu
-    // taie roata (are inaltimea in vh). Timerul e rezerva pentru cazul in care
-    // transitionend nu se declanseaza (reduced-motion, tab in fundal).
+/**
+ * Dupa animatie lasam inaltimea libera, ca redimensionarea ferestrei sau
+ * incarcarea pozelor din grila sa nu ramana taiate. Timerul e rezerva pentru
+ * cazul in care transitionend nu se declanseaza (reduced-motion, tab in fundal).
+ */
+function releaseHeightAfter(entry: Entry) {
     const release = () => {
         if (entry.panel.dataset.open === 'true') entry.panel.style.height = 'auto';
     };
@@ -315,24 +491,43 @@ function expand(entry: Entry) {
     expandTimer = window.setTimeout(release, 700);
 }
 
+/** Trece panoul deschis de la inaltimea curenta la cea noua, animat. */
+function resizeOpenPanel(entry: Entry) {
+    const from = entry.panel.getBoundingClientRect().height;
+    entry.panel.style.height = from + 'px';
+    void entry.panel.offsetHeight;
+    entry.panel.style.height = entry.panel.scrollHeight + 'px';
+    releaseHeightAfter(entry);
+}
+
+function setView(mode: ViewMode) {
+    if (viewMode === mode) return;
+
+    if (openEntry) unmountView(openEntry);
+    viewMode = mode;
+
+    entries.forEach(entry => {
+        entry.inner.dataset.view = mode;
+        entry.hint.textContent = HINT[mode];
+        paintToggle(entry);
+    });
+
+    if (openEntry) {
+        mountView(openEntry);
+        resizeOpenPanel(openEntry);
+    }
+}
+
 function open(entry: Entry) {
     if (openEntry === entry) return;
 
     if (openEntry) {
+        unmountView(openEntry);
         collapse(openEntry);
         openEntry = null;
     }
 
-    // roata se creeaza la prima deschidere si traieste pana la parasirea paginii
-    if (!wheel) wheel = new CircularWheel({ bend: 3, borderRadius: 0.05 });
-
-    window.clearTimeout(collapseTimer);
-    wheel.detach();
-    wheel.attach(entry.wheelEl, entry.items, (i: number) => {
-        const target = entry.index.children[i] as HTMLImageElement | undefined;
-        if (target) openFullView(target);
-    });
-
+    mountView(entry);
     expand(entry);
     openEntry = entry;
 }
@@ -345,7 +540,7 @@ function close(entry: Entry) {
     // in mijlocul animatiei
     window.clearTimeout(collapseTimer);
     collapseTimer = window.setTimeout(() => {
-        if (!openEntry) wheel?.detach();
+        if (!openEntry) unmountView(entry);
     }, 500);
 }
 
@@ -357,9 +552,12 @@ function toggle(entry: Entry) {
 function teardown() {
     window.clearTimeout(collapseTimer);
     window.clearTimeout(expandTimer);
+    lazyObserver?.disconnect();
+    lazyObserver = null;
     wheel?.destroy();
     wheel = null;
     openEntry = null;
+    entries.length = 0;
 }
 
 async function initGallery() {
@@ -369,6 +567,8 @@ async function initGallery() {
     // avoid double-init on astro:page-load
     if (root.dataset.initialized === 'true') return;
     root.dataset.initialized = 'true';
+
+    viewMode = DEFAULT_VIEW; // fiecare intrare in tab porneste in modul roata
 
     root.innerHTML = '<div class="gallery-loading">Se încarcă galeria...</div>';
 
@@ -385,7 +585,6 @@ async function initGallery() {
 
     root.innerHTML = '';
 
-    const entries: Entry[] = [];
     folders.forEach((folder, i) => {
         const entry = buildSection(folder, i);
         if (entry) entries.push(entry);

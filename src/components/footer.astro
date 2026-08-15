@@ -71,7 +71,7 @@ const currentYear = new Date().getFullYear();
 
     .site-footer {
         position: relative;
-        background: linear-gradient(160deg, #241335 0%, #170b26 100%);
+        background: var(--footer-bg);
         /* font-family: 'Manrope', sans-serif; */
     }
 
@@ -133,13 +133,13 @@ const currentYear = new Date().getFullYear();
         /* font-family: 'Poppins', sans-serif; */
         font-weight: 700;
         font-size: 0.95rem;
-        color: #f1e8ff;
+        color: var(--glass-text);
     }
 
     .site-footer__tagline {
         margin: 6px 0 0;
         font-size: 0.82rem;
-        color: #8d7aad;
+        color: var(--glass-text-dim);
     }
 
     .site-footer__links {
@@ -168,14 +168,14 @@ const currentYear = new Date().getFullYear();
         display: flex;
         align-items: center;
         justify-content: center;
-        background: rgba(168, 85, 247, 0.12);
-        color: #c084fc;
+        background: var(--glass-inset-bg);
+        color: var(--glass-text-soft);
         transition: background 0.25s ease, color 0.25s ease;
     }
 
     .site-footer__icon--static {
-        background: rgba(141, 122, 173, 0.15);
-        color: #8d7aad;
+        background: var(--glass-inset-bg);
+        color: var(--glass-text-dim);
     }
 
     .site-footer__link:hover .site-footer__icon {
@@ -184,38 +184,38 @@ const currentYear = new Date().getFullYear();
     }
 
     .site-footer__link--static:hover .site-footer__icon {
-        background: rgba(141, 122, 173, 0.15);
-        color: #8d7aad;
+        background: var(--glass-inset-bg);
+        color: var(--glass-text-dim);
     }
 
     .site-footer__link-text {
         font-weight: 600;
         font-size: 0.88rem;
-        color: #cbb9e8;
+        color: var(--glass-body);
         transition: color 0.2s ease;
     }
 
     .site-footer__link-text--static {
-        color: #8d7aad;
+        color: var(--glass-text-dim);
         font-style: italic;
     }
 
     .site-footer__link:hover .site-footer__link-text {
-        color: #f1e8ff;
+        color: var(--glass-text);
     }
 
     .site-footer__link--static:hover .site-footer__link-text {
-        color: #8d7aad;
+        color: var(--glass-text-dim);
     }
 
     .site-footer__arrow {
-        color: #5c4a7a;
+        color: var(--glass-text-dim);
         transition: transform 0.25s ease, color 0.25s ease;
     }
 
     .site-footer__link:hover .site-footer__arrow {
         transform: translateX(4px);
-        color: #c084fc;
+        color: var(--glass-text-soft);
     }
 
     @media (max-width: 640px) {

@@ -3,23 +3,42 @@ export interface Props {
     url: string;
     title?: string;
     aspectRatio?: string;
+    /** Miniatura proprie. Implicit se foloseste cea de la YouTube. */
+    poster?: string;
+    posterAlt?: string;
 }
 
-const { url, title = '', aspectRatio = "16 / 9" } = Astro.props;
+const {
+    url,
+    title = '',
+    aspectRatio = "16 / 9",
+    poster,
+    posterAlt = 'Deschide videoclipul'
+} = Astro.props;
 
-function getEmbedUrl(source: string) {
-    const watchMatch = source.match(/[?&]v=([^&]+)/);
-    if (source.includes("youtube.com/watch") && watchMatch) {
-        return `https://www.youtube.com/embed/${watchMatch[1]}`;
-    }
-    const shortMatch = source.match(/youtu\.be\/([^?&]+)/);
-    if (shortMatch) {
-        return `https://www.youtube.com/embed/${shortMatch[1]}`;
-    }
-    return source;
+function getVideoId(source: string): string | null {
+    const watch = source.match(/[?&]v=([^&]+)/);
+    if (watch) return watch[1];
+
+    const short = source.match(/youtu\.be\/([^?&]+)/);
+    if (short) return short[1];
+
+    const embed = source.match(/youtube(?:-nocookie)?\.com\/embed\/([^?&]+)/);
+    if (embed) return embed[1];
+
+    return null;
 }
 
-const embedUrl = getEmbedUrl(url);
+const videoId = getVideoId(url);
+
+// -nocookie nu pune cookie-uri de urmarire pana cand chiar se porneste redarea
+const embedUrl = videoId
+    ? `https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&rel=0`
+    : url;
+
+// maxresdefault nu exista pentru toate clipurile — daca da 404 cadem pe hqdefault
+const thumb = poster ?? (videoId ? `https://i.ytimg.com/vi/${videoId}/maxresdefault.jpg` : null);
+const thumbFallback = videoId ? `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg` : null;
 ---
 
 <section class="video-section">
@@ -29,14 +48,49 @@ const embedUrl = getEmbedUrl(url);
         <p class="video-section__label">{title}</p>
         </div>
     )}
+
     <div class="video-section__frame" style={`aspect-ratio:${aspectRatio};`}>
-        <iframe
-            src={embedUrl}
-            title={title ?? "Video"}
-            loading="lazy"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-            allowfullscreen
-        ></iframe>
+        {thumb ? (
+            /*
+             * Fatada: pana la click nu se incarca nimic de la YouTube in afara
+             * miniaturii (~80 KB). Iframe-ul complet aduce 1,5-2 MB in 10-15
+             * cereri, chiar si cu loading="lazy" — de aceea pagina parea lenta.
+             */
+            <button
+                type="button"
+                class="video-facade"
+                data-embed={embedUrl}
+                data-allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                data-title={title || 'Video'}
+                aria-label={posterAlt}
+            >
+                <img
+                    class="video-facade__thumb"
+                    src={thumb}
+                    alt=""
+                    loading="lazy"
+                    decoding="async"
+                    draggable="false"
+                    data-fallback={thumbFallback}
+                    onerror="if(this.dataset.fallback && this.src !== this.dataset.fallback){this.src = this.dataset.fallback;}"
+                />
+                <span class="video-facade__play" aria-hidden="true">
+                    <svg viewBox="0 0 68 48" fill="none">
+                        <path class="video-facade__play-bg"
+                              d="M66.5 7.7a8.6 8.6 0 0 0-6-6C55.2 0 34 0 34 0S12.8 0 7.5 1.6a8.6 8.6 0 0 0-6 6A89.6 89.6 0 0 0 0 24a89.6 89.6 0 0 0 1.5 16.3 8.6 8.6 0 0 0 6 6C12.8 48 34 48 34 48s21.2 0 26.5-1.6a8.6 8.6 0 0 0 6-6A89.6 89.6 0 0 0 68 24a89.6 89.6 0 0 0-1.5-16.3Z"/>
+                        <path d="M45 24 27 14v20l18-10Z" fill="#fff"/>
+                    </svg>
+                </span>
+            </button>
+        ) : (
+            <iframe
+                src={url}
+                title={title || 'Video'}
+                loading="lazy"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowfullscreen
+            ></iframe>
+        )}
     </div>
 </section>
 
@@ -85,7 +139,10 @@ const embedUrl = getEmbedUrl(url);
             0 0 46px rgba(168, 85, 247, 0.18);
     }
 
-    .video-section__frame iframe {
+    /* :global pe iframe — iframe-ul e creat din JS la click, deci n-are
+       atributul data-astro-cid pe care Astro il adauga elementelor din sablon.
+       Fara asta regula nu i se aplica si ramane la 300x150 in coltul din stanga sus. */
+    .video-section__frame :global(iframe) {
         position: absolute;
         inset: 0;
         width: 100%;
@@ -93,4 +150,100 @@ const embedUrl = getEmbedUrl(url);
         display: block;
         border: 0;
     }
+
+    .video-facade {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        padding: 0;
+        border: 0;
+        background: #0a0512;
+        cursor: pointer;
+        display: block;
+    }
+
+    .video-facade__thumb {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+        transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+                    filter 0.35s ease;
+    }
+
+    .video-facade:hover .video-facade__thumb,
+    .video-facade:focus-visible .video-facade__thumb {
+        transform: scale(1.03);
+        filter: brightness(0.75);
+    }
+
+    .video-facade__play {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        pointer-events: none;
+    }
+
+    .video-facade__play svg {
+        width: clamp(58px, 8vw, 84px);
+        height: auto;
+        filter: drop-shadow(0 6px 20px rgba(0, 0, 0, 0.45));
+        transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .video-facade__play-bg {
+        fill: #212121;
+        fill-opacity: 0.85;
+        transition: fill 0.25s ease, fill-opacity 0.25s ease;
+    }
+
+    .video-facade:hover .video-facade__play svg,
+    .video-facade:focus-visible .video-facade__play svg {
+        transform: scale(1.08);
+    }
+
+    .video-facade:hover .video-facade__play-bg,
+    .video-facade:focus-visible .video-facade__play-bg {
+        fill: #f00;
+        fill-opacity: 1;
+    }
+
+    .video-facade:focus-visible {
+        outline: 3px solid #d8b4fe;
+        outline-offset: -3px;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .video-facade__thumb,
+        .video-facade__play svg { transition: none; }
+        .video-facade:hover .video-facade__thumb { transform: none; }
+    }
 </style>
+
+<script>
+    function initVideoFacades() {
+        document.querySelectorAll<HTMLButtonElement>('.video-facade').forEach(facade => {
+            if (facade.dataset.bound === 'true') return;
+            facade.dataset.bound = 'true';
+
+            facade.addEventListener('click', () => {
+                const src = facade.dataset.embed;
+                if (!src) return;
+
+                const iframe = document.createElement('iframe');
+                iframe.src = src; // contine deja autoplay=1
+                iframe.title = facade.dataset.title ?? 'Video';
+                iframe.allow = facade.dataset.allow ?? '';
+                iframe.allowFullscreen = true;
+                iframe.setAttribute('frameborder', '0');
+
+                facade.replaceWith(iframe);
+            }, { once: true });
+        });
+    }
+
+    document.addEventListener('astro:page-load', initVideoFacades);
+</script>

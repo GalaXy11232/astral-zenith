@@ -1,27 +1,85 @@
 ---
 const home_button_src = "/assets/Logo_alb.png";
 
+// Colegiul National „Grigore Moisil” — acelasi link ca pe pagina de sponsori
+const school = {
+    logo: "/assets/parteneri/Sigla_CNGM.png",
+    name: "Colegiul Național „Grigore Moisil”",
+    website: "https://www.moisil.ro/"
+};
+
 // selected link prop
 const { activeLink = -1, has_margin = true } = Astro.props;
+/*
+ * Etichetele au traducere scrisa de mana, iar linkurile sunt marcate
+ * translate="no". Google traducea "Rezultate" la singular ("Result"), si oricum
+ * nu avem niciun control asupra a ce scoate. Sunt opt cuvinte in cea mai
+ * vizibila parte a site-ului — merita sa fie exacte si sa apara instant, fara
+ * sa astepte procesarea Google.
+ */
 const links = [
-    { name: "Acasă", href: "/" },
-    { name: "Echipă", href: "/echipa" },
-    { name: "Activitate", href: "/activitate" },
-    { name: "Rezultatele", href: "/rezultate" },
-    { name: "Sponsori", href: "/sponsori" },
-    { name: "Galerie", href: "/galerie" },
-    { name: "Știri", href: "/news" },
-    { name: "Contact", href: "/contact" }
+    { name: "Acasă",      en: "Home",     href: "/" },
+    { name: "Echipă",     en: "Team",     href: "/echipa" },
+    { name: "Activitate", en: "Activity", href: "/activitate" },
+    { name: "Rezultate",  en: "Results",  href: "/rezultate" },
+    { name: "Sponsori",   en: "Sponsors", href: "/sponsori" },
+    { name: "Galerie",    en: "Gallery",  href: "/galerie" },
+    { name: "Presă",      en: "Press",    href: "/news" },
+    { name: "Contact",    en: "Contact",  href: "/contact" }
 ]
 ---
 <div class = 'mobile-background-blur' onclick = 'switch_menu_visibility("0px")' />
 <nav>
     <div class = 'home-container'>
         <a class = 'navbar-home scale-hover' href="/"> <img style = "width: calc(var(--min-height) - 5px);" src = {home_button_src} alt="Home" /> </a>
+
+        <a
+            class = 'navbar-school scale-hover'
+            href = {school.website}
+            target = "_blank"
+            rel = "noopener noreferrer"
+            title = {school.name}
+            aria-label = {school.name}
+        >
+            <img src = {school.logo} alt = {school.name} decoding = "async" />
+        </a>
     </div>
     
     <div class = 'links-container'>
         <div class="gtranslate_wrapper"></div>
+
+        <!-- Un singur buton: arata steagul limbii in care INTRI daca il apesi.
+             data-target e pus de script din cookie-ul googtrans. -->
+        <button
+            type="button"
+            class="lang-toggle notranslate"
+            translate="no"
+            data-target="en"
+            aria-label="Switch to English"
+            title="Switch to English"
+        >
+            <span class="lang-flag lang-flag--ro" aria-hidden="true">
+                <svg viewBox="0 0 3 2" preserveAspectRatio="xMidYMid slice">
+                    <rect x="0" width="1" height="2" fill="#002B7F"/>
+                    <rect x="1" width="1" height="2" fill="#FCD116"/>
+                    <rect x="2" width="1" height="2" fill="#CE1126"/>
+                </svg>
+            </span>
+            <span class="lang-flag lang-flag--en" aria-hidden="true">
+                <svg viewBox="0 0 60 30" preserveAspectRatio="xMidYMid slice">
+                    <clipPath id="uk-frame"><path d="M0,0 v30 h60 v-30 z"/></clipPath>
+                    <clipPath id="uk-diag"><path d="M30,15 h30 v15 z v15 h-30 z h-30 v-15 z v-15 h30 z"/></clipPath>
+                    <g clip-path="url(#uk-frame)">
+                        <path d="M0,0 v30 h60 v-30 z" fill="#012169"/>
+                        <path d="M0,0 L60,30 M60,0 L0,30" stroke="#fff" stroke-width="6"/>
+                        <path d="M0,0 L60,30 M60,0 L0,30" clip-path="url(#uk-diag)" stroke="#C8102E" stroke-width="4"/>
+                        <path d="M30,0 v30 M0,15 h60" stroke="#fff" stroke-width="10"/>
+                        <path d="M30,0 v30 M0,15 h60" stroke="#C8102E" stroke-width="6"/>
+                    </g>
+                </svg>
+            </span>
+        </button>
+
         <a class="hamburger-btn" onclick = 'switch_menu_visibility()' >&#8801;</a>
         <!-- genereaza dinamic linkurile -> se poate atribui din index activeLink prop -->
         <div class="links-wrapper">
@@ -29,7 +87,10 @@ const links = [
                 links.map((link, index) => {
                     return (<>
                         <a 
-                            class = {`navbar-link scale-hover ${activeLink === index ? "active" : ""}`}
+                            class = {`navbar-link scale-hover notranslate ${activeLink === index ? "active" : ""}`}
+                            translate = "no"
+                            data-ro = {link.name}
+                            data-en = {link.en}
                             href = {link.href}
                         > 
                             {link.name} 
@@ -51,7 +112,10 @@ const links = [
             {
                 links.map((link, index) => {
                     return (<a 
-                        class = {`mobile-navbar-link scale-hover ${activeLink === index ? "mobile-active" : ""}`}
+                        class = {`mobile-navbar-link scale-hover notranslate ${activeLink === index ? "mobile-active" : ""}`}
+                        translate = "no"
+                        data-ro = {link.name}
+                        data-en = {link.en}
                         href = {link.href}
                     > 
                         {link.name} 
@@ -69,23 +133,73 @@ const links = [
         const nav = document.querySelector("nav") as HTMLElement | null;
         if (!nav) return;
 
-        var yOffset = window.pageYOffset || document.body.scrollTop;
+        const yOffset = window.pageYOffset || document.body.scrollTop;
 
-        if (yOffset <= 20) {
-            nav.style.background = "transparent";
-            nav.style.backdropFilter = "none";
-        } else {
-            nav.style.background = "var(--navbar_bg_color)";
-            nav.style.backdropFilter = "var(--navbar_bg_filter)";
-        }
+        // clasa, nu stiluri inline: fundalul sta pe nav::before ca sa poata fi
+        // estompat spre baza fara sa se estompeze si logourile sau linkurile
+        nav.classList.toggle("is-scrolled", yOffset > 20);
     }
     
     // un singur listener de scroll pe toata durata sesiunii — altfel se acumuleaza
     // cate unul la fiecare navigare ClientRouter
     window.addEventListener("scroll", update_background);
 
+    /** Limba activa, din cookie-ul pus de GTranslate. Implicit romana. */
+    function current_language(): string {
+        const match = document.cookie.match('(^|;) ?googtrans=([^;]*)(;|$)');
+        return match?.[2]?.split('/')?.[2] || 'ro';
+    }
+
+    /** Pune pe fiecare link eticheta din limba activa. */
+    function paint_nav_labels() {
+        const language = current_language();
+
+        document.querySelectorAll<HTMLElement>('[data-ro][data-en]').forEach(link => {
+            const label = language === 'en' ? link.dataset.en : link.dataset.ro;
+            if (label && link.textContent?.trim() !== label) link.textContent = label;
+        });
+    }
+
+    function paint_lang_toggle(button: HTMLElement) {
+        // butonul arata limba in care INTRI, nu pe cea activa
+        const target = current_language() === 'ro' ? 'en' : 'ro';
+        const label = target === 'en' ? 'Switch to English' : 'Comută în română';
+
+        button.dataset.target = target;
+        button.setAttribute('aria-label', label);
+        button.title = label;
+    }
+
+    function init_lang_toggle() {
+        const button = document.querySelector('.lang-toggle') as HTMLElement | null;
+        if (!button) return;
+
+        paint_lang_toggle(button);
+
+        if (button.dataset.bound === "true") return;
+        button.dataset.bound = "true";
+
+        button.addEventListener('click', () => {
+            const translate = (window as any).doGTranslate;
+            if (typeof translate !== 'function') return;
+
+            // GTranslate asteapta mereu "limba_originala|limba_tinta";
+            // ro|ro readuce pagina la textul original
+            const from = (window as any).gtranslateSettings?.default_language || 'ro';
+            translate(`${from}|${button.dataset.target || 'en'}`);
+
+            // cookie-ul se scrie de GTranslate, deci recitim dupa ce termina
+            window.setTimeout(() => {
+                paint_lang_toggle(button);
+                paint_nav_labels();
+            }, 150);
+        });
+    }
+
     ['astro:page-load', 'DOMContentLoaded'].forEach((ev) => {
         document.addEventListener(ev, update_background);
+        document.addEventListener(ev, init_lang_toggle);
+        document.addEventListener(ev, paint_nav_labels);
     });
 </script>
 

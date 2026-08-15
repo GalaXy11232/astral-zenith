@@ -19,6 +19,33 @@
 </style>
 
 <script>
+/** Citeste un token CSS, cu valoare de rezerva daca lipseste. */
+function token(name: string, fallback: string): string {
+    const value = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+    return value || fallback;
+}
+
+/**
+ * Culorile fundalului vin din tokenii de tema, nu sunt scrise aici: e WebGL,
+ * deci nu se schimba singur cand se schimba tema — se reconstruieste la
+ * evenimentul 'theme-change' trimis de butonul din header.
+ */
+function themeColors() {
+    const bg = token('--page-bg', '#0d0d12');
+    const palette = token('--hex-palette', '#7c3aed, #6d28d9, #5b21b6, #4c1d95, #8b5cf6, #3b0764')
+        .split(',')
+        .map(c => c.trim())
+        .filter(Boolean);
+
+    return {
+        background: bg,
+        fog: token('--hex-fog', bg),
+        palette,
+        opacity: parseFloat(token('--hex-opacity', '0.4')) || 0.4,
+        ambient: parseFloat(token('--hex-ambient', '0.35')) || 0.35,
+    };
+}
+
 const CONFIG = {
     backgroundColor: '#0d0d12',
     fog: { color: '#0d0d12', near: 8, far: 40 },
@@ -85,6 +112,8 @@ async function initBackground() {
         return;
     }
 
+    const theme = themeColors();
+
     // Renderer
     const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false });
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
@@ -92,8 +121,8 @@ async function initBackground() {
 
     // Scene
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(CONFIG.backgroundColor);
-    scene.fog = new THREE.Fog(CONFIG.fog.color, CONFIG.fog.near, CONFIG.fog.far);
+    scene.background = new THREE.Color(theme.background);
+    scene.fog = new THREE.Fog(theme.fog, CONFIG.fog.near, CONFIG.fog.far);
 
     // Camera
     const camera = new THREE.PerspectiveCamera(
@@ -105,7 +134,8 @@ async function initBackground() {
     camera.position.set(...CONFIG.camera.position);
 
     // Lights
-    scene.add(new THREE.AmbientLight(CONFIG.lights.ambient.color, CONFIG.lights.ambient.intensity));
+    const ambient = new THREE.AmbientLight(CONFIG.lights.ambient.color, theme.ambient);
+    scene.add(ambient);
     for (const dl of CONFIG.lights.directional) {
         const l = new THREE.DirectionalLight(dl.color, dl.intensity);
         l.position.set(...dl.position);
@@ -133,9 +163,9 @@ async function initBackground() {
             const angle = (h / hexPerRing) * Math.PI * 2;
 
             const mat = new THREE.MeshStandardMaterial({
-                color:       pick(CONFIG.colors.palette),
-                opacity:     CONFIG.colors.opacity,
-                transparent: CONFIG.colors.opacity < 1,
+                color:       pick(theme.palette),
+                opacity:     theme.opacity,
+                transparent: theme.opacity < 1,
                 flatShading: CONFIG.colors.flatShading,
             });
 
@@ -227,9 +257,34 @@ async function initBackground() {
         hexGeo.dispose();
         ringGroups.forEach(g => g.children.forEach((m: any) => m.material.dispose()));
         document.removeEventListener('astro:before-swap', cleanup);
+        window.removeEventListener('theme-change', onThemeChange);
         (canvas as any)._initialized = false;
     };
+
+    /*
+     * Schimbarea temei repicteaza scena existenta; NU o reconstruieste.
+     * renderer.dispose() elibereaza contextul WebGL legat de pânza, iar o pânza
+     * poate da un singur context in toata viata ei — deci un initBackground()
+     * de-al doilea pe acelasi <canvas> nu mai avea cum sa reuseasca, si fundalul
+     * ramanea rupt dupa prima comutare.
+     */
+    const onThemeChange = () => {
+        const next = themeColors();
+
+        scene.background = new THREE.Color(next.background);
+        if (scene.fog) scene.fog.color.set(next.fog);
+        ambient.intensity = next.ambient;
+
+        ringGroups.forEach(group => group.children.forEach((mesh: any) => {
+            mesh.material.color.set(pick(next.palette));
+            mesh.material.opacity = next.opacity;
+            mesh.material.transparent = next.opacity < 1;
+            mesh.material.needsUpdate = true;
+        }));
+    };
+
     document.addEventListener('astro:before-swap', cleanup);
+    window.addEventListener('theme-change', onThemeChange);
 }
 
 ['astro:page-load', 'DOMContentLoaded'].forEach((ev) => {

@@ -93,9 +93,9 @@ const {
 <style>
     .hero {
         --ac:      #7c3aed;
-        --ac-mid:  #a78bfa;
-        --text:    #f0eeff;
-        --muted:   #8b87a8;
+        --ac-mid:  var(--glass-text-soft);
+        --text:    var(--glass-text);
+        --muted:   var(--glass-text-dim);
         --tr:      0.38s cubic-bezier(0.22, 1, 0.36, 1);
 
         position:        relative;
@@ -271,7 +271,7 @@ const {
         position:        absolute;
         inset:           0;
         justify-content: center;
-        background:      rgba(13, 13, 18, 0.6);
+        background:      var(--glass-inset-bg);
     }
 
     .spinner-ring {

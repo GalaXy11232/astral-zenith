@@ -99,7 +99,7 @@ const textOrder = videoPosition === "right" ? 1 : 2;
         min-width: 280px;
         border-radius: 1.35rem;
         overflow: hidden;
-        background: #0a0512;
+        background: var(--glass-inset-bg);
         border: 1px solid rgba(168, 85, 247, 0.25);
         box-shadow:
         0 0 0 1px rgba(147, 51, 234, 0.08),
@@ -133,7 +133,7 @@ const textOrder = videoPosition === "right" ? 1 : 2;
         font-size: 0.78rem;
         letter-spacing: 0.16em;
         text-transform: uppercase;
-        color: #d8b4fe;
+        color: var(--glass-text-soft);
     }
 
     .video-text__heading {
@@ -175,11 +175,11 @@ const textOrder = videoPosition === "right" ? 1 : 2;
     }
 
     .video-text__body :global(strong) {
-        color: #ffffff;
+        color: var(--glass-text);
     }
 
     .video-text__body :global(a) {
-        color: #e9a6ff;
+        color: var(--glass-text-soft);
         text-decoration-color: rgba(232, 121, 249, 0.5);
         text-underline-offset: 3px;
     }
