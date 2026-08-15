@@ -24,5 +24,6 @@ pnpm-debug.log*
 .idea/
 
 # Neamtu added
+dist/
 .vscode/ 
 *.py
