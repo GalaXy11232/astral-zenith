@@ -38,6 +38,7 @@ function debounce<T extends (...args: any[]) => void>(func: T, wait: number) {
     };
 }
 
+
 // Fara deplasare pe z: efectul de val cerea un plan foarte tesselat
 // (100x50 segmente = ~10.000 de triunghiuri per poza). Acum planul are
 // 2 triunghiuri.
