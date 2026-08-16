@@ -20,11 +20,11 @@ interface Props {
 const { name, logo, website, tier } = Astro.props;
 
 const tierColors: Record<string, string> = {
-    gold:   '#c9a84c',
-    silver: '#9aa0a8',
-    bronze: '#a0644a',
+    gold:   'var(--tier-gold)',
+    silver: 'var(--tier-silver)',
+    bronze: 'var(--tier-bronze)',
 };
-const accentColor = tierColors[tier ?? ''] ?? 'var(--primary, #7c3aed)';
+const accentColor = tierColors[tier ?? ''] ?? 'var(--primary, var(--primary))';
 ---
 
 <a
@@ -77,7 +77,7 @@ const accentColor = tierColors[tier ?? ''] ?? 'var(--primary, #7c3aed)';
     /* ── Token system ──────────────────────────────────────────────────── */
     .sponsor-card {
         --card-size:     200px;
-        --card-bg:       #111118;
+        --card-bg:       var(--surface-dark);
         --card-border:   rgba(255, 255, 255, 0.08);
         --strip-h:       44px;
         --radius:        14px;

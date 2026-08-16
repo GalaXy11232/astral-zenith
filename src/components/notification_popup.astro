@@ -27,7 +27,7 @@ const {
     side = "right",
     intensity = "normal",
     delay = 700,
-    badgeColor = "#d8b4fe",
+    badgeColor = "var(--brand-300)",
     imageZoom = 1,
     imagePosX = "50%",
     imagePosY = "50%",
@@ -271,8 +271,8 @@ const {
         display: flex;
         align-items: center;
         justify-content: center;
-        background: #ffffff;
-        color: #6b21a8;
+        background: var(--glass-text);
+        color: var(--brand-800);
         box-shadow: 0 4px 10px rgba(0, 0, 0, 0.35);
         cursor: pointer;
         transition: all 0.25s ease;
@@ -280,8 +280,8 @@ const {
 
     .notif__close:hover {
         transform: scale(1.1);
-        background: #6b21a8;
-        color: #ffffff;
+        background: var(--brand-800);
+        color: var(--glass-text);
     }
 
     .notif[data-side="right"] .notif__close { left: -10px; }

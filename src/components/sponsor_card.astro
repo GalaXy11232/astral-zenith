@@ -1,15 +1,26 @@
 ---
-const { name, logo, website, tier, scale_factor = 1, light_icon = true } = Astro.props;
+import { needsLightPlate } from "../utils/logo_ink.ts";
+
+const { name, logo, website, tier, scale_factor = 1, light_icon } = Astro.props;
+
+/* Cerneala inchisa primeste o placa deschisa dedesubt, altfel sigla se pierde
+   in cardul intunecat. Se detecteaza automat din imagine (vezi logo_ink.ts);
+   `light_icon` ramane ca portita manuala daca euristica greseste la o sigla
+   anume — light_icon={true} inseamna "sigla e deschisa, las-o pe fundal
+   intunecat". */
+const lightPlate = light_icon === undefined
+    ? await needsLightPlate(logo)
+    : !light_icon;
 
 const tierColors: Record<string, string> = {
-    bronze:   '#b5623a',
-    gold:     '#d4a843',
-    silver:   '#a8b0ba',
-    platinum: '#4cafd4',
-    diamond:  '#6c63ff',
-    partener: '#c8c0e8',
+    bronze:   'var(--tier-bronze)',
+    gold:     'var(--tier-gold)',
+    silver:   'var(--tier-silver)',
+    platinum: 'var(--tier-platinum)',
+    diamond:  'var(--tier-diamond)',
+    partener: 'var(--tier-partener)',
 };
-const accentColor = tierColors[tier ?? ''] ?? 'var(--primary, #7c3aed)';
+const accentColor = tierColors[tier ?? ''] ?? 'var(--primary)';
 ---
 
 <div class="sponsor-col">
@@ -20,7 +31,7 @@ const accentColor = tierColors[tier ?? ''] ?? 'var(--primary, #7c3aed)';
         class="sponsor-card"
         aria-label={website !== '#' ? `Vizitează website-ul ${name}` : name}
         style={`--accent: ${accentColor};`}
-        data-light={light_icon ? 'true' : 'false'}
+        data-plate={lightPlate ? 'light' : 'dark'}
     >
         <span class="corner-notch" aria-hidden="true" style={`display: ${website === '#' ? 'none' : 'block'}`}></span>
 
@@ -30,23 +41,25 @@ const accentColor = tierColors[tier ?? ''] ?? 'var(--primary, #7c3aed)';
         <span class="card-shine" aria-hidden="true"></span>
 
         <div class="logo-container">
-            <img
-                src={logo}
-                alt={`${name} logo`}
-                class="sponsor-logo"
-                loading="lazy"
-                decoding="async"
-                draggable="false"
-                style={`transform: scale(${scale_factor});`}
-            />
+            <span class="logo-plate">
+                <img
+                    src={logo}
+                    alt={`${name} logo`}
+                    class="sponsor-logo"
+                    loading="lazy"
+                    decoding="async"
+                    draggable="false"
+                    style={`transform: scale(${scale_factor});`}
+                />
+            </span>
         </div>
 
         {website !== '#' ? (
             <div class="visit-strip">
-                <span class="visit-label" style={`color: ${tier === 'partener' ? '#000' : '#fff'}`}>
+                <span class="visit-label" style={`color: ${tier === 'partener' ? 'var(--brand-950)' : '#fff'}`}>
                     Vizitează website-ul
                 </span>
-                <svg class="visit-arrow" style={`color: ${tier === 'partener' ? '#000' : '#fff'}`} viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <svg class="visit-arrow" style={`color: ${tier === 'partener' ? 'var(--brand-950)' : '#fff'}`} viewBox="0 0 16 16" fill="none" aria-hidden="true">
                     <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>
             </div>
@@ -67,7 +80,7 @@ const accentColor = tierColors[tier ?? ''] ?? 'var(--primary, #7c3aed)';
 
     .sponsor-card {
         --card-size:      clamp(140px, 20vw, 200px);
-        --card-bg:        #2e2e36;
+        --card-bg:        var(--surface-dark-2);
         --card-border:    rgba(255, 255, 255, 0.08);
         --strip-h:        35px;
         --radius:         14px;
@@ -127,13 +140,13 @@ const accentColor = tierColors[tier ?? ''] ?? 'var(--primary, #7c3aed)';
         transform:      translateX(-50%);
         z-index:        3;
         font-family:    ui-monospace, 'Cascadia Code', monospace;
-        font-size:      9px;
-        font-weight:    600;
+        font-size:      10px;
+        font-weight:    700;
         letter-spacing: 0.18em;
         text-transform: uppercase;
         white-space:    nowrap;
         color:          var(--accent);
-        opacity:        0.7;
+        opacity:        0.95;
         transition:     opacity var(--transition), bottom var(--transition);
         -webkit-text-stroke: .37px var(--accent);
     }
@@ -212,13 +225,48 @@ const accentColor = tierColors[tier ?? ''] ?? 'var(--primary, #7c3aed)';
         display:         flex;
         align-items:     center;
         justify-content: center;
-        padding:         clamp(12px, 3vw, 28px) clamp(10px, 2.5vw, 24px) 0;
+        /* Bordura de jos tine placa deasupra etichetei de nivel (care sta la
+           bottom: 30px): fara ea eticheta ar cadea peste placa deschisa, iar
+           accentele palide — silver, platinum — n-ar mai avea contrast. */
+        padding:         clamp(12px, 3vw, 28px) clamp(10px, 2.5vw, 24px) 16px;
         transition:      transform var(--transition);
         overflow:        hidden;
     }
     .sponsor-card:hover .logo-container,
     .sponsor-card:focus-visible .logo-container {
         transform: translateY(-4px) scale(1.04);
+    }
+
+    /* Placa de sub sigla. Siglele cu cerneala inchisa o primesc deschisa, ca
+       sa aiba pe ce se citi; cele deschise raman pe fundalul cardului. Care
+       varianta se aplica se decide la build, din imagine (logo_ink.ts). */
+    /* Placa umple zona siglei si NU se dimensioneaza dupa imagine. Trei
+       sponsori folosesc `scale_factor` (2.25, 2, 1.4) ca sa compenseze
+       marginile transparente din propriile fisiere; `transform: scale()` nu
+       schimba layoutul, deci o placa croita pe cutia imaginii ar fi ramas
+       mica iar sigla ar fi dat pe dinafara, peste cardul intunecat. Asa,
+       placa are aceeasi marime pe toate cardurile, orice scala ar avea sigla. */
+    .logo-plate {
+        flex:            1;
+        align-self:      stretch;
+        display:         flex;
+        align-items:     center;
+        justify-content: center;
+        padding:         8px;
+        border-radius:   10px;
+        transition:      background var(--transition), box-shadow var(--transition);
+    }
+
+    .sponsor-card[data-plate='light'] .logo-plate {
+        background: #f6f5f9;
+        box-shadow:
+            inset 0 0 0 1px rgba(255, 255, 255, 0.55),
+            0 2px 10px rgba(0, 0, 0, 0.35);
+    }
+
+    .sponsor-card[data-plate='light']:hover .logo-plate,
+    .sponsor-card[data-plate='light']:focus-visible .logo-plate {
+        background: #ffffff;
     }
 
     .sponsor-logo {
@@ -232,19 +280,16 @@ const accentColor = tierColors[tier ?? ''] ?? 'var(--primary, #7c3aed)';
         transition:  filter var(--transition);
     }
 
-    .sponsor-card:not([data-light='true']) .sponsor-logo {
-        filter: grayscale(55%) brightness(0.85);
+    /* Siglele nu se mai intuneca: filtrul de dinainte (brightness 0.92 pe
+       toate, plus grayscale 55% pe o ramura care nu se activa niciodata,
+       fiindca `light_icon` nu era trimis de nicaieri) reducea exact
+       lizibilitatea de care e vorba. */
+    .sponsor-card[data-plate='dark'] .sponsor-logo {
+        filter: brightness(1.02);
     }
-    .sponsor-card:not([data-light='true']):hover .sponsor-logo,
-    .sponsor-card:not([data-light='true']):focus-visible .sponsor-logo {
-        filter: grayscale(0%) brightness(1.05);
-    }
-    .sponsor-card[data-light='true'] .sponsor-logo {
-        filter: brightness(0.92);
-    }
-    .sponsor-card[data-light='true']:hover .sponsor-logo,
-    .sponsor-card[data-light='true']:focus-visible .sponsor-logo {
-        filter: brightness(1.08);
+    .sponsor-card[data-plate='dark']:hover .sponsor-logo,
+    .sponsor-card[data-plate='dark']:focus-visible .sponsor-logo {
+        filter: brightness(1.12);
     }
 
     .visit-strip {

@@ -49,9 +49,16 @@ const VERTEX = `
     uniform mat4 modelViewMatrix;
     uniform mat4 projectionMatrix;
     varying vec2 vUv;
+    varying float vX;
     void main() {
         vUv = uv;
-        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+        // Pozitia pe orizontala fata de camera. Toate planurile stau la z = 0
+        // (nu exista deplasare pe z), iar camera priveste din (0, 0, 20), deci
+        // adancimea e constanta si vX e proportional cu pozitia pe ecran —
+        // adica poate fi folosit direct pentru stingerea de la margini.
+        vec4 mv = modelViewMatrix * vec4(position, 1.0);
+        vX = mv.x;
+        gl_Position = projectionMatrix * mv;
     }
 `;
 
@@ -62,7 +69,10 @@ const FRAGMENT = `
     uniform sampler2D tMap;
     uniform float uBorderRadius;
     uniform float uAlpha;
+    // x = unde incepe stingerea, y = unde e complet transparent (unitati de lume)
+    uniform vec2 uEdgeFade;
     varying vec2 vUv;
+    varying float vX;
 
     float roundedBoxSDF(vec2 p, vec2 b, float r) {
         vec2 d = abs(p) - b;
@@ -84,7 +94,14 @@ const FRAGMENT = `
         float edgeSmooth = 0.002;
         float alpha = 1.0 - smoothstep(-edgeSmooth, edgeSmooth, d);
 
-        gl_FragColor = vec4(color.rgb, alpha * uAlpha);
+        // Stingere spre marginile rotii. Fara ea pozele dispar brusc: bucla
+        // infinita muta planul inapoi exact cand iese din cadru, deci saltul
+        // se vedea. Acum ajung la alfa 0 inainte de mutare, iar mutarea nu se
+        // mai observa. Se calculeaza per fragment, nu per plan, ca sa se stinga
+        // continuu si pentru planurile inclinate de bend.
+        float edgeFade = 1.0 - smoothstep(uEdgeFade.x, uEdgeFade.y, abs(vX));
+
+        gl_FragColor = vec4(color.rgb, alpha * uAlpha * edgeFade);
     }
 `;
 
@@ -99,6 +116,11 @@ const FADE_MS = 260;
 
 /** Plasa de siguranta impotriva unei bucle infinite daca widthTotal e absurd. */
 const MAX_WRAPS = 64;
+
+/** Unde incepe stingerea de la marginile rotii, ca fractiune din jumatatea
+ *  latimii cadrului. 1 = fara stingere (pozele dispar brusc, ca inainte),
+ *  valori mici = banda de stingere mai lata. */
+const EDGE_FADE_START = 0.9;
 
 interface TexEntry {
     texture: any;
@@ -262,7 +284,9 @@ class Media {
                 uImageSizes: { value: [entry.width, entry.height] },
                 uBorderRadius: { value: this.borderRadius },
                 // 0 pana soseste textura, apoi urca la 1 in FADE_MS
-                uAlpha: { value: 0 }
+                uAlpha: { value: 0 },
+                // setat in onResize, din latimea viewportului
+                uEdgeFade: { value: [0, 0] }
             },
             transparent: true
         });
@@ -344,6 +368,21 @@ class Media {
         this.plane.scale.y = (this.viewport.height * (900 * this.scale)) / this.screen.height;
         this.plane.scale.x = (this.viewport.width * (700 * this.scale)) / this.screen.width;
         this.plane.program.uniforms.uPlaneSizes.value = [this.plane.scale.x, this.plane.scale.y];
+
+        // Stingerea se termina exact la marginea cadrului, deci planul e deja
+        // invizibil cand bucla infinita il muta pe partea cealalta.
+        //
+        // Cele doua capete trebuie sa ramana STRICT diferite: smoothstep(a, a, x)
+        // e nedefinit in GLSL si poate intoarce NaN, iar un alfa NaN scoate poza
+        // cu totul. Se poate ajunge acolo: galeria e un acordeon, iar un panou
+        // inchis are clientWidth 0, deci viewport.width iese 0 sau NaN daca
+        // onResize prinde roata intr-o sectiune neafisata.
+        const half = this.viewport.width / 2;
+        const fadeEnd = Number.isFinite(half) && half > 0 ? half : 1;
+        const fadeStart = Math.min(fadeEnd * EDGE_FADE_START, fadeEnd - 1e-4);
+
+        this.plane.program.uniforms.uEdgeFade.value = [fadeStart, fadeEnd];
+
         this.width = this.plane.scale.x + this.padding;
         this.widthTotal = this.width * this.length;
         this.x = this.width * this.index;

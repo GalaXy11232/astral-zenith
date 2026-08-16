@@ -250,7 +250,7 @@ a img {
     }
 
     .mobile-active {
-        border-left: 10px solid rgb(255, 105, 255);
+        border-left: 10px solid var(--navlink_underline_color);
     }
 
     .mobile-xbtn-container {
@@ -302,4 +302,10 @@ a img {
     .links-wrapper { display: none; }
     .hamburger-btn { display: inline; vertical-align: middle; }
     .nav-margin { margin-bottom: 8rem; }
+
+    /* Pe desktop butonul de limba e ultimul, lipit de marginea din dreapta.
+       Pe mobil linkurile dispar si ramane hamburgerul, care prin conventie
+       sta cel mai la dreapta — deci doar aici inversam ordinea celor doua. */
+    .lang-toggle   { order: 1; }
+    .hamburger-btn { order: 2; }
 }

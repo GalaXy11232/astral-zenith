@@ -31,8 +31,8 @@ function token(name: string, fallback: string): string {
  * evenimentul 'theme-change' trimis de butonul din header.
  */
 function themeColors() {
-    const bg = token('--page-bg', '#0d0d12');
-    const palette = token('--hex-palette', '#7c3aed, #6d28d9, #5b21b6, #4c1d95, #8b5cf6, #3b0764')
+    const bg = token('--page-bg', '#0b0714');
+    const palette = token('--hex-palette', '#37079f, #4b219d, #1e0759, #8453e5, #a77aff, #130436')
         .split(',')
         .map(c => c.trim())
         .filter(Boolean);
@@ -47,8 +47,9 @@ function themeColors() {
 }
 
 const CONFIG = {
-    backgroundColor: '#0d0d12',
-    fog: { color: '#0d0d12', near: 8, far: 40 },
+    // Rezerve daca tokenii lipsesc; oglindesc --page-bg din global.css.
+    backgroundColor: '#0b0714',
+    fog: { color: '#0b0714', near: 8, far: 40 },
 
     camera: {
         fov:      75,

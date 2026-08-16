@@ -4,7 +4,6 @@ import NavBar from "../components/NavBar.astro"
 import Footer from "../components/footer.astro";
 import Hexbackground from "../components/hexbackground.astro"
 
-import Icon from "../components/contact/Icon.astro";
 import ContactMethodCard from "../components/contact/ContactMethodCard.astro";
 import { contactMethods, location } from '../data/contact-data';
 ---
@@ -41,16 +40,27 @@ import { contactMethods, location } from '../data/contact-data';
             <div class="contact-location__grid">
                 <div class="contact-location__info glass">
                     <span class="glass-sheen" aria-hidden="true"></span>
-                    <span class="contact-location__icon">
-                        <Icon name="mappin" size={26} />
+
+                    <!-- Sigla reala a scolii, nu culorile ei imprumutate pe
+                         caseta: referinta e explicita, iar restul casetei
+                         ramane in tema site-ului. -->
+                    <span class="contact-location__crest">
+                        <img
+                            src={location.schoolLogo}
+                            alt={location.schoolName}
+                            width="72"
+                            height="72"
+                            loading="lazy"
+                            decoding="async"
+                        />
                     </span>
 
-                    <div class="contact-location__details">
-                        <p class="contact-location__label">Liceul</p>
-                        <p class="contact-location__value">{location.schoolName}</p>
-                        <p class="contact-location__label">Adresă</p>
-                        <p class="contact-location__value">{location.address}</p>
-                    </div>
+                    <dl class="contact-location__details">
+                        <dt class="contact-location__label">Liceul</dt>
+                        <dd class="contact-location__value">{location.schoolName}</dd>
+                        <dt class="contact-location__label">Adresă</dt>
+                        <dd class="contact-location__value">{location.address}</dd>
+                    </dl>
                 </div>
 
                 <div class="contact-location__map glass">
@@ -91,7 +101,7 @@ import { contactMethods, location } from '../data/contact-data';
         font-size: 0.78rem;
         letter-spacing: 0.14em;
         text-transform: uppercase;
-        color: #b15dff;
+        color: var(--brand-400);
         margin: 0 0 0.6rem;
     }
 
@@ -101,7 +111,7 @@ import { contactMethods, location } from '../data/contact-data';
         font-size: clamp(2.2rem, 5vw, 4rem);
         line-height: 1.1;
         margin: 0 0 0.9rem;
-        background: linear-gradient(135deg, #9333ea 0%, #c026d3 55%, #a855f7 100%);
+        background: linear-gradient(135deg, var(--brand-800) 0%, var(--brand-700) 55%, var(--brand-500) 100%);
         -webkit-background-clip: text;
         background-clip: text;
         color: transparent;
@@ -111,7 +121,7 @@ import { contactMethods, location } from '../data/contact-data';
         margin: 0;
         font-size: 1.05rem;
         line-height: 1.6;
-        color: #cc91ff;
+        color: var(--brand-300);
     }
 
     .contact-methods {
@@ -129,7 +139,7 @@ import { contactMethods, location } from '../data/contact-data';
         /* font-family: "Space Grotesk", system-ui, sans-serif; */
         font-weight: 700;
         font-size: 1.6rem;
-        color: #b14aff;
+        color: var(--brand-400);
         margin: 0 0 1.5rem;
     }
 
@@ -151,25 +161,36 @@ import { contactMethods, location } from '../data/contact-data';
         border-radius: 1.25rem;
     }
 
-    .contact-location__icon {
+    /* Placa de sub sigla: o suprafata deschisa, ca sa se vada si baza neagra
+       a scutului, care altfel s-ar pierde in fundalul intunecat. */
+    .contact-location__crest {
         flex: 0 0 auto;
-        width: 3.4rem;
-        height: 3.4rem;
-        border-radius: 999px;
+        width: 4.75rem;
+        height: 4.75rem;
+        padding: 0.45rem;
+        border-radius: 0.9rem;
         display: flex;
         align-items: center;
         justify-content: center;
-        color: #e9d5ff;
-        background: radial-gradient(circle at 30% 28%,
-            rgba(246, 213, 254, 0.22) 0%,
-            rgba(221, 211, 251, 0.10) 75%);
+        background: rgba(255, 255, 255, 0.12);
         backdrop-filter: blur(6px);
         -webkit-backdrop-filter: blur(6px);
-        box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.28);
+        box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.24);
     }
 
+    .contact-location__crest img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        display: block;
+    }
+
+    /* `flex: 1` ca textul sa ocupe latimea ramasa — fara el se ingramadea in
+       stanga si jumatate de caseta ramanea goala. */
     .contact-location__details {
+        flex: 1 1 auto;
         min-width: 0;
+        margin: 0;
     }
 
     .contact-location__label {
@@ -192,6 +213,29 @@ import { contactMethods, location } from '../data/contact-data';
 
     .contact-location__value:last-child {
         margin-bottom: 0;
+    }
+
+    /* Cand e loc, eticheta si valoarea stau pe acelasi rand, aliniate pe o
+       coloana comuna — asa textul se intinde pe toata latimea in loc sa
+       lase un gol in dreapta. */
+    @media (min-width: 560px) {
+        .contact-location__details {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            column-gap: 1.25rem;
+            row-gap: 0.7rem;
+            align-items: baseline;
+        }
+
+        .contact-location__label {
+            text-align: right;
+            padding-top: 0.1rem;
+        }
+
+        .contact-location__value,
+        .contact-location__value:last-child {
+            margin: 0;
+        }
     }
 
     /* sticla vine din .glass (global.css) */

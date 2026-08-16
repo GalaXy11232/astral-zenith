@@ -39,7 +39,7 @@ const isYouTube = embedUrl !== null;
                 ? <img src={poster} alt="Video thumbnail" loading="lazy" decoding="async" draggable="false" />
                 : <div class="me-yt-placeholder">
                     <svg viewBox="0 0 68 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                        <rect width="68" height="48" rx="10" fill="#ff0000" opacity="0.85"/>
+                        <rect width="68" height="48" rx="10" fill="var(--yt-red)" opacity="0.85"/>
                         <polygon points="26,14 26,34 46,24" fill="white"/>
                     </svg>
                   </div>
@@ -80,7 +80,7 @@ const isYouTube = embedUrl !== null;
         display:         flex;
         align-items:     center;
         justify-content: center;
-        background:      linear-gradient(135deg, #e9e4f8, #d4c8f0);
+        background:      linear-gradient(135deg, var(--brand-050), var(--brand-100));
     }
 
     .me-yt-placeholder svg {

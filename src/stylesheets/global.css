@@ -1,28 +1,147 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   TEMA — indigo / violet
+   Numele vechilor variabile au fost pastrate exact, asa ca restul
+   fisierelor CSS nu trebuie modificate. Doar valorile s-au schimbat.
+   ═══════════════════════════════════════════════════════════════════════ */
+
 :root {
     --transition_overshoot: cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    
-    --primary: #7b28ae;
-    --purple_hgradient: linear-gradient(90deg, var(--primary), #ba12aa);
 
-    --bg-light: #d1c3e6;
+    /* ─── Scara de brand ──────────────────────────────────────────────
+       Paleta primita avea patru indigo-uri practic identice
+       (#37079f, #3d0ba3, #3b09a1, #3b08a1) — pe ecran nu se vede
+       diferenta, deci am pastrat unul singur. O scara utila are pasi
+       clari de luminozitate, nu variatii de 1-2%.
+       950 si 900 sunt derivate: paleta nu avea nimic mai inchis decat
+       #37079f, iar footerul si meniul mobil au nevoie de tonuri adanci. */
+    --brand-950: #130436;   /* derivat */
+    --brand-900: #1e0759;   /* derivat */
+    --brand-800: #37079f;
+    --brand-700: #4b219d;
+    --brand-500: #8453e5;
+    --brand-400: #a77aff;
+    --brand-300: #bb99ff;
+    --brand-200: #c6a9ff;
+    --brand-100: #d4c0fa;   /* era #d4cofa in lista — 'o' nu e cifra hex */
+    --brand-050: #ddcff8;
 
-    /* ─── Bara de navigare ───────────────────────────────────────────────
-       Erau definite in navbar.css; mutate aici cand culorile au devenit
-       tokeni de tema. Fara ele, `color: var(--navlink_color)` era invalid si
-       linkurile cadeau pe albastrul implicit de link al browserului. */
-    --navbar_bg_color:         rgba(76, 0, 126, 0.5);
-    --navbar_bg_filter:        blur(12px) saturate(180%);
-    --navlink_color:           rgb(255, 255, 255);
-    --navlink_underline_color: rgb(104, 0, 184);
-    --glow_color:              rgb(255, 89, 205);
-    --nav-divider:             rgba(255, 255, 255, 0.22);
-    --nav-btn-bg:              rgba(255, 255, 255, 0.08);
-    --nav-btn-bg-hover:        rgba(255, 255, 255, 0.18);
-    --nav-btn-border:          rgba(255, 255, 255, 0.30);
-    --mobile-nav-bg:           rgb(96, 0, 160);
+    /* Aceleasi culori, ca triplete de canale, pentru cazurile cu alfa:
+       rgb(var(--brand-500-rgb) / 0.4). Fara ele componentele ajungeau sa
+       scrie rgba(...) cu valori inventate, in afara scarii.
+       Canalele sunt separate prin spatiu, nu prin virgula: doar forma
+       moderna rgb(R G B / A) accepta si var() si alfa dupa slash. Cu
+       virgule ar iesi rgb(19, 4, 54 / 0.55), sintaxa amestecata pe care
+       browserul o ignora. */
+    --brand-950-rgb: 19 4 54;
+    --brand-900-rgb: 30 7 89;
+    --brand-800-rgb: 55 7 159;
+    --brand-700-rgb: 75 33 157;
+    --brand-500-rgb: 132 83 229;
+    --brand-400-rgb: 167 122 255;
+    --brand-300-rgb: 187 153 255;
+    --brand-200-rgb: 198 169 255;
+    --brand-100-rgb: 212 192 250;
+    --brand-050-rgb: 221 207 248;
+
+    /* ─── Fundaluri intunecate ────────────────────────────────────────
+       Site-ul e pe fond intunecat. Erau imprastiate prin componente
+       #111, #0d0d12, #0a0512, #222, #2e2e36, #111118 — sase griuri
+       neutre diferite, niciunul legat de tema. Scara de mai jos e
+       aceeasi nuanta indigo ca brandul, doar foarte desaturata, deci
+       arata la fel de "negru" dar apartine paletei. */
+    --page-bg:        #0b0714;   /* fundalul paginii + panza hexagoanelor */
+    --surface-dark:   #140f22;   /* cutii pe fundal (video, galerie)      */
+    --surface-dark-2: #1e1830;   /* cardurile de sponsori                 */
+
+    /* ─── Culori care NU vin din tema ─────────────────────────────────
+       Sunt externe si trebuie sa ramana asa; sunt aici ca sa fie
+       evidente si sa nu para hardcodari uitate.                        */
+    --danger:      #e05252;   /* stari de eroare                        */
+    --ftc-into-the-deep: rgb(33, 103, 255);  /* culoarea sezonului FTC  */
+    --yt-red:      #f00;      /* butonul de play YouTube                */
+    --yt-dark:     #212121;   /* fundalul butonului YouTube             */
+    --legacy-orange: 235 110 0;      /* brandingul vechi (rebranding)   */
+    --legacy-orange-dark: 173 81 0;
+
+    /* Sigla Colegiului National „Grigore Moisil": scut rosu/alb, baza neagra,
+       lauri aurii. Valorile sunt luate din Sigla_CNGM.png. Folosite doar in
+       caseta de locatie de pe /contact, care imita blazonul scolii. */
+    --cngm-red:       #eb1c26;
+    --cngm-red-rgb:   235 28 38;
+    --cngm-gold:      #daab2a;
+    --cngm-gold-rgb:  218 171 42;
+    --cngm-black:     #211e1e;
+    --cngm-black-rgb: 33 30 30;
+
+    /* Nivelurile de sponsorizare sunt metale conventionale, nu tema */
+    --tier-bronze:   #b5623a;
+    --tier-silver:   #a8b0ba;
+    --tier-gold:     #d4a843;
+    --tier-platinum: #4cafd4;
+    --tier-diamond:  #6c63ff;
+    --tier-partener: var(--brand-100);
+
+    /* ─── Tokeni semantici ────────────────────────────────────────────
+       Componentele folosesc doar tokenii de mai jos, nu scara de sus.
+       Asa schimbi tema dintr-un singur loc. */
+    --primary:          var(--brand-800);
+    --primary-hover:    var(--brand-700);
+    --accent:           var(--brand-500);
+    --accent-hover:     var(--brand-400);
+    --bg-light:         var(--brand-050);
+    --surface:          #ffffff;
+    --border-subtle:    var(--brand-100);
+
+    /* Gradientul principal: acum variaza luminozitatea, nu nuanta.
+       Vechiul mov → magenta atragea atentia asupra lui insusi; un
+       gradient in aceeasi familie de culoare citeste mai sobru. */
+    --purple_hgradient: linear-gradient(90deg, var(--brand-800), var(--brand-500));
+    --brand_hgradient:  var(--purple_hgradient);  /* alias, pentru migrare */
+
+    /* ─── Text ────────────────────────────────────────────────────────
+       Perechile de mai jos trec WCAG AA (>= 4.5:1). */
+    --text-on-light:    var(--brand-950);   /* 13:1 pe --bg-light */
+    --text-muted-light: var(--brand-700);   /* 7.1:1 pe --bg-light */
+    --text-on-dark:     var(--brand-050);   /* 8.5:1 pe --primary  */
+    --text-muted-dark:  var(--brand-200);   /* 6.2:1 pe --primary  */
+    --link-on-light:    var(--accent);      /* 4.8:1 pe alb        */
+
+    --focus-ring: 0 0 0 3px rgb(var(--brand-500-rgb) / 0.45);
+
+    /* ─── Bara de navigare ───────────────────────────────────────────
+       Fundalul e putin mai opac decat inainte (0.55 fata de 0.5):
+       indigo-ul nou e mai luminos decat violetul vechi, iar textul alb
+       pierdea contrast cand navbar-ul trecea peste imagini deschise. */
+    --navbar_bg_color:         rgb(var(--brand-900-rgb) / 0.55);
+    --navbar_bg_filter:        blur(14px) saturate(170%);
+    --navlink_color:           #ffffff;
+    --navlink_underline_color: var(--brand-400);
+    --glow_color:              var(--brand-400);
+
+    /* Suprafetele "de sticla" sunt tintate cu lavanda in loc de alb pur:
+       albul peste indigo iese gri si murdar. Lavanda e --brand-100 /
+       --brand-200 din scara, nu doua nuante inventate ca inainte. */
+    --nav-divider:             rgb(var(--brand-100-rgb) / 0.24);
+    --nav-btn-bg:              rgb(var(--brand-200-rgb) / 0.12);
+    --nav-btn-bg-hover:        rgb(var(--brand-200-rgb) / 0.24);
+    --nav-btn-border:          rgb(var(--brand-100-rgb) / 0.34);
+    --mobile-nav-bg:           var(--brand-900);
 
     /* ─── Footer ─────────────────────────────────────────────────────── */
-    --footer-bg: linear-gradient(160deg, #241335 0%, #170b26 100%);
+    --footer-bg: linear-gradient(160deg, var(--brand-900) 0%, var(--brand-950) 100%);
+
+    /* ─── Fundalul cu hexagoane (WebGL) ───────────────────────────────
+       hexbackground.astro citea deja tokenii de mai jos, dar nu erau
+       definiti nicaieri, deci cadea mereu pe fallback-uri Tailwind
+       (#7c3aed, #6d28d9, ...) — de asta fundalul nu semana cu tema.
+       Valorile sunt scrise literal, nu ca var(--brand-*): componenta le
+       citeste cu getPropertyValue, care intoarce textul declarat fara sa
+       rezolve var(), iar Three.js n-ar sti ce sa faca cu el. Sunt exact
+       treptele 800/700/900/500/400/950 din scara de mai sus — daca
+       schimbi scara, schimba si aici. */
+    --hex-palette: #37079f, #4b219d, #1e0759, #8453e5, #a77aff, #130436;
+    --hex-opacity: 0.4;
+    --hex-ambient: 0.35;
 
     /* ─── Sectiunea video + text ──────────────────────────────────────── */
     --video-basis: 420px;
@@ -31,7 +150,6 @@
 *, ::after, ::before {
     box-sizing: border-box;
 }
-
 /* ─── Liquid glass ────────────────────────────────────────────────────────
    Textura comuna pentru toate "cutiile" de pe echipa / activitate /
    rezultate / stiri / contact.
@@ -48,13 +166,24 @@
    conflict cu ::before-urile pe care si le definesc componentele.
    ───────────────────────────────────────────────────────────────────────── */
 :root {
-    --glass-text:      #f6f1ff;
-    --glass-text-soft: #d9b3ff;
-    --glass-text-dim:  #b0a3c8;
+    /* Textul de pe sticla vine din capatul deschis al scarii. Inainte
+       erau patru mov-uri desprinse de tema (#f6f1ff, #d9b3ff, #b0a3c8,
+       #8d7aad) — ultimele doua bateau in gri si nu se potriveau cu
+       niciun alt mov de pe pagina. */
+    --glass-text:      #ffffff;
+    --glass-text-soft: var(--brand-100);
+    --glass-text-dim:  var(--brand-200);
     --glass-border:    rgba(255, 255, 255, 0.20);
     --glass-border-hover: rgba(255, 255, 255, 0.34);
-    --glass-inset-bg:  rgba(141, 122, 173, 0.15);
-    --glass-body:      #8d7aad;
+    --glass-inset-bg:  rgb(var(--brand-200-rgb) / 0.15);
+    --glass-body:      var(--brand-200);
+
+    /* Bula de sub iconite (stats_card, contact, ContactMethodCard) — era
+       copiata identic in trei fisiere, cu doua roz-uri (#f6d5fe, #ddd3fb)
+       care nu erau in scara. */
+    --icon-bubble-bg: radial-gradient(circle at 30% 28%,
+        rgb(var(--brand-100-rgb) / 0.22) 0%,
+        rgb(var(--brand-050-rgb) / 0.10) 75%);
 }
 
 .glass {
@@ -65,14 +194,14 @@
         linear-gradient(150deg,
             rgba(255, 255, 255, 0.16) 0%,
             rgba(255, 255, 255, 0.06) 42%,
-            rgba(168, 85, 247, 0.10) 100%);
+            rgb(var(--brand-500-rgb) / 0.10) 100%);
     backdrop-filter: blur(22px) saturate(170%);
     -webkit-backdrop-filter: blur(22px) saturate(170%);
 
     border: 1px solid var(--glass-border);
     box-shadow:
         0 8px 32px rgba(0, 0, 0, 0.35),
-        0 2px 8px rgba(88, 28, 135, 0.20),
+        0 2px 8px rgb(var(--brand-900-rgb) / 0.20),
         inset 0 1px 0 rgba(255, 255, 255, 0.38),
         inset 0 -1px 0 rgba(255, 255, 255, 0.06);
 
@@ -101,17 +230,20 @@
 }
 
 /* varianta cu movul temei sub reflexia alba (slidere "Valorile Noastre",
-   notificari). Trebuie sa vina dupa .glass ca sa-i suprascrie background-ul. */
+   notificari). Trebuie sa vina dupa .glass ca sa-i suprascrie background-ul.
+   Al doilea strat mergea inainte spre magenta (rgba(186, 18, 170)) — exact
+   deviatia de nuanta pe care restul temei o evita. Acum ramane in familia
+   indigo si variaza doar luminozitatea. */
 .glass-purple {
     background:
         linear-gradient(150deg,
             rgba(255, 255, 255, 0.16) 0%,
             rgba(255, 255, 255, 0.06) 42%,
-            rgba(168, 85, 247, 0.10) 100%),
+            rgb(var(--brand-500-rgb) / 0.10) 100%),
         linear-gradient(160deg,
-            rgba(123, 40, 174, 0.45) 0%,
-            rgba(123, 40, 174, 0.28) 58%,
-            rgba(186, 18, 170, 0.32) 100%);
+            rgb(var(--brand-800-rgb) / 0.45) 0%,
+            rgb(var(--brand-700-rgb) / 0.28) 58%,
+            rgb(var(--brand-500-rgb) / 0.32) 100%);
 }
 
 /* suprafata interioara (poze, iconite, panouri imbricate) */
@@ -131,10 +263,10 @@
 
 .glass-hover:hover {
     transform: translateY(-6px);
-    border-color: rgba(255, 255, 255, 0.34);
+    border-color: var(--glass-border-hover);
     box-shadow:
         0 18px 44px rgba(0, 0, 0, 0.42),
-        0 6px 20px rgba(147, 51, 234, 0.28),
+        0 6px 20px rgb(var(--brand-500-rgb) / 0.28),
         inset 0 1px 0 rgba(255, 255, 255, 0.50),
         inset 0 -1px 0 rgba(255, 255, 255, 0.08);
 }
@@ -235,7 +367,7 @@ h1, h2, h3 { font-family: 'Prompt', monospace; }
 }
 
 .obiectiv .paragraf {
-    color: #e3dbf2;
+    color: var(--glass-text-soft);
 }
 
 .title {
@@ -246,6 +378,6 @@ h1, h2, h3 { font-family: 'Prompt', monospace; }
 .rounded-pill {
     display: inline-block;
     padding: 8px 20px;
-    border: 7px solid #000;
+    border: 7px solid var(--brand-950);
     border-radius: 50px;
 }

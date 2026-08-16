@@ -17,15 +17,20 @@ const { activeLink = -1, has_margin = true } = Astro.props;
  * vizibila parte a site-ului — merita sa fie exacte si sa apara instant, fara
  * sa astepte procesarea Google.
  */
+/*
+ * ATENTIE: `activeLink` e un INDICE in lista de mai jos, dat de fiecare pagina.
+ * Daca schimbi ordinea, actualizeaza si numerele din <NavBar activeLink={...}>
+ * in src/pages/ — altfel se evidentiaza linkul gresit.
+ */
 const links = [
-    { name: "Acasă",      en: "Home",     href: "/" },
-    { name: "Echipă",     en: "Team",     href: "/echipa" },
-    { name: "Activitate", en: "Activity", href: "/activitate" },
-    { name: "Rezultate",  en: "Results",  href: "/rezultate" },
-    { name: "Sponsori",   en: "Sponsors", href: "/sponsori" },
-    { name: "Galerie",    en: "Gallery",  href: "/galerie" },
-    { name: "Presă",      en: "Press",    href: "/news" },
-    { name: "Contact",    en: "Contact",  href: "/contact" }
+    { name: "Acasă",      en: "Home",     href: "/" },           // 0
+    { name: "Rezultate",  en: "Results",  href: "/rezultate" },  // 1
+    { name: "Activitate", en: "Activity", href: "/activitate" }, // 2
+    { name: "Echipă",     en: "Team",     href: "/echipa" },     // 3
+    { name: "Sponsori",   en: "Sponsors", href: "/sponsori" },   // 4
+    { name: "Galerie",    en: "Gallery",  href: "/galerie" },    // 5
+    { name: "Presă",      en: "Press",    href: "/news" },       // 6
+    { name: "Contact",    en: "Contact",  href: "/contact" }     // 7
 ]
 ---
 <div class = 'mobile-background-blur' onclick = 'switch_menu_visibility("0px")' />
@@ -48,8 +53,31 @@ const links = [
     <div class = 'links-container'>
         <div class="gtranslate_wrapper"></div>
 
+        <a class="hamburger-btn" onclick = 'switch_menu_visibility()' >&#8801;</a>
+        <!-- genereaza dinamic linkurile -> se poate atribui din index activeLink prop -->
+        <div class="links-wrapper">
+            {
+                links.map((link, index) => {
+                    return (<>
+                        <a
+                            class = {`navbar-link scale-hover notranslate ${activeLink === index ? "active" : ""}`}
+                            translate = "no"
+                            data-ro = {link.name}
+                            data-en = {link.en}
+                            href = {link.href}
+                        >
+                            {link.name}
+                        </a>
+
+                    </>);
+                })
+            }
+        </div>
+
         <!-- Un singur buton: arata steagul limbii in care INTRI daca il apesi.
-             data-target e pus de script din cookie-ul googtrans. -->
+             data-target e pus de script din cookie-ul googtrans.
+             Sta ultimul in DOM ca sa fie lipit de marginea din dreapta a barei;
+             pe mobil il trece inaintea hamburgerului o regula de `order`. -->
         <button
             type="button"
             class="lang-toggle notranslate"
@@ -79,27 +107,6 @@ const links = [
                 </svg>
             </span>
         </button>
-
-        <a class="hamburger-btn" onclick = 'switch_menu_visibility()' >&#8801;</a>
-        <!-- genereaza dinamic linkurile -> se poate atribui din index activeLink prop -->
-        <div class="links-wrapper">
-            {
-                links.map((link, index) => {
-                    return (<>
-                        <a 
-                            class = {`navbar-link scale-hover notranslate ${activeLink === index ? "active" : ""}`}
-                            translate = "no"
-                            data-ro = {link.name}
-                            data-en = {link.en}
-                            href = {link.href}
-                        > 
-                            {link.name} 
-                        </a>
-                        
-                    </>);
-                })
-            }
-        </div>
     </div>
 </nav>
 

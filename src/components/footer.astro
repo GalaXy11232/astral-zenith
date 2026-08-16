@@ -78,7 +78,8 @@ const currentYear = new Date().getFullYear();
     .site-footer__shimmer {
         height: 2px;
         width: 100%;
-        background: linear-gradient(90deg, transparent, #a855f7 35%, #ff21c0 50%, #6208ff 65%, transparent);
+        background: linear-gradient(90deg, transparent,
+            var(--brand-500) 35%, var(--brand-300) 50%, var(--brand-800) 65%, transparent);
         background-size: 220% 100%;
         animation: footer-shimmer 7s ease-in-out infinite;
         margin-top: 2rem;
@@ -103,16 +104,16 @@ const currentYear = new Date().getFullYear();
         display: flex;
         align-items: center;
         justify-content: center;
-        background: linear-gradient(135deg, #a855f7, #6b2fae);
+        background: linear-gradient(135deg, var(--brand-500), var(--brand-700));
         color: #ffffff;
-        box-shadow: 0 6px 16px rgba(168, 85, 247, 0.4);
+        box-shadow: 0 6px 16px rgb(var(--brand-500-rgb) / 0.4);
         cursor: pointer;
         transition: transform 0.25s ease, box-shadow 0.25s ease;
     }
 
     .site-footer__totop:hover {
         transform: translateX(-50%) translateY(-3px);
-        box-shadow: 0 10px 22px rgba(168, 85, 247, 0.5);
+        box-shadow: 0 10px 22px rgb(var(--brand-500-rgb) / 0.5);
     }
 
     .site-footer__inner {
@@ -179,7 +180,7 @@ const currentYear = new Date().getFullYear();
     }
 
     .site-footer__link:hover .site-footer__icon {
-        background: linear-gradient(135deg, #a855f7, #6b2fae);
+        background: linear-gradient(135deg, var(--brand-500), var(--brand-700));
         color: #ffffff;
     }
 

@@ -100,11 +100,11 @@ const textOrder = videoPosition === "right" ? 1 : 2;
         border-radius: 1.35rem;
         overflow: hidden;
         background: var(--glass-inset-bg);
-        border: 1px solid rgba(168, 85, 247, 0.25);
+        border: 1px solid rgb(var(--brand-500-rgb) / 0.25);
         box-shadow:
-        0 0 0 1px rgba(147, 51, 234, 0.08),
-        0 24px 60px rgba(88, 28, 135, 0.45),
-        0 0 46px rgba(168, 85, 247, 0.18);
+        0 0 0 1px rgb(var(--brand-500-rgb) / 0.08),
+        0 24px 60px rgb(var(--brand-900-rgb) / 0.45),
+        0 0 46px rgb(var(--brand-500-rgb) / 0.18);
     }
 
     .video-text__video iframe,
@@ -148,7 +148,7 @@ const textOrder = videoPosition === "right" ? 1 : 2;
         width: 4px;
         height: 2rem;
         border-radius: 999px;
-        background: linear-gradient(180deg, #9333ea, #d946ef);
+        background: linear-gradient(180deg, var(--brand-800), var(--brand-400));
     }
 
     .video-text__title {
@@ -157,7 +157,7 @@ const textOrder = videoPosition === "right" ? 1 : 2;
         font-size: clamp(1.7rem, 3.4vw, 2.35rem);
         line-height: 1.15;
         letter-spacing: -0.01em;
-        color: #a855f7;
+        color: var(--brand-400);
     }
 
     .video-text__body {
@@ -180,7 +180,7 @@ const textOrder = videoPosition === "right" ? 1 : 2;
 
     .video-text__body :global(a) {
         color: var(--glass-text-soft);
-        text-decoration-color: rgba(232, 121, 249, 0.5);
+        text-decoration-color: rgb(var(--brand-300-rgb) / 0.5);
         text-underline-offset: 3px;
     }
 

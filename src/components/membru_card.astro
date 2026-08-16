@@ -32,8 +32,8 @@ const tooltipText = tooltip ? TOOLTIP_ABBREVIATIONS[tooltip] ?? "" : "";
 
 <style>
     .member-card {
-        --tooltip-color: rgba(62, 22, 98, 0.55);
-        --text-color: #f2e4ff;
+        --tooltip-color: rgb(var(--brand-900-rgb) / 0.55);
+        --text-color: var(--glass-text);
     }
 
     .facultate-tooltiptext {
@@ -66,7 +66,7 @@ const tooltipText = tooltip ? TOOLTIP_ABBREVIATIONS[tooltip] ?? "" : "";
         border-color: transparent transparent rgba(255, 255, 255, 0.22) transparent;
     }
     .facultate-tooltip { position: relative; }
-    .facultate-tooltip > i { color: #cfa8f5; border-bottom: 1px dotted rgba(255, 255, 255, 0.45); cursor: help;}
+    .facultate-tooltip > i { color: var(--brand-300); border-bottom: 1px dotted rgba(255, 255, 255, 0.45); cursor: help;}
     .facultate-tooltip:hover div { visibility: visible; opacity: 1;}
 
     
@@ -118,7 +118,7 @@ const tooltipText = tooltip ? TOOLTIP_ABBREVIATIONS[tooltip] ?? "" : "";
         font-family: 'Prompt', sans-serif;
         font-size: 1.2rem;
         font-weight: 600;
-        color: #f6f1ff;
+        color: var(--glass-text);
         letter-spacing: -0.01em;
 
         text-shadow: 0 1px 12px rgba(0, 0, 0, 0.45);
@@ -129,7 +129,7 @@ const tooltipText = tooltip ? TOOLTIP_ABBREVIATIONS[tooltip] ?? "" : "";
         font-family: 'Prompt', sans-serif;
         font-size: 1rem;
         font-weight: 500;
-        color: #d9b3ff;
+        color: var(--glass-text-soft);
         line-height: 1.4;
         
         white-space: pre-wrap; 

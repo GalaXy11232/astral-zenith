@@ -163,7 +163,7 @@ const uid = `activity-${Math.random().toString(36).slice(2, 8)}`;
     .card-content-inner :global(p) {
         font-size:     0.95rem;
         line-height:   1.7;
-        color:         #e3dbf2;
+        color:         var(--glass-text-soft);
         margin:        0 0 0.85rem;
         text-indent:   1.2em;  /* matches the screenshot's paragraph indent */
     }
@@ -179,7 +179,7 @@ const uid = `activity-${Math.random().toString(36).slice(2, 8)}`;
         padding:        0;
         font-size:      0.9rem;
         font-weight:    500;
-        color:          #c9a6ff;
+        color:          var(--brand-300);
         cursor:         pointer;
         letter-spacing: 0.01em;
         transition:     opacity 0.2s;
@@ -189,7 +189,7 @@ const uid = `activity-${Math.random().toString(36).slice(2, 8)}`;
         opacity: 0.7;
     }
     .toggle-btn:focus-visible {
-        outline:        2px solid #c9a6ff;
+        outline:        2px solid var(--brand-300);
         outline-offset: 3px;
         border-radius:  3px;
     }

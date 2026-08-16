@@ -28,11 +28,11 @@ import Hexbackground from "../components/hexbackground.astro";
         margin-bottom: 3.5rem;
     }
 
-    /* fara asta mesajele de loading/eroare erau text negru pe fundal #111 */
+    /* fara asta mesajele de loading/eroare erau text negru pe fundal intunecat */
     .gallery-loading {
         text-align: center;
         padding: 4rem 1.5rem;
-        color: #d9c7ee;
+        color: var(--glass-text-soft);
         font-size: 1.05rem;
         font-weight: 500;
     }
@@ -157,7 +157,7 @@ import Hexbackground from "../components/hexbackground.astro";
         transition: .3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         box-shadow: 0 0 10px black;
         display: block;
-        background: #222;
+        background: var(--surface-dark);
         border-radius: 10px;
     }
 
@@ -291,7 +291,9 @@ function openFullView(img: HTMLImageElement) {
     visualizer.src = img.dataset.src ?? img.src; // use real src
     visualizer.setAttribute('data-visible', 'true');
     container.style.zIndex = '100';
-    container.style.background = '#111d';
+    // backgroundColor, nu background: e doar o culoare, iar prescurtarea cu
+    // var() inauntru se serializeaza ca sir gol daca o citeste cineva inapoi
+    container.style.backgroundColor = 'rgb(var(--brand-950-rgb) / 0.87)';
 }
 
 // Incarca pozele grilei abia cand se apropie de ecran. In modul roata imaginile

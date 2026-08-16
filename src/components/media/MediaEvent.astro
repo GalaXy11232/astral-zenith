@@ -44,11 +44,11 @@ if (uid == '')
 <style>
     /* sticla vine din .glass / .glass-hover (global.css) */
     .me-block {
-        --ac:         #c9a6ff;
-        --ac-mid:     #a78bfa;
-        --ac-soft:    rgba(167, 139, 250, 0.16);
+        --ac:         var(--brand-300);
+        --ac-mid:     var(--brand-400);
+        --ac-soft:    rgb(var(--brand-400-rgb) / 0.16);
         --ac-border:  rgba(255, 255, 255, 0.18);
-        --surface:    rgba(255, 255, 255, 0.07);
+        --event-surface: rgba(255, 255, 255, 0.07);
         --text:       var(--glass-text);
         --muted:      var(--glass-text-dim);
         --radius:     20px;
@@ -95,8 +95,8 @@ if (uid == '')
         background: linear-gradient(
             to bottom,
             transparent 55%,
-            rgba(23, 14, 40, 0.55) 85%,
-            rgba(23, 14, 40, 0.85) 100%
+            rgb(var(--brand-950-rgb) / 0.55) 85%,
+            rgb(var(--brand-950-rgb) / 0.85) 100%
         );
         pointer-events: none;
     }
@@ -176,7 +176,7 @@ if (uid == '')
         align-items:     flex-start;
         gap:             11px;
         padding:         13px 14px;
-        background:      var(--surface);
+        background:      var(--event-surface);
         border:          1px solid rgba(255, 255, 255, 0.14);
         border-radius:   var(--radius-sm);
         text-decoration: none;
@@ -205,7 +205,7 @@ if (uid == '')
     }
 
     .me-body :global(.me-link:hover .me-link-icon) {
-        background: rgba(124, 58, 237, 0.2);
+        background: rgb(var(--brand-500-rgb) / 0.2);
     }
 
     .me-body :global(.me-link-icon svg) {
@@ -300,11 +300,11 @@ if (uid == '')
         width:           40px;
         height:          40px;
         border-radius:   50%;
-        background:      rgba(124, 58, 237, 0.9);
+        background:      rgb(var(--brand-500-rgb) / 0.9);
         display:         flex;
         align-items:     center;
         justify-content: center;
-        box-shadow:      0 4px 16px rgba(124, 58, 237, 0.45);
+        box-shadow:      0 4px 16px rgb(var(--brand-500-rgb) / 0.45);
         backdrop-filter: blur(4px);
     }
 
@@ -377,7 +377,7 @@ if (uid == '')
             lb.id = 'me-lightbox';
             lb.style.cssText = [
                 'position:fixed', 'inset:0', 'z-index:9000',
-                'background:rgba(13,9,25,0.82)',
+                'background:rgb(var(--brand-950-rgb) / 0.82)',
                 'backdrop-filter:blur(6px)',
                 'display:flex', 'align-items:center', 'justify-content:center',
                 'padding:24px', 'opacity:0',
@@ -404,10 +404,10 @@ if (uid == '')
             closeBtn.style.cssText = [
                 'position:absolute', 'top:-14px', 'right:-14px',
                 'width:34px', 'height:34px', 'border-radius:50%',
-                'background:#7c3aed', 'border:none', 'cursor:pointer',
+                'background:var(--brand-500)', 'border:none', 'cursor:pointer',
                 'display:flex', 'align-items:center', 'justify-content:center',
                 'color:#fff', 'font-size:20px', 'line-height:1', 'z-index:1',
-                'box-shadow:0 4px 16px rgba(124,58,237,0.5)',
+                'box-shadow:0 4px 16px rgb(var(--brand-500-rgb) / 0.5)',
                 'transition:transform .2s ease',
             ].join(';');
             closeBtn.setAttribute('aria-label', 'Închide');

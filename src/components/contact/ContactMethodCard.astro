@@ -50,10 +50,8 @@ const { label, value, href, icon, external = true } = Astro.props;
         display: flex;
         align-items: center;
         justify-content: center;
-        color: #e9d5ff;
-        background: radial-gradient(circle at 30% 28%,
-            rgba(246, 213, 254, 0.22) 0%,
-            rgba(221, 211, 251, 0.10) 75%);
+        color: var(--brand-100);
+        background: var(--icon-bubble-bg);
         backdrop-filter: blur(6px);
         -webkit-backdrop-filter: blur(6px);
         box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.28);

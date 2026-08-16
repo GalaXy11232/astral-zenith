@@ -92,7 +92,8 @@ const {
 
 <style>
     .hero {
-        --ac:      #7c3aed;
+        --ac:      var(--brand-500);
+        --ac-rgb:  var(--brand-500-rgb);
         --ac-mid:  var(--glass-text-soft);
         --text:    var(--glass-text);
         --muted:   var(--glass-text-dim);
@@ -207,7 +208,7 @@ const {
         width:         clamp(240px, 36vw, 420px);
         aspect-ratio:  1/1;
         /* clip-path:     polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%); */
-        /* background:    rgba(13, 13, 18, 0.6); */
+        /* background:    rgb(var(--brand-950-rgb) / 0.6); */
         opacity:       0;
         transform:     scale(0.86);
         animation:
@@ -217,12 +218,12 @@ const {
 
     /* .robot-frame:hover {
         animation-play-state: paused, running;
-        filter: drop-shadow(0 0 40px rgba(124, 58, 237, 0.65)) drop-shadow(0 16px 48px rgba(0, 0, 0, 0.4));
+        filter: drop-shadow(0 0 40px rgb(var(--ac-rgb) / 0.65)) drop-shadow(0 16px 48px rgba(0, 0, 0, 0.4));
     } */
  
     /* @keyframes hex-pulse {
-        0%, 100% { filter: drop-shadow(0 0 20px rgba(124, 58, 237, 0.35)) drop-shadow(0 12px 36px rgba(0, 0, 0, 0.35)); }
-        50%       { filter: drop-shadow(0 0 34px rgba(124, 58, 237, 0.6))  drop-shadow(0 12px 36px rgba(0, 0, 0, 0.35)); }
+        0%, 100% { filter: drop-shadow(0 0 20px rgb(var(--ac-rgb) / 0.35)) drop-shadow(0 12px 36px rgba(0, 0, 0, 0.35)); }
+        50%       { filter: drop-shadow(0 0 34px rgb(var(--ac-rgb) / 0.6))  drop-shadow(0 12px 36px rgba(0, 0, 0, 0.35)); }
     } */
 
     @keyframes frame-reveal {
@@ -277,7 +278,7 @@ const {
     .spinner-ring {
         width:        36px;
         height:       36px;
-        border:       2.5px solid rgba(124, 58, 237, 0.2);
+        border:       2.5px solid rgb(var(--ac-rgb) / 0.2);
         border-top:   2.5px solid var(--ac);
         border-radius: 50%;
         animation:    spin 0.85s linear infinite;
@@ -301,8 +302,8 @@ const {
         align-items:     center;
         gap:             9px;
         padding:         10px 22px;
-        background:      rgba(124, 58, 237, 0.12);
-        border:          1px solid rgba(124, 58, 237, 0.3);
+        background:      rgb(var(--ac-rgb) / 0.12);
+        border:          1px solid rgb(var(--ac-rgb) / 0.3);
         border-radius:   100px;
         color:           var(--ac-mid);
         /* font-family:     ui-monospace, 'Cascadia Code', monospace; */
@@ -319,8 +320,8 @@ const {
     }
 
     .model-toggle:hover {
-        background:   rgba(124, 58, 237, 0.22);
-        border-color: rgba(124, 58, 237, 0.55);
+        background:   rgb(var(--ac-rgb) / 0.22);
+        border-color: rgb(var(--ac-rgb) / 0.55);
         color:        #fff;
         transform:    translateY(-1px);
     }
@@ -330,7 +331,7 @@ const {
     }
 
     .model-toggle[aria-pressed='true'] {
-        background:   rgba(124, 58, 237, 0.25);
+        background:   rgb(var(--ac-rgb) / 0.25);
         border-color: var(--ac);
         color:        #fff;
     }
@@ -470,7 +471,7 @@ const {
                 modelViewer.addEventListener('error', (event: any) => {
                     console.error('model-viewer failed to load the model', event.detail ?? event);
                     spinner.querySelector('.spinner-label')!.textContent = 'Modelul nu a putut fi încărcat';
-                    spinner.querySelector('.spinner-ring')!.setAttribute('style', 'animation-play-state:paused;border-top-color:#e05252;');
+                    spinner.querySelector('.spinner-ring')!.setAttribute('style', 'animation-play-state:paused;border-top-color:var(--danger);');
                 }, { once: true });
  
                 modelViewer.setAttribute('src', modelViewer.dataset.src ?? '');

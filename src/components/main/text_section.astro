@@ -48,7 +48,7 @@ const { title, eyebrow = '', text_align = 'start' } = Astro.props;
         width: 4px;
         height: 2.1rem;
         border-radius: 999px;
-        background: linear-gradient(180deg, #9333ea, #d946ef);
+        background: linear-gradient(180deg, var(--brand-800), var(--brand-400));
     }
 
     .text-section__title {
@@ -57,7 +57,7 @@ const { title, eyebrow = '', text_align = 'start' } = Astro.props;
         font-size: clamp(1.9rem, 4vw, 2.7rem);
         line-height: 1.15;
         letter-spacing: -0.01em;
-        color: #a855f7;
+        color: var(--brand-400);
     }
 
     .text-section__body {
@@ -80,7 +80,7 @@ const { title, eyebrow = '', text_align = 'start' } = Astro.props;
 
     .text-section__body :global(a) {
         color: var(--glass-text-soft);
-        text-decoration-color: rgba(232, 121, 249, 0.5);
+        text-decoration-color: rgb(var(--brand-300-rgb) / 0.5);
         text-underline-offset: 3px;
     }
 </style>

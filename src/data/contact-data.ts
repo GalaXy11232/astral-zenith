@@ -53,6 +53,8 @@ export const contactMethods = [
 export const location = {
     schoolName: "Colegiul Național \"Grigore Moisil\"",
     address: "Bd. Timișoara 33, Sector 6, București",
+    // aceeasi sigla ca in bara de navigare si pe pagina de sponsori
+    schoolLogo: "/assets/parteneri/Sigla_CNGM.png",
     mapEmbedUrl:
         "https://maps.google.com/maps?q=44.4266085,26.0411891(Colegiul+Na%C8%9Bional+Grigore+Moisil)&z=16&output=embed",
 };
