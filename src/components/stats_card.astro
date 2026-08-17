@@ -51,10 +51,9 @@ const { end, label, icon, duration = 1500, iconAlt } = Astro.props;
         line-height: 1;
         letter-spacing: -0.02em;
         font-variant-numeric: tabular-nums;
-        background: linear-gradient(135deg, var(--brand-400) 0%, var(--brand-200) 55%, var(--brand-300) 100%);
-        -webkit-background-clip: text;
-        background-clip: text;
-        color: transparent;
+        /* Fara gradient taiat pe text: cifrele folosesc aceeasi culoare plina
+           ca titlurile si restul accentelor mov din site. */
+        color: var(--brand-500);
     }
 
     .stat-card__label {

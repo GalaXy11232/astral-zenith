@@ -1,5 +1,18 @@
 ---
+import { getLogoMetrics } from '../utils/logo-metrics';
+
 const { name, logo, website, tier, scale_factor = 1 } = Astro.props;
+
+// Dimensiunea siglei se calculeaza din desenul real din fisier (vezi
+// logo-metrics.ts), nu se mai nimereste din ochi. `scale_factor` ramane ca
+// portita manuala: inmulteste rezultatul automat, pentru cazul rar in care o
+// sigla trebuie sa iasa dinadins din rand.
+const m = await getLogoMetrics(logo);
+const logoStyle = [
+    `width: ${m.widthPct * scale_factor}%`,
+    `height: ${m.heightPct * scale_factor}%`,
+    `transform: translate(${m.offsetXPct}%, ${m.offsetYPct}%)`,
+].join('; ');
 
 const tierColors: Record<string, string> = {
     bronze:   'var(--tier-bronze)',
@@ -21,34 +34,43 @@ const accentColor = tierColors[tier ?? ''] ?? 'var(--primary)';
         aria-label={website !== '#' ? `Vizitează website-ul ${name}` : name}
         style={`--accent: ${accentColor};`}
     >
-        <span class="corner-notch" aria-hidden="true" style={`display: ${website === '#' ? 'none' : 'block'}`}></span>
+        <div class="card-fade">
+            {tier && <span class="tier-badge" translate="no">{tier}</span>}
 
-        {tier && <span class="tier-badge" translate="no">{tier}</span>}
+            <div class="logo-container">
+                <div class="logo-box">
+                    <img
+                        src={logo}
+                        alt={`${name} logo`}
+                        class="sponsor-logo"
+                        loading="lazy"
+                        decoding="async"
+                        draggable="false"
+                        style={logoStyle}
+                    />
+                </div>
+            </div>
 
-        <div class="logo-container">
-            <img
-                src={logo}
-                alt={`${name} logo`}
-                class="sponsor-logo"
-                loading="lazy"
-                decoding="async"
-                draggable="false"
-                style={`transform: scale(${scale_factor});`}
-            />
+            {website !== '#' ? (
+                <div class="visit-strip">
+                    <span class="visit-label" style={`color: ${tier === 'partener' ? 'var(--brand-950)' : '#fff'}`}>
+                        Vizitează website-ul
+                    </span>
+                    <svg class="visit-arrow" style={`color: ${tier === 'partener' ? 'var(--brand-950)' : '#fff'}`} viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                        <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+            ) : (
+                <div class="visit-strip-placeholder"></div>
+            )}
         </div>
 
-        {website !== '#' ? (
-            <div class="visit-strip">
-                <span class="visit-label" style={`color: ${tier === 'partener' ? 'var(--brand-950)' : '#fff'}`}>
-                    Vizitează website-ul
-                </span>
-                <svg class="visit-arrow" style={`color: ${tier === 'partener' ? 'var(--brand-950)' : '#fff'}`} viewBox="0 0 16 16" fill="none" aria-hidden="true">
-                    <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-            </div>
-        ) : (
-            <div class="visit-strip-placeholder"></div>
-        )}
+        <!-- Corner-notch traieste in afara lui .card-fade dinadins: e singurul
+             indiciu vizual ca link-ul duce spre un site extern, iar in coltul
+             cardului "raza" mastii radiale de mai jos e deja aproape de zero,
+             asa ca daca ar sta inauntru ar disparea aproape complet. Ramane
+             plin, deasupra stingerii, ca un fel de eticheta lipita pe card. -->
+        <span class="corner-notch" aria-hidden="true" style={`display: ${website === '#' ? 'none' : 'block'}`}></span>
     </a>
 </div>
 
@@ -64,7 +86,6 @@ const accentColor = tierColors[tier ?? ''] ?? 'var(--primary)';
     .sponsor-card {
         --card-size:      clamp(140px, 20vw, 200px);
         --card-bg:        #ffffff;
-        --card-border:    rgba(0, 0, 0, 0.08);
         --strip-h:        35px;
         --radius:         14px;
         --notch:          22px;
@@ -81,23 +102,45 @@ const accentColor = tierColors[tier ?? ''] ?? 'var(--primary)';
         outline:         none;
         cursor:          pointer;
         flex-shrink:     0;
-        border:          1px solid var(--card-border);
-        box-shadow:      0 2px 8px rgba(0, 0, 0, 0.4);
-        transition:      box-shadow var(--transition), transform var(--transition);
+        transition:      transform var(--transition);
         user-select:     none;
         -webkit-user-select: none;
+    }
 
-        /* Textura: acelasi hexagon din HexBackground (var(--hex-palette)),
-           doar decupat plat si repetat pe cardul alb, nu randat in WebGL.
-           Doua copii ale aceluiasi tile, a doua decalata pe jumatate, dau
-           randurile intretesute tipice unui fagure — fara sa fie un
-           hexagon-grid matematic perfect, ceea ce oricum n-ar aparea
-           altfel decat foarte de-aproape. Opacitatea e joasa dinadins: e
-           textura fundalului, nu trebuie sa concureze cu sigla de deasupra. */
+    /* Tot continutul "de suprafata" al cardului (fundal + eticheta de nivel +
+       logo + banda de vizitare) e grupat aici ca sa se stinga IMPREUNA spre
+       margini, ca o vinieta, nu doar textura din spate. Elipsa 100%/100%
+       urmareste forma dreptunghiulara a cardului; platoul opac merge pana la
+       68% din raza ca zona centrala (unde sta sigla) sa ramana intotdeauna
+       plina, iar stingerea reala se vede doar pe ultima treime, spre colturi
+       si margini. Corner-notch-ul ramane deliberat in afara acestui strat
+       (vezi .astro) ca sa nu dispara complet in colt. */
+    .card-fade {
+        position:        relative;
+        z-index:          0;
+        display:         flex;
+        flex-direction:  column;
+        width:           100%;
+        height:          100%;
+        mask-image:      radial-gradient(ellipse 100% 100% at 50% 50%, black 68%, transparent 100%);
+        -webkit-mask-image: radial-gradient(ellipse 100% 100% at 50% 50%, black 68%, transparent 100%);
+    }
+
+    /* Fundalul alb + textura de hexagoane sta pe un strat separat
+       (::before), sub logo/etichete, exact ca bara de navigare
+       (navbar.css nav::before). Nu exista alt fundal opac sub el, asa ca
+       acolo unde masca de mai sus stinge cardul se vede fundalul paginii
+       prin spate. */
+    .card-fade::before {
+        content:        '';
+        position:       absolute;
+        inset:           0;
+        z-index:         0;
+        pointer-events:  none;
         background-color: var(--card-bg);
         background-image:
-            url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='64' viewBox='0 0 56 64'%3E%3Cpolygon points='28,8 43.6,17 43.6,35 28,44 12.4,35 12.4,17' fill='none' stroke='%234b219d' stroke-width='1.4' stroke-opacity='0.14'/%3E%3C/svg%3E"),
-            url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='64' viewBox='0 0 56 64'%3E%3Cpolygon points='28,8 43.6,17 43.6,35 28,44 12.4,35 12.4,17' fill='none' stroke='%238453e5' stroke-width='1.4' stroke-opacity='0.10'/%3E%3C/svg%3E");
+            url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='64' viewBox='0 0 56 64'%3E%3Cpolygon points='28,8 43.6,17 43.6,35 28,44 12.4,35 12.4,17' fill='%234b219d' fill-opacity='0.10' stroke='%234b219d' stroke-width='1.4' stroke-opacity='0.20'/%3E%3C/svg%3E"),
+            url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='64' viewBox='0 0 56 64'%3E%3Cpolygon points='28,8 43.6,17 43.6,35 28,44 12.4,35 12.4,17' fill='%238453e5' fill-opacity='0.07' stroke='%238453e5' stroke-width='1.4' stroke-opacity='0.14'/%3E%3C/svg%3E");
         background-position: 0 0, 28px 32px;
         background-size: 56px 64px;
         background-repeat: repeat;
@@ -106,7 +149,6 @@ const accentColor = tierColors[tier ?? ''] ?? 'var(--primary)';
     .sponsor-card:hover,
     .sponsor-card:focus-visible {
         transform:  translateY(-3px);
-        box-shadow: 0 0 0 1px var(--accent), 0 12px 28px rgba(0, 0, 0, 0.55);
     }
 
     .corner-notch {
@@ -167,13 +209,25 @@ const accentColor = tierColors[tier ?? ''] ?? 'var(--primary)';
         transform: translateY(-4px) scale(1.04);
     }
 
+    /* Caseta in care se aseaza sigla. Are raport de aspect FIX (acelasi numar
+       ca LOGO_BOX_RATIO din logo-metrics.ts) tocmai ca incadrarea calculata la
+       build sa fie valabila la orice latime de ecran — daca raportul ar varia
+       cu breakpointul, siglele late ar iesi din caseta pe ecrane mici. */
+    .logo-box {
+        position:     relative;
+        width:        100%;
+        aspect-ratio: 1.9;
+    }
+
+    /* width/height/transform vin inline, calculate per sigla. Imaginea se pune
+       cu coltul in centrul casetei, iar translate-ul (tot inline) o trage
+       inapoi exact cat trebuie ca DESENUL sa fie cel centrat, nu fisierul. */
     .sponsor-logo {
-        max-width:   100%;
-        max-height:  clamp(50px, 8vw, 80px);
-        width:       auto;
-        height:      auto;
-        object-fit:  contain;
-        display:     block;
+        position:   absolute;
+        left:       50%;
+        top:        50%;
+        display:    block;
+        object-fit: contain;
     }
 
     .visit-strip {

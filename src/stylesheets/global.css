@@ -94,8 +94,14 @@
 
     /* Gradientul principal: acum variaza luminozitatea, nu nuanta.
        Vechiul mov → magenta atragea atentia asupra lui insusi; un
-       gradient in aceeasi familie de culoare citeste mai sobru. */
-    --purple_hgradient: linear-gradient(90deg, var(--brand-800), var(--brand-500));
+       gradient in aceeasi familie de culoare citeste mai sobru.
+
+       Scara e 500 → 300, nu 800 → 500: capatul --brand-800 (#37079f) e gandit
+       pentru fundal deschis si pe fundalul intunecat al site-ului (#0b0714)
+       ajungea la ~1.6:1, adica jumatatea din stanga a liniei disparea. Mutata
+       cu doua trepte mai sus, linia merge de la ~4.1:1 la ~8.6:1 — vizibila pe
+       toata lungimea, cu acelasi salt de luminozitate ca inainte. */
+    --purple_hgradient: linear-gradient(90deg, var(--brand-500), var(--brand-300));
     --brand_hgradient:  var(--purple_hgradient);  /* alias, pentru migrare */
 
     /* ─── Text ────────────────────────────────────────────────────────
@@ -282,18 +288,27 @@ h1, h2, h3 { font-family: 'Prompt', monospace; }
 
 .hidden { display: none !important; }
 
+/* Titlurile de sectiune din paginile interioare ("Rezultatele echipei",
+   "Activitatea Noastră", "Sponsori Gold" etc.).
+
+   Culoarea e --brand-500 (#8453e5) — aceeasi pentru TOT textul mov din site
+   (titluri de sectiune, subtitluri, accente in carduri), ca sa nu mai existe
+   trei nuante apropiate care par o greseala. Inainte era --primary
+   (--brand-800, #37079f): un mov inchis gandit pentru fundal deschis, care pe
+   fundalul intunecat al site-ului (#0b0714) ajungea la un contrast de ~1.6:1 —
+   practic ilizibil. --brand-500 da ~4.1:1 pe acelasi fundal. */
 .title-container {
     text-align: center;
     margin-bottom: 2rem;
     padding: .2rem;
 
-    color: var(--primary);
+    color: var(--brand-500);
 }
 
 .title-underline {
     font-size: clamp(25px, 2.5vw + 1rem, 34px);
     font-weight: 600;
-    color: var(--primary);
+    color: var(--brand-500);
     position: relative;
     padding: .75rem;
 }

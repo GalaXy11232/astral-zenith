@@ -48,7 +48,9 @@ const { title, eyebrow = '', text_align = 'start' } = Astro.props;
         width: 4px;
         height: 2.1rem;
         border-radius: 999px;
-        background: linear-gradient(180deg, var(--brand-800), var(--brand-400));
+        /* Aceeasi scara ca --purple_hgradient (500 → 300): capatul --brand-800
+           se pierdea pe fundalul intunecat, lasand bara sa para taiata la varf. */
+        background: linear-gradient(180deg, var(--brand-500), var(--brand-300));
     }
 
     .text-section__title {
@@ -57,7 +59,7 @@ const { title, eyebrow = '', text_align = 'start' } = Astro.props;
         font-size: clamp(1.9rem, 4vw, 2.7rem);
         line-height: 1.15;
         letter-spacing: -0.01em;
-        color: var(--brand-400);
+        color: var(--brand-500);
     }
 
     .text-section__body {

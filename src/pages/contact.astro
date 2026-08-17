@@ -101,7 +101,7 @@ import { contactMethods, location } from '../data/contact-data';
         font-size: 0.78rem;
         letter-spacing: 0.14em;
         text-transform: uppercase;
-        color: var(--brand-400);
+        color: var(--brand-500);
         margin: 0 0 0.6rem;
     }
 
@@ -111,17 +111,19 @@ import { contactMethods, location } from '../data/contact-data';
         font-size: clamp(2.2rem, 5vw, 4rem);
         line-height: 1.1;
         margin: 0 0 0.9rem;
-        background: linear-gradient(135deg, var(--brand-800) 0%, var(--brand-700) 55%, var(--brand-500) 100%);
-        -webkit-background-clip: text;
-        background-clip: text;
-        color: transparent;
+        /* Era un gradient --brand-800 → --brand-700 → --brand-500 taiat pe
+           text. Primele doua opriri sunt movuri inchise, gandite pentru fundal
+           deschis: pe fundalul intunecat al site-ului (#0b0714) jumatatea din
+           stanga a titlului practic disparea. Acum e plin, in aceeasi culoare
+           ca restul textului mov din site. */
+        color: var(--brand-500);
     }
 
     .contact-hero__subtitle {
         margin: 0;
         font-size: 1.05rem;
         line-height: 1.6;
-        color: var(--brand-300);
+        color: var(--brand-500);
     }
 
     .contact-methods {
@@ -139,7 +141,7 @@ import { contactMethods, location } from '../data/contact-data';
         /* font-family: "Space Grotesk", system-ui, sans-serif; */
         font-weight: 700;
         font-size: 1.6rem;
-        color: var(--brand-400);
+        color: var(--brand-500);
         margin: 0 0 1.5rem;
     }
 
