@@ -1,16 +1,5 @@
 ---
-import { needsLightPlate } from "../utils/logo_ink.ts";
-
-const { name, logo, website, tier, scale_factor = 1, light_icon } = Astro.props;
-
-/* Cerneala inchisa primeste o placa deschisa dedesubt, altfel sigla se pierde
-   in cardul intunecat. Se detecteaza automat din imagine (vezi logo_ink.ts);
-   `light_icon` ramane ca portita manuala daca euristica greseste la o sigla
-   anume — light_icon={true} inseamna "sigla e deschisa, las-o pe fundal
-   intunecat". */
-const lightPlate = light_icon === undefined
-    ? await needsLightPlate(logo)
-    : !light_icon;
+const { name, logo, website, tier, scale_factor = 1 } = Astro.props;
 
 const tierColors: Record<string, string> = {
     bronze:   'var(--tier-bronze)',
@@ -31,27 +20,21 @@ const accentColor = tierColors[tier ?? ''] ?? 'var(--primary)';
         class="sponsor-card"
         aria-label={website !== '#' ? `Vizitează website-ul ${name}` : name}
         style={`--accent: ${accentColor};`}
-        data-plate={lightPlate ? 'light' : 'dark'}
     >
         <span class="corner-notch" aria-hidden="true" style={`display: ${website === '#' ? 'none' : 'block'}`}></span>
 
         {tier && <span class="tier-badge" translate="no">{tier}</span>}
 
-        <span class="card-glow" aria-hidden="true"></span>
-        <span class="card-shine" aria-hidden="true"></span>
-
         <div class="logo-container">
-            <span class="logo-plate">
-                <img
-                    src={logo}
-                    alt={`${name} logo`}
-                    class="sponsor-logo"
-                    loading="lazy"
-                    decoding="async"
-                    draggable="false"
-                    style={`transform: scale(${scale_factor});`}
-                />
-            </span>
+            <img
+                src={logo}
+                alt={`${name} logo`}
+                class="sponsor-logo"
+                loading="lazy"
+                decoding="async"
+                draggable="false"
+                style={`transform: scale(${scale_factor});`}
+            />
         </div>
 
         {website !== '#' ? (
@@ -80,14 +63,12 @@ const accentColor = tierColors[tier ?? ''] ?? 'var(--primary)';
 
     .sponsor-card {
         --card-size:      clamp(140px, 20vw, 200px);
-        --card-bg:        var(--surface-dark-2);
-        --card-border:    rgba(255, 255, 255, 0.08);
+        --card-bg:        #ffffff;
+        --card-border:    rgba(0, 0, 0, 0.08);
         --strip-h:        35px;
         --radius:         14px;
         --notch:          22px;
         --transition:     0.5s cubic-bezier(0.175, 0.885, 0.32, 1);
-        --shine-duration: 6s;
-        --shine-delay:    0s;
 
         position:        relative;
         display:         flex;
@@ -100,12 +81,26 @@ const accentColor = tierColors[tier ?? ''] ?? 'var(--primary)';
         outline:         none;
         cursor:          pointer;
         flex-shrink:     0;
-        background:      var(--card-bg);
         border:          1px solid var(--card-border);
-        box-shadow:      0 0 0 0 transparent, 0 2px 8px rgba(0, 0, 0, 0.4);
+        box-shadow:      0 2px 8px rgba(0, 0, 0, 0.4);
         transition:      box-shadow var(--transition), transform var(--transition);
         user-select:     none;
         -webkit-user-select: none;
+
+        /* Textura: acelasi hexagon din HexBackground (var(--hex-palette)),
+           doar decupat plat si repetat pe cardul alb, nu randat in WebGL.
+           Doua copii ale aceluiasi tile, a doua decalata pe jumatate, dau
+           randurile intretesute tipice unui fagure — fara sa fie un
+           hexagon-grid matematic perfect, ceea ce oricum n-ar aparea
+           altfel decat foarte de-aproape. Opacitatea e joasa dinadins: e
+           textura fundalului, nu trebuie sa concureze cu sigla de deasupra. */
+        background-color: var(--card-bg);
+        background-image:
+            url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='64' viewBox='0 0 56 64'%3E%3Cpolygon points='28,8 43.6,17 43.6,35 28,44 12.4,35 12.4,17' fill='none' stroke='%234b219d' stroke-width='1.4' stroke-opacity='0.14'/%3E%3C/svg%3E"),
+            url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='64' viewBox='0 0 56 64'%3E%3Cpolygon points='28,8 43.6,17 43.6,35 28,44 12.4,35 12.4,17' fill='none' stroke='%238453e5' stroke-width='1.4' stroke-opacity='0.10'/%3E%3C/svg%3E");
+        background-position: 0 0, 28px 32px;
+        background-size: 56px 64px;
+        background-repeat: repeat;
     }
 
     .sponsor-card:hover,
@@ -134,9 +129,8 @@ const accentColor = tierColors[tier ?? ''] ?? 'var(--primary)';
 
     .tier-badge {
         position:       absolute;
-        bottom:         calc(var(--strip-h) + 8px);
+        bottom:         30px;
         left:           50%;
-        bottom: 30px;
         transform:      translateX(-50%);
         z-index:        3;
         font-family:    ui-monospace, 'Cascadia Code', monospace;
@@ -145,77 +139,14 @@ const accentColor = tierColors[tier ?? ''] ?? 'var(--primary)';
         letter-spacing: 0.18em;
         text-transform: uppercase;
         white-space:    nowrap;
-        color:          var(--accent);
-        opacity:        0.95;
+        color:          var(--text-on-light);
+        opacity:        0.6;
         transition:     opacity var(--transition), bottom var(--transition);
-        -webkit-text-stroke: .37px var(--accent);
     }
     .sponsor-card:hover .tier-badge,
     .sponsor-card:focus-visible .tier-badge {
         opacity: 0;
         bottom:  calc(var(--strip-h) + 2px);
-    }
-
-    .card-glow {
-        position:       absolute;
-        inset:          0;
-        z-index:        1;
-        pointer-events: none;
-        border-radius:  var(--radius);
-        background:     radial-gradient(
-            ellipse 60% 60% at 50% 48%,
-            color-mix(in srgb, var(--accent) 28%, transparent),
-            transparent 85%
-        );
-        animation: glow-breathe 3.8s ease-in-out infinite;
-        will-change: transform, opacity;
-    }
-
-    @keyframes glow-breathe {
-        0%   { transform: scale(0.82); opacity: 0.5; }
-        50%  { transform: scale(1.18); opacity: 1;   }
-        100% { transform: scale(0.82); opacity: 0.5; }
-    }
-
-    .card-shine {
-        position:         absolute;
-        inset:            0;
-        z-index:          5;
-        pointer-events:   none;
-        border-radius:    var(--radius);
-        overflow:         hidden;
-        will-change:      opacity;
-    }
-
-    .card-shine::after {
-        content:    '';
-        position:   absolute;
-        top:        -50%;
-        left:       -140%;
-        width:      60%;
-        height:     200%;
-        background: linear-gradient(
-            to right,
-            transparent                                              0%,
-            transparent                                              30%,
-            color-mix(in srgb, var(--accent) 40%, transparent)      44%,
-            color-mix(in srgb, var(--accent) 60%, white)             50%,
-            color-mix(in srgb, var(--accent) 40%, transparent)      56%,
-            transparent                                              70%,
-            transparent                                              100%
-        );
-        transform:        rotate(0deg) skewX(-15deg);
-        animation:        card-shine-sweep var(--shine-duration, 7s) ease-in-out infinite;
-        animation-delay:  var(--shine-delay, 0s);
-        will-change:      left;
-    }
-
-    @keyframes card-shine-sweep {
-        0%   { left: -140%; opacity: 0;   }
-        4%   { opacity: 1;               }
-        30%  { left:  180%; opacity: 1;   }
-        32%  { opacity: 0;               }
-        100% { left:  180%; opacity: 0;   }
     }
 
     .logo-container {
@@ -225,9 +156,8 @@ const accentColor = tierColors[tier ?? ''] ?? 'var(--primary)';
         display:         flex;
         align-items:     center;
         justify-content: center;
-        /* Bordura de jos tine placa deasupra etichetei de nivel (care sta la
-           bottom: 30px): fara ea eticheta ar cadea peste placa deschisa, iar
-           accentele palide — silver, platinum — n-ar mai avea contrast. */
+        /* Padding-ul de jos lasa loc etichetei de nivel (bottom: 30px) sub
+           sigla, fara sa se suprapuna peste ea. */
         padding:         clamp(12px, 3vw, 28px) clamp(10px, 2.5vw, 24px) 16px;
         transition:      transform var(--transition);
         overflow:        hidden;
@@ -237,59 +167,13 @@ const accentColor = tierColors[tier ?? ''] ?? 'var(--primary)';
         transform: translateY(-4px) scale(1.04);
     }
 
-    /* Placa de sub sigla. Siglele cu cerneala inchisa o primesc deschisa, ca
-       sa aiba pe ce se citi; cele deschise raman pe fundalul cardului. Care
-       varianta se aplica se decide la build, din imagine (logo_ink.ts). */
-    /* Placa umple zona siglei si NU se dimensioneaza dupa imagine. Trei
-       sponsori folosesc `scale_factor` (2.25, 2, 1.4) ca sa compenseze
-       marginile transparente din propriile fisiere; `transform: scale()` nu
-       schimba layoutul, deci o placa croita pe cutia imaginii ar fi ramas
-       mica iar sigla ar fi dat pe dinafara, peste cardul intunecat. Asa,
-       placa are aceeasi marime pe toate cardurile, orice scala ar avea sigla. */
-    .logo-plate {
-        flex:            1;
-        align-self:      stretch;
-        display:         flex;
-        align-items:     center;
-        justify-content: center;
-        padding:         8px;
-        border-radius:   10px;
-        transition:      background var(--transition), box-shadow var(--transition);
-    }
-
-    .sponsor-card[data-plate='light'] .logo-plate {
-        background: #f6f5f9;
-        box-shadow:
-            inset 0 0 0 1px rgba(255, 255, 255, 0.55),
-            0 2px 10px rgba(0, 0, 0, 0.35);
-    }
-
-    .sponsor-card[data-plate='light']:hover .logo-plate,
-    .sponsor-card[data-plate='light']:focus-visible .logo-plate {
-        background: #ffffff;
-    }
-
     .sponsor-logo {
         max-width:   100%;
         max-height:  clamp(50px, 8vw, 80px);
         width:       auto;
-        /* margin-bottom: max(auto, 40px) !important; */
         height:      auto;
         object-fit:  contain;
         display:     block;
-        transition:  filter var(--transition);
-    }
-
-    /* Siglele nu se mai intuneca: filtrul de dinainte (brightness 0.92 pe
-       toate, plus grayscale 55% pe o ramura care nu se activa niciodata,
-       fiindca `light_icon` nu era trimis de nicaieri) reducea exact
-       lizibilitatea de care e vorba. */
-    .sponsor-card[data-plate='dark'] .sponsor-logo {
-        filter: brightness(1.02);
-    }
-    .sponsor-card[data-plate='dark']:hover .sponsor-logo,
-    .sponsor-card[data-plate='dark']:focus-visible .sponsor-logo {
-        filter: brightness(1.12);
     }
 
     .visit-strip {
