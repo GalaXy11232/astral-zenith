@@ -106,7 +106,9 @@ const CONFIG = {
     },
 
     motion: {
-        ringSpeed:         0.001,
+        // Rotatia inelelor: cerut mai lenta decat 0.001, care citea ca o
+        // invartire vizibila in loc de o miscare de fundal.
+        ringSpeed:         0.0004,
         parallax:          0.18,
         parallaxEase:      0.03,
         verticalSpeed:     0.002, // How fast the rings move up/down

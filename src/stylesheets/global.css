@@ -203,16 +203,12 @@
 
     /* ─── Fundalul cu hexagoane ───────────────────────────────────────
        Literal, nu var(): componenta citeste cu getPropertyValue, care nu
-       rezolva var(). Aceeasi familie --brand-700 ca pe tema intunecata,
-       dar intinsa spre alb (nu sarita pe alta treapta a scarii): pe
-       fundal aproape alb, --brand-700 in forma lui plina ar fi un bloc
-       greu, nu o textura. Amestecul cu alb pastreaza nuanta si scade
-       doar luminozitatea, deci hexagoanele raman recognoscibil "700".
-       Ambientul urca de la 0.35 la 0.85: pe fundal deschis o lumina slaba
-       lasa fetele hexagonului aproape negre. */
-    /* Ancorata pe --brand-300 (#bb99ff), aceeasi constructie ca la tema
-       intunecata: H=260° si S=1.00 fixe, variaza doar L (0.73 → 0.87). */
-    --hex-palette: #a273ff, #ae86ff, #bb99ff, #bb99ff, #c8acff, #d4bfff;
+       rezolva var(). Cerut: interval --brand-200 (#c6a9ff) → --brand-100
+       (#d4c0fa), ales aleator per hexagon; treptele din mijloc sunt
+       interpolari liniare intre cele doua capete ale scarii.
+       Ambientul urca fata de tema intunecata: pe fundal deschis o lumina
+       slaba lasa fetele hexagonului aproape negre. */
+    --hex-palette: #c6a9ff, #c9aefe, #ccb2fd, #ceb7fc, #d1bbfb, #d4c0fa;
     --hex-opacity: 0.95;
     /* Three.js imparte iradianta la PI, deci pixelul randat este
        aproximativ albedo * (total intensitati / PI). Ca hexagoanele sa
@@ -297,6 +293,44 @@
    fie brand-700. Specificitate 0,3,0, deci bate regula din .obiectiv. */
 :root[data-theme="light"] .obiectiv .titlu {
     color: var(--brand-700);
+}
+
+/* Cardurile glisante, doar pe tema deschisa: stratul mov din .glass-purple
+   e gandit pentru fundal intunecat, unde textul de pe el e aproape alb. Pe
+   tema deschisa textul se intoarce pe brand-700 / brand-800, deci ajungea
+   mov inchis pe mov mediu — de aici senzatia de "greu de citit". Aceleasi
+   trei opriri, cu alfa taiat la ~o treime: cardul devine mai transparent,
+   pagina deschisa se vede prin el si contrastul cu textul creste.
+   Tintit pe .swiper-slide ca notificarile, care folosesc tot .glass-purple
+   peste fundal intunecat, sa ramana neatinse. */
+:root[data-theme="light"] .swiper-slide.glass-purple {
+    background:
+        var(--glass-gradient),
+        linear-gradient(160deg,
+            rgb(var(--brand-800-rgb) / 0.14) 0%,
+            rgb(var(--brand-700-rgb) / 0.08) 58%,
+            rgb(var(--brand-500-rgb) / 0.10) 100%);
+}
+
+/* Conturul cutiilor de sticla de pe activitate si echipa, doar pe tema
+   deschisa. .glass are deja border: 1px solid var(--glass-border), dar pe
+   tema deschisa tokenul e brand-700 la alfa 0.20 — pe un fundal aproape
+   alb linia practic dispare si cutiile n-au margine. Se schimba doar
+   culoarea, nu si grosimea: ramane linia fina de 1px. Alfa a urcat de la
+   0.45 la 0.75 — la 0.45 linia inca nu se vedea peste fundalul deschis. */
+:root[data-theme="light"] .activity-card.glass,
+:root[data-theme="light"] .member-card.glass {
+    border-color: rgb(var(--brand-700-rgb) / 0.75);
+}
+
+/* Regula de mai sus are specificitate 0,4,0 si ar fi acoperit
+   .glass-hover:hover (0,2,0), care e cel care aprinde marginea la hover:
+   cardurile de membru ar fi ramas cu aceeasi linie si sub cursor. Alfa
+   urca peste cel din repaus — --glass-border-hover e 0.38 pe tema
+   deschisa, adica sub cel din repaus, deci hover-ul ar fi palit, nu
+   aprins. */
+:root[data-theme="light"] .member-card.glass-hover:hover {
+    border-color: rgb(var(--brand-700-rgb) / 0.95);
 }
 
 *, ::after, ::before {
@@ -523,6 +557,16 @@ h1, h2, h3 { font-family: 'Prompt', sans-serif; }
 .swiper-slide-shadow-left,
 .swiper-slide-shadow-right {
     border-radius: 20px !important;
+}
+
+/* Cardurile stau direct pe fundalul cu hexagoane, nu pe o suprafata plina:
+   umbra proiectata de .glass (0 8px 32px, deplasata in jos) se citea ca o
+   banda intunecata sub fiecare card. Raman doar muchiile inset, care dau
+   grosimea sticlei fara sa arunce umbra in pagina. */
+.swiper-slide.glass {
+    box-shadow:
+        inset 0 1px 0 var(--glass-hilite),
+        inset 0 -1px 0 var(--glass-fill);
 }
 
 .obiectiv {
