@@ -333,6 +333,37 @@
     border-color: rgb(var(--brand-700-rgb) / 0.95);
 }
 
+/* Butonul rotund "Inapoi sus" de pe marginea footerului, doar pe tema
+   deschisa: cerut sa fie in aceeasi culoare ca footerul, deci ia chiar
+   --footer-bg, nu o copie a lui. Sageata din el ramane pe --glass-text,
+   care pe tema deschisa e brand-800 — inchis pe lavanda, deci se vede.
+   Specificitate 0,3,0, peste 0,2,0 al regulii scoped din footer.astro;
+   :hover de acolo schimba doar transform si box-shadow, deci nu se bate
+   cu asta. */
+:root[data-theme="light"] .site-footer__totop {
+    background: var(--footer-bg);
+}
+
+/* Butonul X al notificarilor, tot pe tema deschisa. Pe langa cererea de
+   culoare, regula repara si un contrast imposibil: fundalul era
+   var(--glass-text), iar --glass-text e brand-800 pe tema deschisa —
+   adica exact culoarea cu care e desenat X-ul. Fond brand-800 peste
+   simbol brand-800: butonul aparea ca un disc plin, fara X. */
+:root[data-theme="light"] .notif__close {
+    background: var(--footer-bg);
+    color: var(--brand-800);
+}
+
+/* Hover-ul din componenta (0,2,1) pierde in fata regulii de mai sus
+   (0,3,0), deci inversarea trebuie rescrisa aici. Si ea cadea in aceeasi
+   capcana: punea color: var(--glass-text) peste fond brand-800, iar pe
+   tema deschisa cele doua sunt aceeasi culoare. brand-050 e capatul
+   deschis al scarii, deci X-ul ramane vizibil si sub cursor. */
+:root[data-theme="light"] .notif__close:hover {
+    background: var(--brand-800);
+    color: var(--brand-050);
+}
+
 *, ::after, ::before {
     box-sizing: border-box;
 }
@@ -590,6 +621,14 @@ h1, h2, h3 { font-family: 'Prompt', sans-serif; }
 
 .obiectiv .paragraf {
     color: var(--glass-text-soft);
+    /* Pana acum nu avea nici font-size, nici line-height: mostenea 16px si
+       `normal` de la body. `normal` se calculeaza din metricile fontului
+       (la Prompt iese in jur de 1.5), deci 1.4 il stramteaza — dar e
+       singurul loc de pe site unde punctul de plecare a fost estimat, nu
+       citit dintr-o regula. Cardul are inaltime fixa (400px) si mai are
+       loc la marimea asta. */
+    font-size:   1.07rem;
+    line-height: 1.4;
 }
 
 .title {

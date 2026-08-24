@@ -136,8 +136,13 @@ const uid = `activity-${Math.random().toString(36).slice(2, 8)}`;
     /* ── Expandable content block ───────────────────────────────────────── */
     /*
      * The clamp is done via max-height:
-     *   line-height (1.7) × font-size (1rem = 16px) × N lines
-     *   = ~27.2px × N
+     *   line-height (1.55) × font-size (1.07rem = ~17.1px) × N lines
+     *   = ~26.5px × N
+     * Atentie: `em` de mai jos se rezolva fata de .card-content, care
+     * ramane la 1rem — nu fata de 1.07rem al paragrafului. De aceea
+     * factorul e 1.55 × 1.07 = ~1.66em, nu 1.55em. Daca se schimba
+     * font-size sau line-height la paragraf, se schimba si aici, altfel
+     * previzualizarea taie alt numar de randuri decat --preview-lines.
      * We add a small extra to not cut a line exactly in half.
      *
      * When expanded, max-height is set to a large safe value in JS.
@@ -150,7 +155,7 @@ const uid = `activity-${Math.random().toString(36).slice(2, 8)}`;
            se citeste mai usor si e deja precedentul din result_card.astro. */
         text-align: left;
         overflow:   hidden;
-        max-height: calc(1.7em * var(--preview-lines, 3) + 0.4em);
+        max-height: calc(1.66em * var(--preview-lines, 3) + 0.4em);
         transition: max-height 0.45s cubic-bezier(0.4, 0, 0.2, 1);
         -webkit-mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
                 mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
@@ -163,11 +168,11 @@ const uid = `activity-${Math.random().toString(36).slice(2, 8)}`;
 
 
     .card-content-inner :global(p) {
-        /* 16px e minimul pentru text de tip paragraf — sub asta Safari mai
-           si da zoom automat pe mobil la focus, iar litera devine grea de
-           citit pe ~70 de carduri de pe pagina asta. */
-        font-size:     1rem;
-        line-height:   1.7;
+        /* Peste 16px, minimul pentru text de tip paragraf — sub acel prag
+           Safari mai si da zoom automat pe mobil la focus, iar litera
+           devine grea de citit pe ~70 de carduri de pe pagina asta. */
+        font-size:     1.07rem;
+        line-height:   1.55;
         color:         var(--glass-text-soft);
         margin:        0 0 0.85rem;
         text-indent:   1.2em;  /* matches the screenshot's paragraph indent */
