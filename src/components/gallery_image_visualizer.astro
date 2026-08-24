@@ -3,7 +3,9 @@
 ---
 
 <div class = 'full-img hidden' translate = 'no'>
-    <img id = 'image-visualizer' src="" alt="">
+    <!-- fara src: un src="" gol face browserul sa ceara din nou pagina
+         curenta ca imagine. JS-ul il completeaza la deschidere. -->
+    <img id = 'image-visualizer' alt="">
     <div class = "img-switcher-wrapper">
         <p id = 'left-img' class = 'img-switcher-btn hidden'>&lt;</p>
         <p id = 'right-img' class = 'img-switcher-btn hidden'>&gt;</p>

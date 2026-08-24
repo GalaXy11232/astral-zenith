@@ -17,7 +17,7 @@ if (uid == '')
 <section class="me-block glass glass-hover" id={uid}>
     <span class="glass-sheen" aria-hidden="true"></span>
 
-    <div class="me-banner">
+    {cover && <div class="me-banner">
         <img
             src={cover}
             alt={coverAlt}
@@ -28,7 +28,7 @@ if (uid == '')
             style={`object-position: ${coverFocus};`}
         />
         <div class="me-banner-gradient" aria-hidden="true"></div>
-    </div>
+    </div>}
 
     <div class="me-body">
         <div class="me-header">

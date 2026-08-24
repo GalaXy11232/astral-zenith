@@ -72,7 +72,97 @@ Scriptul mai are două protecții care nu trebuie scoase:
 
 ---
 
-## 2. Tipare Astro care se repetă peste tot
+## 2. O activitate = un folder
+
+A doua regulă importantă. Activitățile **nu** se mai scriu în
+`src/pages/activitate.astro` — pagina aia doar citește și ordonează.
+
+```
+originals/activitati/2026-07-03-inchidere-unico/
+├── articol.md      textul
+├── cover.webp      coperta cardului — NU intră în albumul din galerie
+├── DSCF0113.jpg    pozele evenimentului → devin album în /galerie
+└── DSCF0027.jpg
+```
+
+`articol.md`:
+
+```markdown
+---
+date: 2026-07-03
+dateLabel: 03 iulie 2026
+title: Festivitatea de închidere UniCo
+focus: 50% 85%
+---
+
+Primul paragraf.
+
+Al doilea paragraf, cu text **îngroșat**.
+```
+
+| Câmp | Obligatoriu | Ce face |
+|---|---|---|
+| `date` | da | Data reală, ISO (`AAAA-LL-ZZ`). **Ordinea pe pagină vine de aici**, descrescător |
+| `title` | da | Titlul cardului **și** al albumului din galerie |
+| `dateLabel` | nu | Cum se afișează data. Necesar la intervale („16-21 iulie 2026"). Fără el, se formatează `date` în română |
+| `focus` | nu | `object-position` pentru copertă, ex. `50% 85%`, când încadrarea implicită taie capete |
+| `thumbnail` | nu | Cale explicită spre o copertă din altă parte. Se folosește doar dacă în folder **nu** există `cover.*` |
+
+### Ca să adaugi o activitate
+
+1. Creează folderul `originals/activitati/<data>-<nume-scurt>/`.
+   Numele folderului e slug-ul: apare în URL ca `/activitate#<nume-folder>`.
+2. Scrie `articol.md` după modelul de mai sus. **Salvează în UTF-8** — altfel
+   diacriticele ies mojibake.
+3. Pune `cover.webp` (coperta) și pozele evenimentului în același folder.
+4. `npm run images`
+5. Gata. Cardul apare la locul lui după dată, iar pozele devin album în
+   `/galerie` sub același titlu.
+
+Un rând gol în text = paragraf nou. Merge `**îngroșat**` și `*înclinat*`.
+
+### Paragrafele sunt `<p>` reale
+
+Înainte textul era scris direct în markup, cu `<br>` între paragrafe, deci
+regulile `.card-content-inner :global(p)` din `activity_card.astro` nu se
+aplicau niciodată. Acum Markdown produce `<p>`, deci se aplică: indentare,
+margini, `line-height`. Dacă schimbi `font-size` sau `line-height` acolo,
+schimbă și factorul din `max-height: calc(1.66em * ...)` de la `.card-content`
+— altfel previzualizarea taie alt număr de rânduri decât spune
+`--preview-lines`.
+
+### Greșelile se văd la build
+
+Schema din `src/content.config.ts` verifică fiecare articol. Un câmp lipsă
+oprește build-ul și spune exact unde:
+
+```
+[InvalidContentEntryDataError] activitati → 2026-08-30-test
+  date: Expected type "date", received "object"
+  title: Required
+```
+
+### Galeria are două surse
+
+`src/pages/api/gallery.json.ts` compune lista din:
+
+1. **folderele de activități** — titlul albumului e titlul articolului, ordinea
+   e data activității. `cover.*` e exclus, iar o activitate fără alte poze nu
+   produce album;
+2. **`public/assets/galerie/NN_Nume`** — cele 55 de albume vechi, exact ca
+   înainte, listate după primele.
+
+Sursa a doua e temporară. Pe măsură ce muți un album vechi în folderul
+activității lui, dispare din grupul de jos și reapare sus, la data corectă.
+Când `galerie/` rămâne gol, se șterge și sursa a doua din cod.
+
+**Nu pune foldere de activități direct în `public/assets/`** — regula de la §1
+e aceeași. Fișierele `.md` rămân în `originals/`, scriptul de imagini nu le
+publică.
+
+---
+
+## 3. Tipare Astro care se repetă peste tot
 
 Site-ul folosește `ClientRouter` (navigare tip SPA). Trei consecințe care au
 produs deja bug-uri reale:
@@ -114,9 +204,12 @@ Soluție — `:global()` doar pe descendent, ca să nu scape regula în tot site
 
 ---
 
-## 3. Galeria (`/galerie`)
+## 4. Galeria (`/galerie`)
 
 Cea mai complicată pagină. Nu o modifica fără să citești asta.
+
+De unde vin albumele (folderele de activități + `galerie/`) e explicat la §2.
+Aici e vorba doar despre cum se afișează.
 
 ### Cum funcționează
 
@@ -169,7 +262,7 @@ elemente, nimic de ținut sincronizat.
 
 ---
 
-## 4. Sistemul de sticlă (`glass`)
+## 5. Sistemul de sticlă (`glass`)
 
 Definit o singură dată în `src/stylesheets/global.css`. Folosește-l, nu copia
 blocul în componente.
@@ -202,7 +295,7 @@ pe fond deschis; pe sticlă peste fundal întunecat devine ilizibil.
 
 ---
 
-## 5. Header
+## 6. Header
 
 **Etichetele din meniu au traducere scrisă de mână** și sunt marcate
 `translate="no"`. Google traducea „Rezultate" la singular și nu avem niciun
@@ -230,7 +323,7 @@ spre bază fără să se estompeze și logourile. JavaScript-ul comută clasa
 
 ---
 
-## 6. Alte lucruri de știut
+## 7. Alte lucruri de știut
 
 **Videoclipul de pe prima pagină** folosește o fațadă: până la click se încarcă
 doar miniatura (~80 KB), nu tot player-ul YouTube (1,5–2 MB în 10–15 cereri).
@@ -243,26 +336,33 @@ apeși X. Click pe corp le ascunde pentru sesiunea curentă. Pentru testare exis
 
 ---
 
-## 7. Probleme cunoscute, nereparate
+## 8. Probleme cunoscute, nereparate
 
 Nu sunt regresii — existau înainte și au fost lăsate intenționat.
 
 | Problemă | Unde |
 |---|---|
-| 4 imagini rupte: prefix `public/` în cale **și** folderul greșit (`67_` în loc de `53_`) | `src/pages/news.astro:53-56` |
-| 16 poze de membri lipsesc din `public/assets/echipa/Oameni/` (cad pe placeholder) | `src/pages/api/*.json` |
-| 17 `<img src>` gol — browserul redescarcă pagina ca imagine | `/activitate`, `/news` |
-| Căi relative la assets (`assets/...` fără `/`) — se rup pe URL cu `/` la final | `activitate.astro`, `rezultate.astro`, `rebranding_section.astro` |
-| Bootstrap CSS+JS încărcat pe fiecare pagină, folosit zero | `BaseLayout.astro:20-21` |
-| React + `@astrojs/react` nefolosite, generează un chunk de 193 KB nereferențiat | `package.json` |
+| 16 poze de voluntari lipsesc din `public/assets/echipa/Oameni/` — cardurile lor arată imagine ruptă | `src/pages/api/volunteers.json` |
+| Bootstrap CSS+JS încărcat pe fiecare pagină, folosit zero | `BaseLayout.astro:34-35` |
+| React + `@astrojs/react` nefolosite (nu există niciun `.tsx`/`.jsx`), generează un chunk nereferențiat | `package.json`, `astro.config.mjs` |
 | `<html lang="en">` pe un site integral în română | `BaseLayout.astro:9` |
 | Fără `meta description`, Open Graph, sitemap sau `robots.txt` | |
-| `claude_card.astro` și `gallery_image.astro` — componente nefolosite | `src/components/` |
-| 10 vulnerabilități npm (8 high), fix disponibil prin `npm audit fix` | |
+| 10 vulnerabilități npm (8 high, 2 low), din `libvips` prin `sharp` | `npm audit` |
+
+### Reparate între timp
+
+| Era | Acum |
+|---|---|
+| 4 imagini rupte pe `/news`: prefix `public/` în cale și folderul `67_` în loc de `53_` | corectate |
+| Căi relative (`assets/...` fără `/`) — se rupeau pe paginile servite din subfolder, ex. `/rezultate/` | absolute |
+| 17 `<img src="">` goale — browserul redescărca pagina curentă ca imagine | cardurile fără copertă nu mai randează `<img>` deloc |
+| `claude_card.astro` (copie a lui `sponsor_card.astro`) și `gallery_image.astro`, nefolosite | șterse |
+| `coperta articole/` duplicat în `originals/` și `public/assets/` după ce copertile au intrat în folderele activităților | șters |
+| `sageata.svg` nefolosit; `sageata_dark/light.svg` existau doar în `public/`, în afara pipeline-ului | vechiul șters, perechea mutată în `originals/` |
 
 ---
 
-## 8. Starea repo-ului azi
+## 9. Starea repo-ului azi
 
 **Dependință nouă:** `ogl` (WebGL, pentru roata din galerie). `sharp` vine deja
 cu Astro, nu s-a instalat separat.
@@ -271,33 +371,36 @@ cu Astro, nu s-a instalat separat.
 
 ```
 originals/                      sursa pozelor la rezoluție plină (75 MB)
+originals/activitati/           70 de activități: articol.md + coperta + poze
 scripts/optimize-images.mjs     pipeline-ul de imagini
+scripts/migrate-activitati.mjs  migrarea unică din activitate.astro (istoric)
+src/content.config.ts           schema colecției de activități
 src/utils/circular_gallery.ts   motorul roții
 ```
 
-**Există un stash cu o temă light neterminată:**
+`scripts/migrate-activitati.mjs` și-a făcut treaba o dată și nu se mai rulează —
+rămâne doar ca urmă a ce s-a întâmplat cu cele 1314 linii din `activitate.astro`.
+Dacă îl rulezi din greșeală, rescrie cele 70 de foldere din vechiul fișier, care
+nu mai există.
 
-```
-stash@{0}: On main: tema light (WIP, incompleta - tokeni lipsa)
-```
-
-Recuperabil cu `git stash pop`. **Nu e gata:** ștergea din `global.css` tokenii
-de culoare (`--navlink_color`, `--glow_color`, `--navbar_bg_color`, `--footer-bg`
-și încă vreo zece), dar `navbar.css` continua să-i folosească — rezultau șapte
-variabile CSS nedefinite, adică meniu fără culoare, bară fără fundal, footer
-fără gradient. Butonul care ar fi activat tema nici nu era adăugat încă.
-
-Dacă reiei tema light, pornește de acolo, dar rezolvă întâi tokenii.
+**Tema deschisă e gata** și e în `main`. Se comută cu butonul din bară, care
+pune `data-theme="light"` pe `<html>`. Tokenii se rescriu într-un singur loc, în
+`:root[data-theme="light"]` din `global.css` — nu împrăștia culori de temă prin
+componente. Stash-ul cu varianta neterminată nu mai există.
 
 ---
 
 ## Verificări rapide înainte de commit
 
 ```bash
-npm run build          # trebuie să treacă fără erori
-npm run preview        # http://localhost:4321
+npm run build            # rulează întâi npm run images, apoi astro build
+npm run preview          # http://localhost:4321
 npm run images -- --dry  # dacă ai atins ceva din originals/
 ```
+
+`npm run build` pornește cu `npm run images`, deci nu poți uita pasul de
+optimizare. E incremental (compară datele fișierelor), nu costă nimic dacă n-ai
+schimbat poze.
 
 Merită și o trecere prin `/galerie`, `/echipa` și `/activitate` — sunt paginile
 cu cele mai multe piese mobile.
