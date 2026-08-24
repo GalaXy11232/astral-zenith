@@ -33,10 +33,23 @@ const RULES = [
     { prefix: 'echipa', maxEdge: 1600 },            // poze de grup
     { prefix: 'stiri', maxEdge: 1600 },
     { prefix: 'rezultate', maxEdge: 1200 },
+    { prefix: 'activitati', maxEdge: 1600 },        // coperti + pozele din galerie
     { prefix: '', maxEdge: 1600 },                  // implicit
 ];
 
 const PROCESSABLE = new Set(['.jpg', '.jpeg', '.png', '.webp']);
+
+/**
+ * Fisiere care stau in originals/ dar NU au ce cauta in public/.
+ *
+ * Un articol (originals/activitati/<slug>/articol.md) sta in acelasi folder
+ * cu pozele evenimentului, pentru ca asta e ideea structurii. Scriptul
+ * copiaza altfel orice extensie pe care n-o poate redimensiona, deci fara
+ * lista asta articolele ar fi ajuns servite ca fisiere la
+ * /assets/activitati/<slug>/articol.md. Textul e randat de pagina, nu livrat
+ * ca fisier.
+ */
+const NEVER_PUBLISH = new Set(['.md', '.txt']);
 
 /**
  * Zone care NU se micsoreaza niciodata, indiferent de dimensiune.
@@ -95,7 +108,7 @@ async function isUpToDate(src, out) {
     }
 }
 
-let scanned = 0, resized = 0, copied = 0, skipped = 0, kept = 0;
+let scanned = 0, resized = 0, copied = 0, skipped = 0, kept = 0, text = 0;
 let bytesIn = 0, bytesOut = 0, mpIn = 0, mpOut = 0;
 
 for await (const src of walk(SRC)) {
@@ -104,6 +117,7 @@ for await (const src of walk(SRC)) {
     const out = join(OUT, rel);
     const ext = extname(src).toLowerCase();
 
+    if (NEVER_PUBLISH.has(ext)) { text++; continue; }
     if (await isUpToDate(src, out)) { skipped++; continue; }
     if (!dry) await mkdir(dirname(out), { recursive: true });
 
@@ -178,6 +192,7 @@ for await (const src of walk(SRC)) {
 
 console.log(`\n${dry ? '[dry run] ' : ''}${scanned} fisiere in ${SRC}/`);
 console.log(`  ${resized} redimensionate, ${copied} copiate ca atare (logouri incluse), ${kept} pastrate (reencodarea le facea mai mari), ${skipped} deja la zi`);
+if (text) console.log(`  ${text} fisiere de text lasate in originals/ (articole)`);
 if (bytesIn) {
     console.log(`  descarcare: ${(bytesIn / 1e6).toFixed(0)} MB -> ${(bytesOut / 1e6).toFixed(0)} MB`);
     console.log(`  de decodat: ${mpIn.toFixed(0)} MP -> ${mpOut.toFixed(0)} MP`);

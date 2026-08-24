@@ -9,27 +9,37 @@ const {
     previewLines    = 3,
     readMoreLabel   = 'Citește mai mult…',
     readLessLabel   = 'Citește mai puțin…',
+    uid: uidProp,
 } = Astro.props;
 
 // Each instance gets a unique ID so multiple cards on the same page
 // don't share toggle state.
-const uid = `activity-${Math.random().toString(36).slice(2, 8)}`;
+//
+// Cand pagina are un slug stabil (folderul activitatii), il folosim pe el:
+// id-ul ajunge in HTML, deci cu Math.random() ancora se schimba la fiecare
+// build si un link catre /activitate#... nu mai nimereste acelasi card.
+const uid = uidProp ?? `activity-${Math.random().toString(36).slice(2, 8)}`;
 ---
 
 <div style = "margin: 5rem 3rem;">
     <article class="activity-card glass">
         <span class="glass-sheen" aria-hidden="true"></span>
-        <div class="thumbnail-wrap" style={`--thumb-h: ${thumbnailHeight};`}>
-            <img
-                src={thumbnail}
-                alt={thumbnailAlt}
-                class="thumbnail-img"
-                loading="lazy"
-                decoding="async"
-                draggable="false"
-                style={`object-position: ${thumbnailFocus};`}
-            />
-        </div>
+        {/* Fara conditia asta, o activitate fara coperta randa <img src="">,
+            adica o zona goala de 280px cu iconita de imagine stricata. Erau
+            17 carduri in situatia asta. Acum cardul incepe direct cu textul. */}
+        {thumbnail && (
+            <div class="thumbnail-wrap" style={`--thumb-h: ${thumbnailHeight};`}>
+                <img
+                    src={thumbnail}
+                    alt={thumbnailAlt}
+                    class="thumbnail-img"
+                    loading="lazy"
+                    decoding="async"
+                    draggable="false"
+                    style={`object-position: ${thumbnailFocus};`}
+                />
+            </div>
+        )}
 
 
         <div class="card-body">
