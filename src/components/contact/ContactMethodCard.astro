@@ -50,11 +50,14 @@ const { label, value, href, icon, external = true } = Astro.props;
         display: flex;
         align-items: center;
         justify-content: center;
-        color: var(--brand-100);
+        /* --glass-text-soft e brand-100 pe intuneric, adica exact valoarea
+           de dinainte; pe tema deschisa se intoarce, altfel iconita
+           lavanda dispare in cartonasul alb. */
+        color: var(--glass-text-soft);
         background: var(--icon-bubble-bg);
         backdrop-filter: blur(6px);
         -webkit-backdrop-filter: blur(6px);
-        box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.28);
+        box-shadow: inset 0 0 0 1px var(--glass-hilite);
         transition: transform 0.35s ease;
     }
 

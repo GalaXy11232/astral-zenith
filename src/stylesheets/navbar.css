@@ -179,7 +179,8 @@ a img {
 }
 
 /* --- comutator de limba: un singur buton, cu steagul limbii in care intri --- */
-.lang-toggle {
+.lang-toggle,
+.theme-toggle {
     flex: 0 0 auto;
     display: flex;
     align-items: center;
@@ -194,15 +195,37 @@ a img {
     cursor: pointer;
 }
 
-.lang-toggle:hover {
+.lang-toggle:hover,
+.theme-toggle:hover {
     background: var(--nav-btn-bg-hover);
     border-color: var(--glass-border-hover);
 }
 
-.lang-toggle:focus-visible {
+.lang-toggle:focus-visible,
+.theme-toggle:focus-visible {
     outline: 2px solid var(--glow_color);
     outline-offset: 2px;
 }
+
+/* Pictograma temei in care INTRI daca apesi: soare cat timp e intuneric,
+   luna cat timp e lumina. Acelasi tipar ca .lang-flag--ro / --en. */
+.theme-toggle {
+    color: var(--navlink_color);
+    padding: 8px;
+}
+
+.theme-icon { display: none; width: 100%; height: 100%; }
+.theme-icon svg { display: block; width: 100%; height: 100%; }
+
+.theme-icon--light { display: block; }
+:root[data-theme="light"] .theme-icon--light { display: none; }
+:root[data-theme="light"] .theme-icon--dark  { display: block; }
+
+/* Sigla: alba pe intuneric, mov pe deschis. Ambele sunt in HTML, deci
+   comutarea nu asteapta JS si nu clipeste la navigare. */
+.logo-light { display: none; }
+:root[data-theme="light"] .logo-dark  { display: none; }
+:root[data-theme="light"] .logo-light { display: block; }
 
 .lang-flag { display: none; width: 100%; height: 100%; }
 .lang-flag svg { display: block; width: 100%; height: 100%; }
@@ -260,6 +283,9 @@ a img {
     }
 
     .mobile-xbtn {
+        /* Fara asta primea albastrul implicit de link din Bootstrap — se
+           vedea si pe tema intunecata, dar sare in ochi pe meniul alb. */
+        color: var(--navlink_color);
         margin: 1rem 2rem 3rem 0;
         font-size: min(300%, 12vw);
         text-decoration: none;
@@ -288,7 +314,7 @@ a img {
         /* display: none; */
         pointer-events: none;
 
-        background: rgba(0, 0, 0, 0.5);
+        background: var(--scrim);
         backdrop-filter: blur(12px) saturate(180%);
         transition: .5s cubic-bezier(0.215, 0.610, 0.355, 1);
     }
@@ -307,5 +333,6 @@ a img {
        Pe mobil linkurile dispar si ramane hamburgerul, care prin conventie
        sta cel mai la dreapta — deci doar aici inversam ordinea celor doua. */
     .lang-toggle   { order: 1; }
+    .theme-toggle  { order: 1; }
     .hamburger-btn { order: 2; }
 }

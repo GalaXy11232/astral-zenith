@@ -36,6 +36,9 @@ const { date, title,  image, imageAlt, scale_factor = 1} = Astro.props;
         display: inline-block;
         padding: 0.4rem 1.1rem;
         background: linear-gradient(135deg, var(--brand-700), var(--brand-800));
+        /* Pastila e violet inchis in AMBELE teme, deci textul ramane alb —
+           nu e un token de tema. Trecuse pe --glass-text si pe tema
+           deschisa iesea text inchis pe fundal inchis. */
         color: #fff;
         font-size: 0.82rem;
         font-weight: 600;
@@ -65,7 +68,7 @@ const { date, title,  image, imageAlt, scale_factor = 1} = Astro.props;
         height: 1.2rem;
         /* culoare explicita: `inherit` ar lua gradientul de sticla si ar arata
            rupt pe patratul rotit */
-        background: rgba(255, 255, 255, 0.13);
+        background: var(--glass-fill-strong);
         border-right: 1px solid var(--glass-border);
         border-top: 1px solid var(--glass-border);
         border-radius: 0.25rem;
@@ -104,7 +107,7 @@ const { date, title,  image, imageAlt, scale_factor = 1} = Astro.props;
 
     .result-card__description {
         margin: 0;
-        font-size: 0.95rem;
+        font-size: 1rem;    /* 16px minim pentru text de paragraf */
         line-height: 1.6;
         color: var(--glass-text-soft);
         /* text-align: justify; */

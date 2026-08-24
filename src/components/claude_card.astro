@@ -78,7 +78,7 @@ const accentColor = tierColors[tier ?? ''] ?? 'var(--primary, var(--primary))';
     .sponsor-card {
         --card-size:     200px;
         --card-bg:       var(--surface-dark);
-        --card-border:   rgba(255, 255, 255, 0.08);
+        --card-border:   var(--glass-border);
         --strip-h:       44px;
         --radius:        14px;
         --notch:         22px;
@@ -273,7 +273,7 @@ const accentColor = tierColors[tier ?? ''] ?? 'var(--primary, var(--primary))';
     /* ── Lift shadow on hover ──────────────────────────────────────────── */
     .sponsor-card {
         box-shadow:  0 0 0 0 transparent,
-                     0 2px 8px rgba(0, 0, 0, 0.4);
+                     0 2px 8px var(--shadow-soft);
         transition:  box-shadow var(--transition),
                      transform var(--transition);
     }
@@ -281,7 +281,7 @@ const accentColor = tierColors[tier ?? ''] ?? 'var(--primary, var(--primary))';
     .sponsor-card:focus-visible {
         transform:   translateY(-3px);
         box-shadow:  0 0 0 1px var(--accent),
-                     0 12px 28px rgba(0, 0, 0, 0.55);
+                     0 12px 28px var(--shadow-strong);
     }
 
     /* ── Reduced motion ────────────────────────────────────────────────── */

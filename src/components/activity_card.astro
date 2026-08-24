@@ -90,8 +90,8 @@ const uid = `activity-${Math.random().toString(36).slice(2, 8)}`;
         height:    var(--thumb-h, 280px);
         overflow:  hidden;
         border-radius: 18px 18px 0 0;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.14);
-        background: rgba(255, 255, 255, 0.07);
+        border-bottom: 1px solid var(--glass-border);
+        background: var(--glass-fill);
         flex-shrink: 0;
         display:   flex;
         align-items: center;
@@ -145,8 +145,10 @@ const uid = `activity-${Math.random().toString(36).slice(2, 8)}`;
      * accordion without needing to know the real content height.
      */
     .card-content {
-        text-align: justify;
-        text-justify: inter-word;
+        /* Justify fara hyphens: auto lasa "rauri" de spatiu alb intre
+           cuvinte — mai vizibil cu cuvinte lungi romanesti. Stanga simpla
+           se citeste mai usor si e deja precedentul din result_card.astro. */
+        text-align: left;
         overflow:   hidden;
         max-height: calc(1.7em * var(--preview-lines, 3) + 0.4em);
         transition: max-height 0.45s cubic-bezier(0.4, 0, 0.2, 1);
@@ -161,7 +163,10 @@ const uid = `activity-${Math.random().toString(36).slice(2, 8)}`;
 
 
     .card-content-inner :global(p) {
-        font-size:     0.95rem;
+        /* 16px e minimul pentru text de tip paragraf — sub asta Safari mai
+           si da zoom automat pe mobil la focus, iar litera devine grea de
+           citit pe ~70 de carduri de pe pagina asta. */
+        font-size:     1rem;
         line-height:   1.7;
         color:         var(--glass-text-soft);
         margin:        0 0 0.85rem;
@@ -179,7 +184,7 @@ const uid = `activity-${Math.random().toString(36).slice(2, 8)}`;
         padding:        0;
         font-size:      0.9rem;
         font-weight:    500;
-        color:          var(--brand-500);
+        color:          var(--accent-text);
         cursor:         pointer;
         letter-spacing: 0.01em;
         transition:     opacity 0.2s;

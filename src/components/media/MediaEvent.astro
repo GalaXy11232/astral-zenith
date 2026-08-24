@@ -47,8 +47,8 @@ if (uid == '')
         --ac:         var(--brand-500);
         --ac-mid:     var(--brand-500);
         --ac-soft:    rgb(var(--brand-400-rgb) / 0.16);
-        --ac-border:  rgba(255, 255, 255, 0.18);
-        --event-surface: rgba(255, 255, 255, 0.07);
+        --ac-border:  var(--glass-border);
+        --event-surface: var(--glass-fill);
         --text:       var(--glass-text);
         --muted:      var(--glass-text-dim);
         --radius:     20px;
@@ -71,7 +71,7 @@ if (uid == '')
         height:       clamp(180px, 26vw, 260px);
         overflow:     hidden;
         border-radius: var(--radius) var(--radius) 0 0;
-        background:   rgba(255, 255, 255, 0.07);
+        background:   var(--glass-fill);
     }
 
     .me-banner-img {
@@ -161,7 +161,7 @@ if (uid == '')
     .me-body :global(.me-divider) {
         height:     1px;
         border:     none;
-        background: rgba(255, 255, 255, 0.14);
+        background: var(--glass-fill-strong);
         margin:     0;
     }
 
@@ -177,7 +177,7 @@ if (uid == '')
         gap:             11px;
         padding:         13px 14px;
         background:      var(--event-surface);
-        border:          1px solid rgba(255, 255, 255, 0.14);
+        border:          1px solid var(--glass-border);
         border-radius:   var(--radius-sm);
         text-decoration: none;
         color:           var(--text);
@@ -186,9 +186,9 @@ if (uid == '')
 
     .me-body :global(.me-link:hover) {
         background:    var(--ac-soft);
-        border-color:  rgba(255, 255, 255, 0.30);
+        border-color:  var(--glass-border-hover);
         transform:     translateY(-2px);
-        box-shadow:    0 4px 16px rgba(0, 0, 0, 0.30);
+        box-shadow:    0 4px 16px var(--shadow-soft);
     }
 
     .me-body :global(.me-link-icon) {
@@ -253,16 +253,16 @@ if (uid == '')
         overflow:      hidden;
         cursor:        pointer;
         aspect-ratio:  16 / 10;
-        background:    rgba(255, 255, 255, 0.07);
-        border:        1px solid rgba(255, 255, 255, 0.14);
-        box-shadow:    0 2px 8px rgba(0, 0, 0, 0.28);
+        background:    var(--glass-fill);
+        border:        1px solid var(--glass-border);
+        box-shadow:    0 2px 8px var(--shadow-soft);
         transition:    transform var(--tr), box-shadow var(--tr);
     }
 
     .me-body :global(.me-img-wrap:hover),
     .me-body :global(.me-vid-wrap:hover) {
         transform:  translateY(-3px);
-        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.38);
+        box-shadow: 0 6px 20px var(--shadow-strong);
     }
 
     .me-body :global(.me-img-wrap img),

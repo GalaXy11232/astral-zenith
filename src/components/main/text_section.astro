@@ -59,13 +59,18 @@ const { title, eyebrow = '', text_align = 'start' } = Astro.props;
         font-size: clamp(1.9rem, 4vw, 2.7rem);
         line-height: 1.15;
         letter-spacing: -0.01em;
-        color: var(--brand-500);
+        color: var(--accent-text);
     }
 
     .text-section__body {
+        /* Sectiunea merge pana la 1050px, dar un rand de text asa de lat
+           (peste 100 de caractere) obliga ochiul sa "sara" inapoi la
+           urmatorul rand. 70ch tine masura in banda confortabila de citit
+           (65-75 caractere), indiferent de latimea sectiunii. */
+        max-width: 70ch;
         font-size: 1.05rem;
         line-height: 1.75;
-        color: rgba(255, 255, 255, 0.82);
+        color: var(--glass-text-soft);
     }
 
     .text-section__body :global(p) {

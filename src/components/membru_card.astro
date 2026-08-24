@@ -43,10 +43,10 @@ const tooltipText = tooltip ? TOOLTIP_ABBREVIATIONS[tooltip] ?? "" : "";
         background: var(--tooltip-color);
         backdrop-filter: blur(16px) saturate(160%);
         -webkit-backdrop-filter: blur(16px) saturate(160%);
-        border: 1px solid rgba(255, 255, 255, 0.22);
+        border: 1px solid var(--glass-border);
         box-shadow:
-            0 8px 24px rgba(0, 0, 0, 0.40),
-            inset 0 1px 0 rgba(255, 255, 255, 0.30);
+            0 8px 24px var(--shadow-soft),
+            inset 0 1px 0 var(--glass-hilite);
         color: var(--text-color);
         border-radius: 15px;
         width: fit-content !important;
@@ -63,10 +63,10 @@ const tooltipText = tooltip ? TOOLTIP_ABBREVIATIONS[tooltip] ?? "" : "";
         margin-left: -5px;
         border-width: 5px;
         border-style: solid;
-        border-color: transparent transparent rgba(255, 255, 255, 0.22) transparent;
+        border-color: transparent transparent var(--glass-border) transparent;
     }
     .facultate-tooltip { position: relative; }
-    .facultate-tooltip > i { color: var(--brand-500); border-bottom: 1px dotted rgba(255, 255, 255, 0.45); cursor: help;}
+    .facultate-tooltip > i { color: var(--accent-text); border-bottom: 1px dotted var(--glass-border-hover); cursor: help;}
     .facultate-tooltip:hover div { visibility: visible; opacity: 1;}
 
     
@@ -121,7 +121,7 @@ const tooltipText = tooltip ? TOOLTIP_ABBREVIATIONS[tooltip] ?? "" : "";
         color: var(--glass-text);
         letter-spacing: -0.01em;
 
-        text-shadow: 0 1px 12px rgba(0, 0, 0, 0.45);
+        text-shadow: 0 1px 12px var(--shadow-strong);
     }
 
     .department {

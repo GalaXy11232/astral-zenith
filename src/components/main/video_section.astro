@@ -123,7 +123,7 @@ const thumbFallback = videoId ? `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg
         font-size: 0.82rem;
         letter-spacing: 0.14em;
         text-transform: uppercase;
-        color: var(--brand-500);
+        color: var(--accent-text);
     }
 
     .video-section__frame {
@@ -190,7 +190,7 @@ const thumbFallback = videoId ? `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg
     .video-facade__play svg {
         width: clamp(58px, 8vw, 84px);
         height: auto;
-        filter: drop-shadow(0 6px 20px rgba(0, 0, 0, 0.45));
+        filter: drop-shadow(0 6px 20px var(--shadow-strong));
         transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
     }
 

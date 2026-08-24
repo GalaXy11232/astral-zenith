@@ -8,6 +8,20 @@ import ClientRouter from "astro/components/ClientRouter.astro";
 ---
 <html lang="en">
 	<head>
+		<!-- Trebuie sa fie primul si sincron: pune data-theme inainte de
+		     prima pictura, altfel pagina clipeste o data in tema gresita.
+		     Intunericul e implicit, deci se scrie doar 'light'. IIFE, ca
+		     ClientRouter reruleaza scripturile din <head> la fiecare swap
+		     si un `const` la nivel de top ar arunca a doua oara. -->
+		<script is:inline>
+			(function () {
+				try {
+					if (localStorage.getItem('theme') === 'light')
+						document.documentElement.dataset.theme = 'light';
+				} catch (e) { /* localStorage blocat — ramane tema intunecata */ }
+			})();
+		</script>
+
 		<meta charset="utf-8" />
 		<link rel="icon" href="/tab_icon.ico" />
 		<meta name="viewport" content=`width=device-width, initial-scale=1.0${!user_scalable ? ', user-scalable=no' : ''}` />
@@ -86,6 +100,21 @@ import ClientRouter from "astro/components/ClientRouter.astro";
             window.__gtranslate_wrapper = wrapper;
             wrapper.remove(); // detach from old DOM so it doesn't get destroyed
         }
+    });
+
+  /*
+   * ClientRouter inlocuieste atributele lui <html> cu cele ale paginii noi,
+   * iar acelea vin din HTML-ul static, unde data-theme nu exista. Fara
+   * randul asta tema deschisa sare inapoi pe intuneric la fiecare link
+   * intern — dar NU si la reincarcare, ceea ce face bugul greu de vazut.
+   */
+    document.addEventListener('astro:after-swap', () => {
+        try {
+            document.documentElement.dataset.theme =
+                localStorage.getItem('theme') === 'light' ? 'light' : '';
+            if (!document.documentElement.dataset.theme)
+                document.documentElement.removeAttribute('data-theme');
+        } catch (e) { /* localStorage blocat */ }
     });
 
   // After each swap: re-inject the rescued wrapper into the new DOM.

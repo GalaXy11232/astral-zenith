@@ -32,7 +32,7 @@ function token(name: string, fallback: string): string {
  */
 function themeColors() {
     const bg = token('--page-bg', '#0b0714');
-    const palette = token('--hex-palette', '#37079f, #4b219d, #1e0759, #8453e5, #a77aff, #130436')
+    const palette = token('--hex-palette', '#120436, #180647, #1e0759, #1e0759, #24086b, #2a0a7c')
         .split(',')
         .map(c => c.trim())
         .filter(Boolean);
@@ -43,13 +43,32 @@ function themeColors() {
         palette,
         opacity: parseFloat(token('--hex-opacity', '0.4')) || 0.4,
         ambient: parseFloat(token('--hex-ambient', '0.35')) || 0.35,
+        // Si luminile sunt tokeni: erau scrise aici si ramaneau violete
+        // dupa comutare, spaland orice paleta mai deschisa.
+        directional: [
+            token('--hex-dir-1', '#8c55f7'),
+            token('--hex-dir-2', '#7c46e5'),
+        ],
+        /*
+         * Intensitatile trebuie sa fie tot per-tema, nu fixe in CONFIG.
+         * Luminile se ADUNA peste albedo: cu ambient 0.95 + 1.4 + 0.6
+         * totalul trecea de 2.9, deci canalele se saturau la alb si
+         * culoarea se pierdea. Pe fundal inchis nu se vedea (albedo
+         * intunecat, ramanea loc pana la clipping), dar pe tema deschisa
+         * albedo-ul e luminos si rezultatul iesea spalat — exact "gri".
+         * Bugetul de lumina (ambient + directionale) trebuie sa stea in
+         * jur de 1.0 ca sa se pastreze nuanta.
+         */
+        directionalIntensity: [
+            parseFloat(token('--hex-dir-1-intensity', '1.4')) || 1.4,
+            parseFloat(token('--hex-dir-2-intensity', '0.6')) || 0.6,
+        ],
     };
 }
 
 const CONFIG = {
-    // Rezerve daca tokenii lipsesc; oglindesc --page-bg din global.css.
-    backgroundColor: '#0b0714',
-    fog: { color: '#0b0714', near: 8, far: 40 },
+    // Ceata: doar distantele sunt fixe, culoarea vine din --hex-fog.
+    fog: { near: 8, far: 40 },
 
     camera: {
         fov:      75,
@@ -72,19 +91,17 @@ const CONFIG = {
     },
 
     colors: {
-        palette: [
-            0x7c3aed, 0x6d28d9, 0x5b21b6,
-            0x4c1d95, 0x8b5cf6, 0x3b0764,
-        ],
-        opacity:     0.4,
         flatShading: true,
     },
 
+    /* Culorile vin din tokeni (theme.ambient / theme.directional); aici
+       raman doar geometria si intensitatile, care nu tin de tema. */
     lights: {
-        ambient:     { color: 0xffffff, intensity: 0.35 },
+        ambient:     { color: 0xffffff },
+        // doar pozitiile raman fixe; culoarea si intensitatea vin din tokeni
         directional: [
-            { color: 0xa855f7, intensity: 1.4, position: [0,  8,  2] as [number,number,number] },
-            { color: 0x4f46e5, intensity: 0.6, position: [0, -6, -2] as [number,number,number] },
+            { position: [0,  8,  2] as [number,number,number] },
+            { position: [0, -6, -2] as [number,number,number] },
         ],
     },
 
@@ -137,11 +154,14 @@ async function initBackground() {
     // Lights
     const ambient = new THREE.AmbientLight(CONFIG.lights.ambient.color, theme.ambient);
     scene.add(ambient);
-    for (const dl of CONFIG.lights.directional) {
-        const l = new THREE.DirectionalLight(dl.color, dl.intensity);
+
+    // Tinute intr-un array: onThemeChange trebuie sa le poata repicta.
+    const directionals = CONFIG.lights.directional.map((dl, i) => {
+        const l = new THREE.DirectionalLight(theme.directional[i], theme.directionalIntensity[i]);
         l.position.set(...dl.position);
         scene.add(l);
-    }
+        return l;
+    });
 
     // Shared hexagon geometry
     const hexGeo = new THREE.CylinderGeometry(
@@ -206,6 +226,18 @@ async function initBackground() {
         renderer.setSize(window.innerWidth, window.innerHeight);
     };
     window.addEventListener('resize', onResize);
+
+    /*
+     * setSize() de mai sus, la initializare, ruleaza chiar dupa
+     * `await import('three')` — adica in prima bucla de microtask-uri de
+     * dupa navigare, inainte ca layout-ul sa fie neaparat asezat definitiv
+     * (webfont-uri incarcate async, alte scripturi din <head>). Cand se
+     * intampla asta, canvas-ul ramane la dimensiunea implicita 300x150 si
+     * fundalul e practic invizibil pana la primul resize real al
+     * ferestrei. Un rAF garanteaza un layout deja asezat, deci repeta
+     * calculul o data in siguranta, fara sa strice nimic daca nu era
+     * nevoie. */
+    requestAnimationFrame(onResize);
 
     let rafId: number;
 
@@ -275,6 +307,10 @@ async function initBackground() {
         scene.background = new THREE.Color(next.background);
         if (scene.fog) scene.fog.color.set(next.fog);
         ambient.intensity = next.ambient;
+        directionals.forEach((l, i) => {
+            l.color.set(next.directional[i]);
+            l.intensity = next.directionalIntensity[i];
+        });
 
         ringGroups.forEach(group => group.children.forEach((mesh: any) => {
             mesh.material.color.set(pick(next.palette));

@@ -112,6 +112,13 @@
     --text-muted-dark:  var(--brand-200);   /* 6.2:1 pe --primary  */
     --link-on-light:    var(--accent);      /* 4.8:1 pe alb        */
 
+    /* Accentul folosit ca TEXT peste fundalul paginii — alt rol decat
+       --accent, care e o umplere plina. Cele doua teme cer capete opuse
+       ale scarii: pe #0b0714 brand-800 da ~1.6:1, pe #f6f3fd brand-500
+       scade la ~3.4:1. Un singur token, ca sa nu se mai repare de mana
+       in douasprezece locuri. */
+    --accent-text:      var(--brand-500);   /* 4.1:1 pe --page-bg  */
+
     --focus-ring: 0 0 0 3px rgb(var(--brand-500-rgb) / 0.45);
 
     /* ─── Bara de navigare ───────────────────────────────────────────
@@ -120,7 +127,9 @@
        pierdea contrast cand navbar-ul trecea peste imagini deschise. */
     --navbar_bg_color:         rgb(var(--brand-900-rgb) / 0.55);
     --navbar_bg_filter:        blur(14px) saturate(170%);
-    --navlink_color:           #ffffff;
+    /* La cerere, brand-700 — dar are doar ~1.9:1 pe --page-bg (#0b0714),
+       sub minimul WCAG AA (4.5:1), si bara n-are fundal decat dupa scroll. */
+    --navlink_color:           var(--brand-700);
     --navlink_underline_color: var(--brand-400);
     --glow_color:              var(--brand-400);
 
@@ -142,15 +151,152 @@
        (#7c3aed, #6d28d9, ...) — de asta fundalul nu semana cu tema.
        Valorile sunt scrise literal, nu ca var(--brand-*): componenta le
        citeste cu getPropertyValue, care intoarce textul declarat fara sa
-       rezolve var(), iar Three.js n-ar sti ce sa faca cu el. Sunt exact
-       treptele 800/700/900/500/400/950 din scara de mai sus — daca
-       schimbi scara, schimba si aici. */
-    --hex-palette: #37079f, #4b219d, #1e0759, #8453e5, #a77aff, #130436;
-    --hex-opacity: 0.4;
-    --hex-ambient: 0.35;
+       rezolve var(), iar Three.js n-ar sti ce sa faca cu el.
+       Ancorata pe --brand-900 (#1e0759): treptele din mijloc sunt exact
+       brand-900, iar restul variaza doar L (0.11 → 0.26) la H si S fixe
+       (256.8° / 0.85). Treptele NU se obtin amestecand cu alb — asa se
+       construia o versiune anterioara, si amestecul prabusea saturatia
+       la ~0.38, adica gri-violet in loc de violet.
+
+       Ambientul nu e decorativ, ci o corectie de redare: three.js imparte
+       iradianta la PI, deci pixelul randat e ~albedo * (total / PI).
+       1.4 + 1.4 + 0.6 = 3.4, adica ~1.08 — hexagoanele apropiate ies chiar
+       in culoarea din paleta, iar ceata le stinge pe cele departate. */
+    --hex-palette: #120436, #180647, #1e0759, #1e0759, #24086b, #2a0a7c;
+    --hex-opacity: 0.85;
+    --hex-ambient: 1.4;
+
+    /* Ceata se topeste in fundalul paginii — hexagoanele departate trebuie
+       sa dispara in el, nu intr-o alta culoare. Era citita de componenta
+       (token '--hex-fog') dar nu exista, deci cadea mereu pe --page-bg. */
+    --hex-fog: #0b0714;
+
+    /* Cele doua lumini directionale erau scrise in hexbackground.astro
+       (0xa855f7 / 0x4f46e5) si nu se schimbau la comutarea temei: peste o
+       paleta palida spalau fiecare hexagon in violet.
+       Acum sunt aliniate pe H=260° ca paleta. Inainte stateau la 271° si
+       243°: doua lumini de nuante diferite, insumate peste albedo, trag
+       rezultatul catre gri — saturatia masurata pe ecran scadea de la
+       0.65 (albedo) la 0.45. Aceeasi nuanta la ambele => raman violete. */
+    --hex-dir-1: #8c55f7;
+    --hex-dir-2: #7c46e5;
+
+    /* Voalul din spatele meniului mobil si al lightboxului */
+    --scrim: rgb(var(--brand-950-rgb) / 0.50);
 
     /* ─── Sectiunea video + text ──────────────────────────────────────── */
     --video-basis: 420px;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   TEMA DESCHISA
+   Se activeaza prin data-theme="light" pe <html>, pus de butonul din
+   navbar si re-pus la fiecare navigare (vezi BaseLayout.astro).
+   Intunericul ramane implicit: aici se rescriu DOAR tokenii care se
+   schimba, scara de brand de mai sus ramane neatinsa.
+   ═══════════════════════════════════════════════════════════════════════ */
+:root[data-theme="light"] {
+    /* ─── Fundaluri ───────────────────────────────────────────────────── */
+    --page-bg:        #f6f3fd;
+    --surface-dark:   #ffffff;
+    --surface-dark-2: #f0eaff;
+
+    /* ─── Fundalul cu hexagoane ───────────────────────────────────────
+       Literal, nu var(): componenta citeste cu getPropertyValue, care nu
+       rezolva var(). Aceeasi familie --brand-700 ca pe tema intunecata,
+       dar intinsa spre alb (nu sarita pe alta treapta a scarii): pe
+       fundal aproape alb, --brand-700 in forma lui plina ar fi un bloc
+       greu, nu o textura. Amestecul cu alb pastreaza nuanta si scade
+       doar luminozitatea, deci hexagoanele raman recognoscibil "700".
+       Ambientul urca de la 0.35 la 0.85: pe fundal deschis o lumina slaba
+       lasa fetele hexagonului aproape negre. */
+    /* Ancorata pe --brand-300 (#bb99ff), aceeasi constructie ca la tema
+       intunecata: H=260° si S=1.00 fixe, variaza doar L (0.73 → 0.87). */
+    --hex-palette: #a273ff, #ae86ff, #bb99ff, #bb99ff, #c8acff, #d4bfff;
+    --hex-opacity: 0.95;
+    /* Three.js imparte iradianta la PI, deci pixelul randat este
+       aproximativ albedo * (total intensitati / PI). Ca hexagoanele sa
+       apara chiar in culoarea din --hex-palette, totalul trebuie sa fie
+       ~3.14, nu ~1.0: cu buget mic ies mult mai inchise decat paleta si
+       — pe fundal deschis — spalate. 1.6 + 1.0 + 0.5 = 3.1. */
+    --hex-ambient: 1.6;
+    --hex-dir-1-intensity: 1.0;
+    --hex-dir-2-intensity: 0.5;
+    --hex-fog:     #f6f3fd;
+    --hex-dir-1:   #c6a9ff;
+    --hex-dir-2:   #8453e5;
+
+    /* ─── Text ────────────────────────────────────────────────────────
+       Capetele scarii se inverseaza. Astea trei duc 48 din folosirile de
+       culoare de text din site, deci fac cea mai mare parte a temei.
+
+       Titlul si corpul sunt amandoua --brand-800 (cerut pentru hero,
+       activitate, presa si contact). Un singur loc, nu patru reguli
+       imprastiate: toate citesc oricum tokenii de mai jos. Ierarhia
+       titlu/corp nu se pierde — ramane data de marime si greutate, nu de
+       culoare. brand-800 pe #f6f3fd = ~11:1. */
+    --glass-text:      var(--brand-800);
+    --glass-text-soft: var(--brand-800);
+    --glass-text-dim:  var(--brand-700);
+    --glass-body:      var(--brand-800);
+
+    /* ─── Sticla ──────────────────────────────────────────────────────
+       Albul peste alb dispare, deci umplerea si marginile se tintesc cu
+       indigo. Doar reflexia de sus ramane alba — acolo albul e chiar
+       efectul dorit, o muchie luminoasa. */
+    --glass-gradient: linear-gradient(150deg,
+        rgb(var(--brand-800-rgb) / 0.10) 0%,
+        rgb(var(--brand-800-rgb) / 0.04) 42%,
+        rgb(var(--brand-500-rgb) / 0.12) 100%);
+    --glass-fill:         rgb(var(--brand-800-rgb) / 0.06);
+    --glass-fill-strong:  rgb(var(--brand-800-rgb) / 0.12);
+    --glass-hilite:       rgba(255, 255, 255, 0.85);
+    --glass-border:       rgb(var(--brand-700-rgb) / 0.20);
+    --glass-border-hover: rgb(var(--brand-700-rgb) / 0.38);
+    --glass-inset-bg:     rgb(var(--brand-500-rgb) / 0.10);
+
+    /* Umbrele nu sunt negre, ci indigo foarte diluat: negrul pe fundal
+       deschis iese gri-murdar si rupe familia de culoare. */
+    --shadow-soft:   rgb(var(--brand-950-rgb) / 0.12);
+    --shadow-strong: rgb(var(--brand-950-rgb) / 0.22);
+    --scrim:         rgb(var(--brand-950-rgb) / 0.35);
+
+    --icon-bubble-bg: radial-gradient(circle at 30% 28%,
+        rgb(var(--brand-500-rgb) / 0.18) 0%,
+        rgb(var(--brand-500-rgb) / 0.06) 75%);
+
+    /* ─── Bara de navigare ────────────────────────────────────────────── */
+    --navbar_bg_color:  rgb(255 255 255 / 0.70);
+    /* brand-700 pe #f6f3fd: ~9.6:1, cu rezerva mare peste AA */
+    --navlink_color:    var(--brand-700);
+    --glow_color:       var(--brand-700);
+    --nav-divider:      rgb(var(--brand-700-rgb) / 0.20);
+    --nav-btn-bg:       rgb(var(--brand-800-rgb) / 0.08);
+    --nav-btn-bg-hover: rgb(var(--brand-800-rgb) / 0.16);
+    --nav-btn-border:   rgb(var(--brand-700-rgb) / 0.28);
+    --mobile-nav-bg:    #ffffff;
+    /* Sublinierea paginii active: brand-400 e ~2.2:1 pe alb, adica marcajul
+       "unde sunt" aproape dispare. brand-700 il tine vizibil. */
+    --navlink_underline_color: var(--brand-700);
+
+    /* ─── Footer ──────────────────────────────────────────────────────── */
+    --footer-bg: linear-gradient(160deg, var(--brand-100) 0%, var(--brand-050) 100%);
+
+    /* ─── Contrast inversat ───────────────────────────────────────────
+       Pe intuneric --brand-800 (#37079f) da ~1.6:1 si e ilizibil, de aceea
+       titlurile si gradientul folosesc --brand-500. Pe #f6f3fd raportul se
+       intoarce: --brand-500 scade la ~3.4:1, iar --brand-800 urca la ~11:1.
+       Deci exact aceeasi regula, cu capetele schimbate intre ele. */
+    --purple_hgradient: linear-gradient(90deg, var(--brand-500), var(--brand-800));
+    --link-on-light:    var(--brand-800);
+    --accent-text:      var(--brand-800);   /* ~11:1 pe #f6f3fd */
+}
+
+/* Exceptie ceruta: titlurile cardurilor glisante din josul paginii de
+   start citesc --glass-text (deci ar fi iesit brand-800), dar trebuie sa
+   fie brand-700. Specificitate 0,3,0, deci bate regula din .obiectiv. */
+:root[data-theme="light"] .obiectiv .titlu {
+    color: var(--brand-700);
 }
 
 *, ::after, ::before {
@@ -184,6 +330,26 @@
     --glass-inset-bg:  rgb(var(--brand-200-rgb) / 0.15);
     --glass-body:      var(--brand-200);
 
+    /* Cele cinci roluri in care se repetau rgba(255,255,255,...) si
+       rgba(0,0,0,...) prin componente — erau ~65 de valori scrise de mana,
+       fiecare cu alfa putin diferit, deci imposibil de intors pe tema
+       deschisa. Acum exista un singur loc pentru fiecare rol.
+       Pe tema deschisa albul peste alb dispare, iar negrul umbrei devine
+       prea greu: ambele se rescriu in :root[data-theme="light"]. */
+    --glass-fill:        rgba(255, 255, 255, 0.07);   /* panouri imbricate, suprafete */
+    --glass-fill-strong: rgba(255, 255, 255, 0.14);   /* hover / suprafata ridicata   */
+    --glass-hilite:      rgba(255, 255, 255, 0.30);   /* muchia speculara de sus      */
+    --shadow-soft:       rgba(0, 0, 0, 0.30);         /* umbra in repaus              */
+    --shadow-strong:     rgba(0, 0, 0, 0.50);         /* umbra la hover / modal       */
+
+    /* Textura de sticla propriu-zisa. Era scrisa de doua ori, identic, in
+       .glass si .glass-purple; pe tema deschisa trebuie sa se intoarca
+       intr-un singur loc, nu in doua. */
+    --glass-gradient: linear-gradient(150deg,
+        rgba(255, 255, 255, 0.16) 0%,
+        rgba(255, 255, 255, 0.06) 42%,
+        rgb(var(--brand-500-rgb) / 0.10) 100%);
+
     /* Bula de sub iconite (stats_card, contact, ContactMethodCard) — era
        copiata identic in trei fisiere, cu doua roz-uri (#f6d5fe, #ddd3fb)
        care nu erau in scara. */
@@ -196,20 +362,16 @@
     position: relative;
     isolation: isolate;
 
-    background:
-        linear-gradient(150deg,
-            rgba(255, 255, 255, 0.16) 0%,
-            rgba(255, 255, 255, 0.06) 42%,
-            rgb(var(--brand-500-rgb) / 0.10) 100%);
+    background: var(--glass-gradient);
     backdrop-filter: blur(22px) saturate(170%);
     -webkit-backdrop-filter: blur(22px) saturate(170%);
 
     border: 1px solid var(--glass-border);
     box-shadow:
-        0 8px 32px rgba(0, 0, 0, 0.35),
+        0 8px 32px var(--shadow-soft),
         0 2px 8px rgb(var(--brand-900-rgb) / 0.20),
-        inset 0 1px 0 rgba(255, 255, 255, 0.38),
-        inset 0 -1px 0 rgba(255, 255, 255, 0.06);
+        inset 0 1px 0 var(--glass-hilite),
+        inset 0 -1px 0 var(--glass-fill);
 
     color: var(--glass-text);
 }
@@ -230,8 +392,8 @@
     inset: -40% -40% auto -40%;
     height: 90%;
     background: radial-gradient(ellipse at 50% 0%,
-        rgba(255, 255, 255, 0.30) 0%,
-        rgba(255, 255, 255, 0.06) 45%,
+        var(--glass-hilite) 0%,
+        var(--glass-fill) 45%,
         transparent 70%);
 }
 
@@ -242,10 +404,7 @@
    indigo si variaza doar luminozitatea. */
 .glass-purple {
     background:
-        linear-gradient(150deg,
-            rgba(255, 255, 255, 0.16) 0%,
-            rgba(255, 255, 255, 0.06) 42%,
-            rgb(var(--brand-500-rgb) / 0.10) 100%),
+        var(--glass-gradient),
         linear-gradient(160deg,
             rgb(var(--brand-800-rgb) / 0.45) 0%,
             rgb(var(--brand-700-rgb) / 0.28) 58%,
@@ -254,11 +413,11 @@
 
 /* suprafata interioara (poze, iconite, panouri imbricate) */
 .glass-inset {
-    background: rgba(255, 255, 255, 0.07);
+    background: var(--glass-fill);
     backdrop-filter: blur(6px);
     -webkit-backdrop-filter: blur(6px);
-    border: 1px solid rgba(255, 255, 255, 0.14);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.22);
+    border: 1px solid var(--glass-border);
+    box-shadow: inset 0 1px 0 var(--glass-hilite);
 }
 
 .glass-hover {
@@ -271,10 +430,10 @@
     transform: translateY(-6px);
     border-color: var(--glass-border-hover);
     box-shadow:
-        0 18px 44px rgba(0, 0, 0, 0.42),
+        0 18px 44px var(--shadow-strong),
         0 6px 20px rgb(var(--brand-500-rgb) / 0.28),
-        inset 0 1px 0 rgba(255, 255, 255, 0.50),
-        inset 0 -1px 0 rgba(255, 255, 255, 0.08);
+        inset 0 1px 0 var(--glass-hilite),
+        inset 0 -1px 0 var(--glass-fill);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -284,7 +443,11 @@
 
 /* Font overrides */
 body { font-family: 'Prompt', sans-serif; font-size: 100%;}
-h1, h2, h3 { font-family: 'Prompt', monospace; }
+/* Fallback-ul era 'monospace': daca fontul Prompt nu apuca sa se incarce
+   (retea lenta, blocat de un extension), toate titlurile de pe site
+   treceau brusc pe Courier — vizibil urat si inconsecvent cu corpul
+   textului, care cade pe sans-serif. */
+h1, h2, h3 { font-family: 'Prompt', sans-serif; }
 
 .hidden { display: none !important; }
 
@@ -302,13 +465,13 @@ h1, h2, h3 { font-family: 'Prompt', monospace; }
     margin-bottom: 2rem;
     padding: .2rem;
 
-    color: var(--brand-500);
+    color: var(--accent-text);
 }
 
 .title-underline {
     font-size: clamp(25px, 2.5vw + 1rem, 34px);
     font-weight: 600;
-    color: var(--brand-500);
+    color: var(--accent-text);
     position: relative;
     padding: .75rem;
 }
