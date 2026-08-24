@@ -238,12 +238,12 @@ a img {
         top: 0; left: 0;
         z-index: 101;
         overflow: hidden;
-        max-width: min(100vw, 500px);
+        /* max-width: min(100vw, 500px);  nu mai e nevoie facem fullscreen acum cu cine vorbesti bro nu stiu ok 👍*/
         height: 100dvh;
         width: 0;
 
         background: var(--mobile-nav-bg);
-        transition: width 1.4s cubic-bezier(0.215, 0.610, 0.355, 1);
+        transition: width 0.2s cubic-bezier(0.215, 0.610, 0.355, 1);
     }
 
     .mobile-links-wrapper {

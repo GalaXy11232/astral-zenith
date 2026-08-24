@@ -129,9 +129,9 @@
     --navbar_bg_filter:        blur(14px) saturate(170%);
     /* La cerere, brand-700 — dar are doar ~1.9:1 pe --page-bg (#0b0714),
        sub minimul WCAG AA (4.5:1), si bara n-are fundal decat dupa scroll. */
-    --navlink_color:           var(--brand-700);
+    --navlink_color:           var(--brand-200);
     --navlink_underline_color: var(--brand-400);
-    --glow_color:              var(--brand-400);
+    --glow_color:              var(--brand-700);
 
     /* Suprafetele "de sticla" sunt tintate cu lavanda in loc de alb pur:
        albul peste indigo iese gri si murdar. Lavanda e --brand-100 /
@@ -140,7 +140,7 @@
     --nav-btn-bg:              rgb(var(--brand-200-rgb) / 0.12);
     --nav-btn-bg-hover:        rgb(var(--brand-200-rgb) / 0.24);
     --nav-btn-border:          rgb(var(--brand-100-rgb) / 0.34);
-    --mobile-nav-bg:           var(--brand-900);
+    --mobile-nav-bg:           #1e075900;
 
     /* ─── Footer ─────────────────────────────────────────────────────── */
     --footer-bg: linear-gradient(160deg, var(--brand-900) 0%, var(--brand-950) 100%);
