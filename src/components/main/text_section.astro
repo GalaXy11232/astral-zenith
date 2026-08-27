@@ -3,19 +3,28 @@ export interface Props {
     title: string;
     eyebrow?: string;
     text_align?: string;
+    /* Aseaza textul pe un panou de sticla, ca restul suprafetelor site-ului
+       (.glass din global.css). Optional pentru ca sectiunile care poarta doar
+       un titlu — "Valorile Noastre", care introduce sliderul de dedesubt — ar
+       ajunge o caseta goala in jurul unui rand. */
+    glass?: boolean;
 }
 
-const { title, eyebrow = '', text_align = 'start' } = Astro.props;
+const { title, eyebrow = '', text_align = 'start', glass = false } = Astro.props;
 ---
 
 <section class="text-section" style = {`text-align: ${text_align}; ${text_align == 'center' ? 'padding: 2rem !important;' : ''}`}>
-    {eyebrow && <p class="text-section__eyebrow">{eyebrow}</p>}
-    <div class="text-section__heading" style = {`text-align: ${text_align}; ${text_align == 'center' ? 'display: block; margin: 0 !important;' : 'display: flex;'}`}>
-        <span class="text-section__bar" aria-hidden="true"></span>
-        <h2 class="text-section__title">{title}</h2>
-    </div>
-    <div class="text-section__body">
-        <slot />
+    <div class:list={["text-section__panel", glass && "glass"]}>
+        {glass && <span class="glass-sheen" aria-hidden="true"></span>}
+
+        {eyebrow && <p class="text-section__eyebrow">{eyebrow}</p>}
+        <div class="text-section__heading" style = {`text-align: ${text_align}; ${text_align == 'center' ? 'display: block; margin: 0 !important;' : 'display: flex;'}`}>
+            <span class="text-section__bar" aria-hidden="true"></span>
+            <h2 class="text-section__title">{title}</h2>
+        </div>
+        <div class="text-section__body">
+            <slot />
+        </div>
     </div>
 </section>
 
@@ -25,6 +34,14 @@ const { title, eyebrow = '', text_align = 'start' } = Astro.props;
         margin-inline: auto;
         padding: 4.5rem 1.5rem;
         /* font-family: system-ui, -apple-system, "Segoe UI", sans-serif; */
+    }
+
+    /* Panoul preia raza si aerul interior; spatierea dintre sectiuni ramane
+       pe <section>, ca sa nu se schimbe ritmul paginii cand panoul lipseste.
+       Fara .glass, div-ul e transparent si nu schimba nimic. */
+    .text-section__panel.glass {
+        border-radius: 28px;
+        padding: clamp(1.75rem, 4vw, 3rem);
     }
 
     .text-section__eyebrow {

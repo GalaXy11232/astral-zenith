@@ -19,7 +19,9 @@
  *   npm run images -- --dry    doar raporteaza, nu scrie
  */
 import sharp from 'sharp';
+import heicConvert from 'heic-convert';
 import { readdir, readFile, writeFile, stat, mkdir, copyFile } from 'node:fs/promises';
+import { createHash } from 'node:crypto';
 import { join, extname, dirname, relative } from 'node:path';
 
 const SRC = 'originals';
@@ -38,6 +40,23 @@ const RULES = [
 ];
 
 const PROCESSABLE = new Set(['.jpg', '.jpeg', '.png', '.webp']);
+
+/**
+ * Pozele de pe iPhone vin .HEIC, si HEIC nu se poate servi: doar Safari il
+ * afiseaza, restul browserelor arata imagine rupta. Nici sharp nu-l poate
+ * deschide — libvips-ul precompilat vine fara decodorul HEVC ("Support for
+ * this compression format has not been built in"), deci le decodam intai cu
+ * heic-convert (libde265 in WebAssembly, fara dependinte de sistem).
+ *
+ * Rezultatul se scrie INTOTDEAUNA ca .webp, deci si numele fisierului se
+ * schimba in public/assets/. Asta face ca `cover.HEIC` sa ajunga `cover.webp`
+ * si sa fie gasit de expresia din activitate.astro, iar pozele sa intre in
+ * albumul din galerie — amandoua citesc din public/assets/, nu din originals/.
+ *
+ * Decodarea costa ~1.3s pentru o poza de 9 MP, de zeci de ori mai mult decat
+ * un JPEG. Se plateste o singura data: la a doua rulare fisierul e deja la zi.
+ */
+const HEIC = new Set(['.heic', '.heif']);
 
 /**
  * Fisiere care stau in originals/ dar NU au ce cauta in public/.
@@ -82,6 +101,13 @@ function maxEdgeFor(rel) {
     return RULES.find(r => normalized.startsWith(r.prefix)).maxEdge;
 }
 
+/* HEIC iese ca .webp, deci calea din public/ nu mai e identica cu cea din
+   originals/. Tot restul isi pastreaza extensia. */
+function outputFor(rel, ext) {
+    const target = HEIC.has(ext) ? rel.slice(0, -ext.length) + '.webp' : rel;
+    return join(OUT, target);
+}
+
 async function* walk(dir) {
     for (const entry of await readdir(dir, { withFileTypes: true })) {
         const path = join(dir, entry.name);
@@ -98,15 +124,49 @@ async function encode(pipeline, ext) {
     }
 }
 
-async function isUpToDate(src, out) {
-    if (force) return false;
+/**
+ * Ce s-a schimbat de la ultima rulare: dupa CONTINUT, nu dupa data fisierului.
+ *
+ * Inainte se comparau datele de modificare (out mai nou decat src => sari
+ * peste). Cade in cazul cel mai obisnuit de aici: iei o poza din folder si o
+ * redenumesti `cover.webp`. Redenumirea nu schimba data, deci sursa noua
+ * pastreaza data pozei vechi, iese mai VECHE decat fisierul generat si
+ * scriptul o ignora. Coperta ramanea cea veche pe site, fara niciun mesaj —
+ * s-a intamplat de doua ori la 2026-07-16-first-robotics-initiative. La fel
+ * pateste orice copiere care pastreaza data (cp -p, dezarhivare, backup).
+ *
+ * Acum se retine hash-ul continutului fiecarei surse. Alt continut = alt
+ * hash = se regenereaza, oricare ar fi data. Manifestul sta langa fisierele
+ * pe care le descrie: daca stergi public/assets/, dispare si el, si atunci
+ * se regenereaza tot — exact ce trebuie.
+ */
+const MANIFEST = join(OUT, '.image-manifest.json');
+
+async function loadManifest() {
+    if (force) return {};
     try {
-        const [a, b] = await Promise.all([stat(src), stat(out)]);
-        return b.mtimeMs >= a.mtimeMs;
+        return JSON.parse(await readFile(MANIFEST, 'utf8'));
     } catch {
-        return false; // out lipseste
+        return {}; // prima rulare, sau manifest sters odata cu public/assets/
     }
 }
+
+function hashOf(buffer) {
+    return createHash('sha1').update(buffer).digest('hex');
+}
+
+/** Fisierul generat exista inca? Hash-ul potrivit nu ajuta daca out lipseste. */
+async function outputExists(out) {
+    try {
+        await stat(out);
+        return true;
+    } catch {
+        return false;
+    }
+}
+
+const manifest = await loadManifest();
+const nextManifest = {};
 
 let scanned = 0, resized = 0, copied = 0, skipped = 0, kept = 0, text = 0;
 let bytesIn = 0, bytesOut = 0, mpIn = 0, mpOut = 0;
@@ -114,23 +174,35 @@ let bytesIn = 0, bytesOut = 0, mpIn = 0, mpOut = 0;
 for await (const src of walk(SRC)) {
     scanned++;
     const rel = relative(SRC, src);
-    const out = join(OUT, rel);
     const ext = extname(src).toLowerCase();
+    const isHeic = HEIC.has(ext);
+    const out = outputFor(rel, ext);
 
     if (NEVER_PUBLISH.has(ext)) { text++; continue; }
-    if (await isUpToDate(src, out)) { skipped++; continue; }
+
+    const source = await readFile(src);
+    const size = source.length;
+    const hash = hashOf(source);
+    nextManifest[rel] = hash;
+
+    if (manifest[rel] === hash && await outputExists(out)) { skipped++; continue; }
     if (!dry) await mkdir(dirname(out), { recursive: true });
 
     // SVG, ICO si orice altceva ce nu se poate redimensiona raster: copiem
-    if (!PROCESSABLE.has(ext)) {
+    if (!PROCESSABLE.has(ext) && !isHeic) {
         if (!dry) await copyFile(src, out);
         copied++;
         continue;
     }
 
-    const input = await readFile(src);
+    // heic-convert scoate un JPEG intermediar, in memorie; de acolo incolo e
+    // acelasi drum ca la orice alta poza. libheif aplica singur rotatia din
+    // container, deci JPEG-ul iese deja drept.
+    const input = isHeic
+        ? Buffer.from(await heicConvert({ buffer: source, format: 'JPEG', quality: 1 }))
+        : source;
+
     const meta = await sharp(input).metadata();
-    const size = input.length;
 
     if (!meta.width || !meta.height) {
         if (!dry) await copyFile(src, out);
@@ -149,7 +221,10 @@ for await (const src of walk(SRC)) {
     const maxEdge = maxEdgeFor(rel);
     const longest = Math.max(width, height);
 
-    if (isProtected(rel) || longest <= maxEdge) {
+    // Un HEIC nu se poate copia ca atare oricat de mic ar fi — nu l-ar afisa
+    // browserul. Merge mai departe la reencodare, unde withoutEnlargement il
+    // lasa la dimensiunea lui.
+    if (!isHeic && (isProtected(rel) || longest <= maxEdge)) {
         if (!dry) await copyFile(src, out);
         copied++;
         bytesOut += size;
@@ -164,13 +239,15 @@ for await (const src of walk(SRC)) {
             // cu telefonul ar ajunge intoarse pe site.
             .rotate()
             .resize({ width: maxEdge, height: maxEdge, fit: 'inside', withoutEnlargement: true }),
-        ext
+        isHeic ? '.webp' : ext
     );
 
     // Logourile PNG cu paleta indexata ies mai mari dupa reencodarea in RGBA.
     // Daca versiunea noua nu e mai mica, pastram originalul — sunt oricum
     // imagini de 1-2 MP, unde decodarea nu e o problema.
-    if (output.length >= size) {
+    // Acelasi motiv: chiar daca .webp iese mai mare decat sursa .HEIC (se
+    // intampla des, HEIC comprima excelent), tot el trebuie servit.
+    if (!isHeic && output.length >= size) {
         if (!dry) await copyFile(src, out);
         kept++;
         bytesOut += size;
@@ -181,13 +258,19 @@ for await (const src of walk(SRC)) {
     if (!dry) await writeFile(out, output);
     resized++;
     bytesOut += output.length;
-    const scale = maxEdge / longest;
+    const scale = Math.min(1, maxEdge / longest);
     mpOut += (width * scale * height * scale) / 1e6;
 
     console.log(
         `  ${String(width).padStart(4)}x${String(height).padEnd(4)} -> ${String(maxEdge).padEnd(4)}  ` +
-        `${(size / 1e6).toFixed(2)}MB -> ${(output.length / 1e6).toFixed(2)}MB  ${rel}`
+        `${(size / 1e6).toFixed(2)}MB -> ${(output.length / 1e6).toFixed(2)}MB  ${rel}` +
+        (isHeic ? '  [HEIC -> webp]' : '')
     );
+}
+
+if (!dry) {
+    await mkdir(dirname(MANIFEST), { recursive: true });
+    await writeFile(MANIFEST, JSON.stringify(nextManifest, null, 0));
 }
 
 console.log(`\n${dry ? '[dry run] ' : ''}${scanned} fisiere in ${SRC}/`);

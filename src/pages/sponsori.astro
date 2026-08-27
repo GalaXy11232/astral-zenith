@@ -4,6 +4,14 @@ import NavBar from "../components/NavBar.astro"
 import Footer from "../components/footer.astro";
 import SponsorCard from "../components/sponsor_card.astro"
 import HexBackground from "../components/hexbackground.astro"
+
+/*
+ * Sponsorii stau in api/sponsors.json, nu mai sunt scrisi aici: pagina de
+ * rezultate are nevoie de numarul lor si il numara din aceeasi sursa
+ * (era scris de mana acolo si ramasese in urma cu cinci).
+ * Ordinea sectiunilor si a cardurilor din fisier e ordinea de pe pagina.
+ */
+import sponsorSections from "./api/sponsors.json";
 ---
 
 <BaseLayout title="Sponsori">
@@ -12,173 +20,24 @@ import HexBackground from "../components/hexbackground.astro"
 
     <div class="sponsor-page">
 
-        <!-- Diamond -->
-        <section class="sponsor-section">
-            <div class="title-container">
-                <span class="title-underline">Sponsori Diamond</span>
-            </div>
-            <div class="cards-grid">
-                <SponsorCard
-                    name="SUPER Foundation"
-                    logo="/assets/sponsori/Super Foundation.webp"
-                    website="https://www.super.xyz/"
-                    tier="diamond"
-                />
+        {sponsorSections.map((sectiune) => (
+            <section class="sponsor-section">
+                <div class="title-container">
+                    <span class="title-underline">{sectiune.title}</span>
+                </div>
+                <div class="cards-grid">
+                    {sectiune.sponsors.map((sponsor) => (
+                        <SponsorCard
+                            name={sponsor.name}
+                            logo={sponsor.logo}
+                            website={sponsor.website}
+                            tier={sectiune.tier}
+                        />
+                    ))}
+                </div>
+            </section>
+        ))}
 
-                <SponsorCard
-                    name="ING"
-                    logo="/assets/sponsori/ing.webp"
-                    website="https://www.ing.ro/"
-                    tier="diamond"
-                />
-
-            </div>
-        </section>
-
-        <!-- Platinum -->
-        <section class="sponsor-section">
-            <div class="title-container">
-                <span class="title-underline">Sponsori Platinum</span>
-            </div>
-            <div class="cards-grid">
-                <SponsorCard
-                    name="ATI Energy"
-                    logo="/assets/sponsori/ATI.webp"
-                    website="https://atienergy.ro/"
-                    tier="platinum"
-                />
-                <SponsorCard
-                    name="RMC Debitare Laser"
-                    logo="/assets/sponsori/Laser_RMC.webp"
-                    website="https://www.laser-rmc.ro"
-                    tier="platinum"
-                />
-                <SponsorCard
-                    name="Electrica Serv"
-                    logo="/assets/sponsori/electricaserv.webp"
-                    website="https://www.electricaserv.ro/"
-                    tier="platinum"
-                />
-            </div>
-        </section>
-
-        <!-- Gold -->
-        <section class="sponsor-section">
-            <div class="title-container">
-                <span class="title-underline">Sponsori Gold</span>
-            </div>
-            <div class="cards-grid">
-                <SponsorCard
-                    name="Sharp Solutions"
-                    logo="/assets/sponsori/Sharp_Solutions.svg"
-                    website="https://sharpsolutions.ro/"
-                    tier="gold"
-                />
-                <SponsorCard
-                    name="ETTI"
-                    logo="/assets/sponsori/ETTI.webp"
-                    website="https://etti.upb.ro/"
-                    tier="gold"
-                />
-
-                <SponsorCard
-                    name="SERA Print House"
-                    logo="/assets/sponsori/seraprint.webp"
-                    website="https://seraprint.ro/"
-                    tier="gold"
-                />
-
-                <SponsorCard
-                    name="Don' Dino"
-                    logo="/assets/sponsori/dondino.webp"
-                    website="https://www.instagram.com/dondinosector1?igsh=MW1ycmZhZHdueXpmaQ%3D%3D"
-                    tier="gold"
-                />
-            </div>
-        </section>
-
-        <!-- Silver -->
-        <section class="sponsor-section">
-            <div class="title-container">
-                <span class="title-underline">Sponsori Silver</span>
-            </div>
-            <div class="cards-grid">
-                <SponsorCard
-                    name="Online Electro"
-                    logo="/assets/sponsori/online concept.webp"
-                    website="https://online-electro.ro/"
-                    tier="silver"
-                />
-                
-                <SponsorCard
-                    name="Laropharm"
-                    logo="/assets/sponsori/Laropharm.webp"
-                    website="https://www.laropharm.ro/"
-                    tier="silver"
-                />
-
-                <SponsorCard
-                    name="Meat Technic Service"
-                    logo="/assets/sponsori/Meat_tech.webp"
-                    website="https://mtsgroup.ro/"
-                    tier="silver"
-                />
-            </div>
-        </section>
-
-        <!-- Bronze -->
-        <section class="sponsor-section">
-            <div class="title-container">
-                <span class="title-underline">Sponsori Bronze</span>
-            </div>
-            <div class="cards-grid">
-
-                <SponsorCard
-                    name="Asociatia Educatie pentru Viata Reala"
-                    logo="/assets/sponsori/aevr.webp"
-                    website="https://aevr.ro/"
-                    tier="bronze"
-                />
-
-                <SponsorCard
-                    name="Direct Pharma"
-                    logo="/assets/sponsori/directpharma.webp"
-                    website="https://www.directpharma.ro/"
-                    tier="bronze"
-                />
-
-                <SponsorCard
-                    name="TimeSalt"
-                    logo="/assets/sponsori/timesalt.webp"
-                    website="https://www.timesalt.co/"
-                    tier="bronze"
-                />
-               
-            </div>
-        </section>
-
-        <!-- Parteneri -->
-        <section class="sponsor-section">
-            <div class="title-container">
-                <span class="title-underline">Partenerii nostri</span>
-            </div>
-            <div class="cards-grid">
-                <SponsorCard
-                    name="Universitatea Copiilor"
-                    logo="/assets/parteneri/Sigla_Asociatia_Universitatea_Copiilor.png"
-                    website="https://unico.org.ro/"
-                    tier="partener"
-                />
-
-                <SponsorCard
-                    name="Colegiul Național „Grigore Moisil”"
-                    logo="/assets/parteneri/Sigla_CNGM.png"
-                    website="https://www.moisil.ro/"
-                    tier="partener"
-                />
-               
-            </div>
-        </section>
     </div>
 
     <Footer />

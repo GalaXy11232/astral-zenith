@@ -387,6 +387,31 @@
 *, ::after, ::before {
     box-sizing: border-box;
 }
+
+/* Ce facea Reboot-ul din Bootstrap, acum ca Bootstrap nu se mai incarca.
+   Erau singurele trei lucruri din el pe care site-ul le folosea:
+     - fara `margin: 0`, browserul pune 8px in jurul paginii si tot fundalul
+       se trage de la margini;
+     - `vertical-align: middle` scoate spatiul fantoma de sub imaginile
+       inline (imaginile sunt asezate pe linia de baza a textului);
+     - controalele de formular nu mostenesc fontul de la parinte decat daca
+       le spui explicit — altfel butoanele ar fi sarit inapoi pe fontul
+       sistemului, la 13.33px. */
+body {
+    margin: 0;
+    /* Bootstrap punea 1.5 pe body si toata pagina mostenea de acolo. Fara el,
+       browserul trece pe `normal` (~1.15) si fiecare text nestilat explicit se
+       string. */
+    line-height: 1.5;
+}
+
+img, svg, video, canvas, iframe {
+    vertical-align: middle;
+}
+
+button, input, select, textarea {
+    font: inherit;
+}
 /* ─── Liquid glass ────────────────────────────────────────────────────────
    Textura comuna pentru toate "cutiile" de pe echipa / activitate /
    rezultate / stiri / contact.

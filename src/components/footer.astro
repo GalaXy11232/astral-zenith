@@ -151,6 +151,10 @@ const currentYear = new Date().getFullYear();
     }
 
     .site-footer__link {
+        /* currentColor pentru sagetile si iconitele SVG de dedesubt. Venea
+           din albastrul implicit al lui <a> (dat de Bootstrap), deci nu era
+           o alegere, ci o scapare. */
+        color: var(--glass-body);
         display: inline-flex;
         align-items: center;
         gap: 10px;

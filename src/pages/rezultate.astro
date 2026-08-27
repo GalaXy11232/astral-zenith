@@ -12,6 +12,11 @@ import StatsCard from "../components/stats_card.astro";
 import teamMembers from "./api/members.json";
 import volunteers from "./api/volunteers.json";
 import mentors from "./api/mentors.json";
+import sponsorSections from "./api/sponsors.json";
+
+/* Numarul era scris de mana (14) si ramasese in urma. Vine din aceeasi
+   sursa pe care o randeaza pagina de sponsori, deci nu mai poate diverge. */
+const sponsoriSiParteneri = sponsorSections.reduce((n, s) => n + s.sponsors.length, 0);
 ---
 
 <BaseLayout title = "Rezultatele Noastre">
@@ -19,7 +24,7 @@ import mentors from "./api/mentors.json";
     <Hexbackground />
      
     <div class="stats-grid">
-        <StatsCard end = {14} label = "Sponsori & Parteneri" icon = "/assets/icons/Sponsori__2_.webp" duration = {850} />
+        <StatsCard end = {sponsoriSiParteneri} label = "Sponsori & Parteneri" icon = "/assets/icons/Sponsori__2_.webp" duration = {850} />
         <StatsCard end = {23} label = "Evenimente organizate" icon = "/assets/icons/Evenimente_organizate.webp" duration = {900} />
         <StatsCard end = {67} label = "Participare evenimente" icon = "/assets/icons/Participare_evenimente.webp" duration = {950} />
         <StatsCard end = {8700} label = "Tineri în comunitate" icon = "/assets/icons/Comunitate__2_.webp" duration = {1000} />

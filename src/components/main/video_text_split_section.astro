@@ -7,6 +7,9 @@ export interface Props {
     videoPosition?: "left" | "right";
     videoWidth?: string;
     aspectRatio?: string;
+    /* Acelasi comutator ca la TextSection: aseaza perechea media + text pe un
+       panou de sticla. Optional, ca sectiunea sa poata sta si fara rama. */
+    glass?: boolean;
 }
 
 const {
@@ -17,6 +20,7 @@ const {
     videoPosition = "left",
     videoWidth = "50%",
     aspectRatio = "16 / 9",
+    glass = false,
 } = Astro.props;
 
 function getEmbedUrl(source: string) {
@@ -47,6 +51,9 @@ const textOrder = videoPosition === "right" ? 1 : 2;
 ---
 
 <section class="video-text" style={`--video-basis:${videoWidth}; text-align: ${text_align}`}>
+  <div class:list={["video-text__panel", glass && "glass"]}>
+    {glass && <span class="glass-sheen" aria-hidden="true"></span>}
+
     <div
         class="video-text__video"
         style={`order:${videoOrder};aspect-ratio:${aspectRatio};`}
@@ -79,6 +86,7 @@ const textOrder = videoPosition === "right" ? 1 : 2;
                 <slot />
             </div>
     </div>
+  </div>
 </section>
 
 <style>
@@ -86,11 +94,22 @@ const textOrder = videoPosition === "right" ? 1 : 2;
         width: min(92vw, max(1050px, 80dvh));
         margin-inline: auto;
         padding: 4rem 1.5rem;
+        /* font-family: system-ui, -apple-system, "Segoe UI", sans-serif; */
+    }
+
+    /* Randul media + text sta pe panou, nu pe <section>: asa spatierea dintre
+       sectiuni ramane pe afara, iar sticla incadreaza exact continutul.
+       Fara .glass, panoul e doar containerul flex de dinainte. */
+    .video-text__panel {
         display: flex;
         flex-wrap: wrap;
         align-items: center;
         gap: 3rem;
-        /* font-family: system-ui, -apple-system, "Segoe UI", sans-serif; */
+    }
+
+    .video-text__panel.glass {
+        border-radius: 28px;
+        padding: clamp(1.75rem, 4vw, 3rem);
     }
 
     .video-text__video {

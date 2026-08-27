@@ -1,5 +1,14 @@
 [
     { "name": "Ioana Preda", "department": "Mecanică", "image": "/assets/echipa/Oameni/Preda Ioana.webp", "tooltip": "UPB, FIMM" },
     { "name": "Serghei Țirulnic", "department": "Mecanică", "image": "/assets/echipa/Oameni/Tirulnic Serghei.webp", "tooltip": "UPB, AC" },
-    { "name": "Ionuț Ghiță", "department": "Mecanică", "image": "/assets/echipa/Oameni/Ghita Ionut.webp", "tooltip": "UPB, FIMM" }
+    { "name": "Ionuț Ghiță", "department": "Mecanică", "image": "/assets/echipa/Oameni/Ghita Ionut.webp", "tooltip": "UPB, FIMM" },
+    { "name": "Mihaela Garabet", "department": "Profesor coordonator", "image": "/assets/echipa/Oameni/Mihaela Garabet.jpeg", "tooltip": "Profesor de Fizică" },
+    { "name": "Florentina Lazăr", "department": "Non-Tehnic", "image": "/assets/echipa/Oameni/Florentina Lazar.jpeg", "tooltip": "Manager Rhinotyres" },
+    { "name": "Laurențiu Lazăr", "department": "Mecanică", "image": "/assets/echipa/Oameni/Laurentiu Lazar.jpeg", "tooltip": "CEO Rhinotyres" },
+    { "name": "Costin Petcu", "department": "Non-Tehnic", "image": "/assets/echipa/Oameni/Costin Petcu.jpeg", "tooltip": "Country Sales Manager EATON" },
+    { "name": "Elena Tiron", "department": "Non-Tehnic", "image": "/assets/echipa/Oameni/Elena Tiron.jpeg", "tooltip": "Producătoare de filme documentare" },
+    { "name": "Adrian Ciocan", "department": "Non-Tehnic", "image": "/assets/echipa/Oameni/Adrian Ciocan.jpeg", "tooltip": "CTO la Investimental" },
+    { "name": "Valentina Ciocan", "department": "Non-Tehnic", "image": "/assets/echipa/Oameni/Valentina Ciocan.jpeg", "tooltip": "" },
+    { "name": "Irina Bacîș", "department": "Non-Tehnic", "image": "/assets/echipa/Oameni/Irina Bacis.jpeg", "tooltip": "Profesor la UPB ETTI" }
+    
 ]

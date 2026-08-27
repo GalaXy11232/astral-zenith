@@ -1,0 +1,133 @@
+[
+    {
+        "title": "Sponsori Diamond",
+        "tier": "diamond",
+        "sponsors": [
+            {
+                "name": "SUPER Foundation",
+                "logo": "/assets/sponsori/Super Foundation.webp",
+                "website": "https://www.super.xyz/"
+            },
+            {
+                "name": "ING",
+                "logo": "/assets/sponsori/ing.webp",
+                "website": "https://www.ing.ro/"
+            }
+        ]
+    },
+    {
+        "title": "Sponsori Platinum",
+        "tier": "platinum",
+        "sponsors": [
+            {
+                "name": "ATI Energy",
+                "logo": "/assets/sponsori/ATI.webp",
+                "website": "https://atienergy.ro/"
+            },
+            {
+                "name": "RMC Debitare Laser",
+                "logo": "/assets/sponsori/Laser_RMC.webp",
+                "website": "https://www.laser-rmc.ro"
+            },
+            {
+                "name": "Electrica Serv",
+                "logo": "/assets/sponsori/electricaserv.webp",
+                "website": "https://www.electricaserv.ro/"
+            },
+            {
+                "name": "Arbomedia",
+                "logo": "/assets/sponsori/arbomedia.png",
+                "website": "https://arbomedia.ro/"
+            },
+            {
+                "name": "Glob Trans MD SRL",
+                "logo": "/assets/sponsori/Glob_Trans_MD.webp",
+                "website": "#"
+            }
+        ]
+    },
+    {
+        "title": "Sponsori Gold",
+        "tier": "gold",
+        "sponsors": [
+            {
+                "name": "Sharp Solutions",
+                "logo": "/assets/sponsori/Sharp_Solutions.svg",
+                "website": "https://sharpsolutions.ro/"
+            },
+            {
+                "name": "ETTI",
+                "logo": "/assets/sponsori/ETTI.webp",
+                "website": "https://etti.upb.ro/"
+            },
+            {
+                "name": "SERA Print House",
+                "logo": "/assets/sponsori/seraprint.webp",
+                "website": "https://seraprint.ro/"
+            },
+            {
+                "name": "Don' Dino",
+                "logo": "/assets/sponsori/dondino.webp",
+                "website": "https://www.instagram.com/dondinosector1?igsh=MW1ycmZhZHdueXpmaQ%3D%3D"
+            }
+        ]
+    },
+    {
+        "title": "Sponsori Silver",
+        "tier": "silver",
+        "sponsors": [
+            {
+                "name": "Online Electro",
+                "logo": "/assets/sponsori/online concept.webp",
+                "website": "https://online-electro.ro/"
+            },
+            {
+                "name": "Laropharm",
+                "logo": "/assets/sponsori/Laropharm.webp",
+                "website": "https://www.laropharm.ro/"
+            },
+            {
+                "name": "Meat Technic Service",
+                "logo": "/assets/sponsori/Meat_tech.webp",
+                "website": "https://mtsgroup.ro/"
+            }
+        ]
+    },
+    {
+        "title": "Sponsori Bronze",
+        "tier": "bronze",
+        "sponsors": [
+            {
+                "name": "Asociatia Educatie pentru Viata Reala",
+                "logo": "/assets/sponsori/aevr.webp",
+                "website": "https://aevr.ro/"
+            },
+            {
+                "name": "Direct Pharma",
+                "logo": "/assets/sponsori/directpharma.webp",
+                "website": "https://www.directpharma.ro/"
+            },
+            {
+                "name": "TimeSalt",
+                "logo": "/assets/sponsori/timesalt.webp",
+                "website": "https://www.timesalt.co/"
+            }
+        ]
+    },
+    {
+        "title": "Partenerii nostri",
+        "tier": "partener",
+        "sponsors": [
+            {
+                "name": "Universitatea Copiilor",
+                "logo": "/assets/parteneri/Sigla_Asociatia_Universitatea_Copiilor.png",
+                "website": "https://unico.org.ro/"
+            },
+            {
+                "name": "Colegiul Național „Grigore Moisil”",
+                "logo": "/assets/parteneri/Sigla_CNGM.png",
+                "website": "https://www.moisil.ro/"
+            }
+        ]
+    }
+]

@@ -3,10 +3,21 @@ const { name, department, image, tooltip = "" } = Astro.props;
 
 const TOOLTIP_ABBREVIATIONS: Record<string, string> = {
     'UPB, AC': 'Universitatea POLITEHNICA București - Facultatea de Automatică și Calculatoare',
-    'UPB, FIMM': 'Universitatea POLITEHNICA București - Facultatea de Inginerie Mecanică și Mecatronică'
+    'UPB, FIMM': 'Universitatea POLITEHNICA București - Facultatea de Inginerie Mecanică și Mecatronică',
+    'CTO la Investimental': 'Chief Technology Officer la Investimental',
+    'Producătoare de filme documentare': 'Producătoare de filme documentare',
+    'Profesor la UPB ETTI': 'Profesor la Universitatea POLITEHNICA București - Facultatea de Electronică, Telecomunicații și Tehnologia Informației',
+    'Manager Rhinotyres': 'Manager la compania Rhinotyres',
+    'CEO Rhinotyres': 'Chief Executive Officer la compania Rhinotyres',
+    'Country Sales Manager EATON': 'Country Sales Manager la compania EATON',
+    'Profesor de Fizică': 'Profesor de Fizică la Colegiul Național "Grigore Moisil" din București'
+
 };
 
-const tooltipText = tooltip ? TOOLTIP_ABBREVIATIONS[tooltip] ?? "" : "";
+/* Fallback pe eticheta insasi: o cheie care nu e in dictionar (sau are o
+   litera pe dos, cum a fost "documnetare") deschidea la hover o caseta goala,
+   fara niciun semn ca de fapt cautarea a dat gres. */
+const tooltipText = TOOLTIP_ABBREVIATIONS[tooltip] || tooltip;
 ---
 
 <article class="member-card glass glass-hover">
@@ -66,6 +77,14 @@ const tooltipText = tooltip ? TOOLTIP_ABBREVIATIONS[tooltip] ?? "" : "";
         border-color: transparent transparent var(--glass-border) transparent;
     }
     .facultate-tooltip { position: relative; }
+
+    /* .glass pune backdrop-filter si isolation: isolate pe fiecare card, deci
+       fiecare card e propriul context de stivuire: z-index-ul casetei se poate
+       ridica doar peste continutul cardului ei, nu peste cardurile vecine.
+       Cardurile fiind flex items in .team-grid, cele de dupa in DOM se deseneaza
+       peste caseta care coboara din cardul curent. Ridicam intreg cardul cat e
+       sub cursor — atunci si caseta lui trece peste randul urmator. */
+    .member-card:hover { z-index: 5; }
     .facultate-tooltip > i { color: var(--accent-text); border-bottom: 1px dotted var(--glass-border-hover); cursor: help;}
     .facultate-tooltip:hover div { visibility: visible; opacity: 1;}
 
