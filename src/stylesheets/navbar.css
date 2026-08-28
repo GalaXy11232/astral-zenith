@@ -138,12 +138,12 @@ a img {
     text-decoration: none;
     transition: .25s cubic-bezier(0.445, 0.05, 0.55, 0.95); /* Ease-in-out sine */
 }
+/* Aureola si culoarea de hover vin din tokeni, nu scrise aici: pe tema
+   deschisa aureola ar fi fost de aceeasi culoare cu textul. Vezi
+   --navlink_hover_shadow in global.css. */
 .navbar-link:hover {
-    /* font-weight: bold; */
-    text-shadow:
-        0 0 3px var(--glow_color),
-        0 0 4px var(--glow_color),
-        0 0 5px var(--glow_color);
+    color: var(--navlink_hover_color);
+    text-shadow: var(--navlink_hover_shadow);
 }
 
 .navbar-link{ display: inline-block }
@@ -264,12 +264,11 @@ a img {
         padding-left: 20px;
         font-size: min(200%, 8vw);
     }
+    /* acelasi lucru ca la .navbar-link:hover — meniul de pe mobil are fundal
+       alb pe tema deschisa, deci pata iesea si mai tare acolo */
     .mobile-navbar-link:hover {
-        /* font-weight: bold; */
-        text-shadow:
-            0 0 3px var(--glow_color),
-            0 0 4px var(--glow_color),
-            0 0 5px var(--glow_color);
+        color: var(--navlink_hover_color);
+        text-shadow: var(--navlink_hover_shadow);
     }
 
     .mobile-active {

@@ -132,6 +132,14 @@
     --navlink_color:           var(--brand-200);
     --navlink_underline_color: var(--brand-400);
     --glow_color:              var(--brand-700);
+    /* Aureola de la hover-ul pe linkurile din bara. Merge aici fiindca
+       brand-700 e mult mai inchis decat textul (brand-200) si mai deschis
+       decat fundalul: halo-ul cade intre ele si se citeste ca lumina. */
+    --navlink_hover_shadow:
+        0 0 3px var(--glow_color),
+        0 0 4px var(--glow_color),
+        0 0 5px var(--glow_color);
+    --navlink_hover_color:     var(--navlink_color);
 
     /* Suprafetele "de sticla" sunt tintate cu lavanda in loc de alb pur:
        albul peste indigo iese gri si murdar. Lavanda e --brand-100 /
@@ -266,6 +274,15 @@
     /* brand-700 pe #f6f3fd: ~9.6:1, cu rezerva mare peste AA */
     --navlink_color:    var(--brand-700);
     --glow_color:       var(--brand-700);
+    /* Aici textul e brand-700 pe alb, deci aureola din tema intunecata ar fi
+       fost brand-700 peste brand-700: blurul umplea spatiile dintre litere si
+       hover-ul iesea o pata violeta murdara in loc de lumina. Un halo deschis
+       n-ar rezolva — pe alb nu s-ar vedea deloc. Pe fundal luminos semnalul
+       firesc e contrastul, nu stralucirea, asa ca hover-ul inchide culoarea la
+       brand-800 (~11:1 pe #f6f3fd) si lasa sublinierea si scale(1.05), care
+       oricum apar deja la hover, sa duca restul. */
+    --navlink_hover_shadow: none;
+    --navlink_hover_color:  var(--brand-800);
     --nav-divider:      rgb(var(--brand-700-rgb) / 0.20);
     --nav-btn-bg:       rgb(var(--brand-800-rgb) / 0.08);
     --nav-btn-bg-hover: rgb(var(--brand-800-rgb) / 0.16);
@@ -627,6 +644,14 @@ h1, h2, h3 { font-family: 'Prompt', sans-serif; }
     align-items: center;
     justify-content: center;
     text-align: center;
+    /* swiper-bundle.min.css se incarca dupa global.css, deci la specificitate
+       egala castiga el — de aceea si `width` de mai sus e cu !important. El
+       pune `height: 100%`, iar o inaltime procentuala nu e `auto`, deci
+       opreste intinderea flex: fiecare card ramane exact cat ii cere textul.
+       Nu se vedea cat timp .obiectiv avea `height: 400px` si toate cardurile
+       ieseau la fel. Cu `auto`, .swiper-wrapper le aduce iar pe toate la
+       inaltimea celui mai inalt. */
+    height: auto !important;
 }
 
 .swiper-3d,
@@ -645,15 +670,31 @@ h1, h2, h3 { font-family: 'Prompt', sans-serif; }
         inset 0 -1px 0 var(--glass-fill);
 }
 
+/* `height: 400px` era o inaltime fixa nimerita pe cel mai lung text din
+   romana, si tot nu ajungea: la "Gracious professionalism" titlul trece pe
+   doua randuri, la "Perseverență" paragraful e cel mai lung, iar in ambele
+   ultimul rand iesea sub marginea cardului. In engleza e si mai rau —
+   paragraful de la "Gracious professionalism" cere 427px. O inaltime fixa nu
+   poate fi buna pentru amandoua limbile, deci devine `min-height`: cardurile
+   scurte arata exact ca pana acum, iar cel lung creste cat ii trebuie.
+   `display: flex` lipsea: `justify-content`/`align-items` erau deja scrise
+   aici, dar pe un bloc obisnuit nu faceau nimic. Acum tin textul centrat pe
+   verticala, ca sliderul intinde toate cardurile la inaltimea celui mai inalt
+   si altfel cardurile scurte ar ramane cu textul lipit de marginea de sus. */
 .obiectiv {
     position: relative;
     width: 100%;
     padding: 40px;
     padding-top: 40px;
     padding-bottom: 50px;
+    display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
-    height: 400px;
+    /* umple cardul intins de .swiper-wrapper, ca textul sa stea centrat pe
+       verticala si in cardurile scurte; min-height ramane podeaua */
+    height: 100%;
+    min-height: 400px;
 }
 
 .obiectiv .titlu {

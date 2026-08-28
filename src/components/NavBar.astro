@@ -254,6 +254,46 @@ const links = [
         });
     }
 
+    /*
+     * flags.js incarca motorul Google (translate_a/element.js) abia cand cineva
+     * atinge widgetul GTranslate — pointerenter/focusin pe .gtranslate_wrapper —
+     * sau cand cookie-ul googtrans arata deja alta limba. Dar noi ascundem
+     * widgetul (navbar.css: pointer-events:none) si punem .lang-toggle in locul
+     * lui, deci pentru un vizitator fara cookie nimic nu declanseaza incarcarea:
+     * doGTranslate exista, insa nu gaseste <select.goog-te-combo> si se
+     * reprogrameaza la infinit din 500 in 500 ms. Pe calculatorul de dezvoltare
+     * bugul nu se vede, fiindca acolo cookie-ul googtrans a ramas de la testele
+     * anterioare si atunci flags.js incarca motorul singur.
+     *
+     * Il cerem noi, exact ca load_tlib din flags.js si prin acelasi
+     * window.gt_translate_script, ca widgetul sa nu il mai ceara a doua oara.
+     */
+    function load_translate_engine() {
+        const w = window as any;
+
+        // fara flags.js nu exista callbackul pe care il apeleaza scriptul Google
+        if (w.gt_translate_script || typeof w.googleTranslateElementInit2 !== 'function') return;
+
+        const script = document.createElement('script');
+        script.src = 'https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit2';
+        w.gt_translate_script = script;
+        document.body.appendChild(script);
+    }
+
+    /**
+     * Ruleaza `done` cand cookie-ul googtrans ajunge la `language`. La primul
+     * clic motorul Google abia se descarca, deci raspunsul poate intarzia mult
+     * peste cele cateva zeci de ms in care se face o comutare ulterioara.
+     */
+    function when_language_applied(language: string, done: () => void) {
+        const deadline = Date.now() + 8000;
+
+        (function poll() {
+            if (current_language() === language || Date.now() > deadline) done();
+            else window.setTimeout(poll, 100);
+        })();
+    }
+
     function init_lang_toggle() {
         const button = document.querySelector('.lang-toggle') as HTMLElement | null;
         if (!button) return;
@@ -263,23 +303,30 @@ const links = [
         if (button.dataset.bound === "true") return;
         button.dataset.bound = "true";
 
+        // pornim descarcarea din timp, ca primul clic sa nu astepte dupa ea
+        button.addEventListener('pointerenter', load_translate_engine);
+        button.addEventListener('focus', load_translate_engine);
+
         button.addEventListener('click', () => {
             const translate = (window as any).doGTranslate;
             if (typeof translate !== 'function') return;
 
+            load_translate_engine();
+
             // GTranslate asteapta mereu "limba_originala|limba_tinta";
             // ro|ro readuce pagina la textul original
             const from = (window as any).gtranslateSettings?.default_language || 'ro';
-            translate(`${from}|${button.dataset.target || 'en'}`);
+            const target = button.dataset.target || 'en';
+            translate(`${from}|${target}`);
 
             // cookie-ul se scrie de GTranslate, deci recitim dupa ce termina
-            window.setTimeout(() => {
+            when_language_applied(target, () => {
                 paint_lang_toggle(button);
                 paint_nav_labels();
 
                 const theme_button = document.querySelector('.theme-toggle') as HTMLElement | null;
                 if (theme_button) paint_theme_toggle(theme_button);
-            }, 150);
+            });
         });
     }
 
