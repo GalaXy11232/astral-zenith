@@ -35,8 +35,6 @@ const accentColor = tierColors[tier ?? ''] ?? 'var(--primary)';
         style={`--accent: ${accentColor};`}
     >
         <div class="card-fade">
-            {tier && <span class="tier-badge" translate="no">{tier}</span>}
-
             <div class="logo-container">
                 <div class="logo-box">
                     <img
@@ -51,7 +49,7 @@ const accentColor = tierColors[tier ?? ''] ?? 'var(--primary)';
                 </div>
             </div>
 
-            {website !== '#' ? (
+            {website !== '#' && (
                 <div class="visit-strip">
                     <span class="visit-label" style={`color: ${tier === 'partener' ? 'var(--brand-950)' : '#fff'}`}>
                         Vizitează website-ul
@@ -60,8 +58,6 @@ const accentColor = tierColors[tier ?? ''] ?? 'var(--primary)';
                         <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                     </svg>
                 </div>
-            ) : (
-                <div class="visit-strip-placeholder"></div>
             )}
         </div>
 
@@ -107,8 +103,8 @@ const accentColor = tierColors[tier ?? ''] ?? 'var(--primary)';
         -webkit-user-select: none;
     }
 
-    /* Tot continutul "de suprafata" al cardului (fundal + eticheta de nivel +
-       logo + banda de vizitare) e grupat aici ca sa se stinga IMPREUNA spre
+    /* Tot continutul "de suprafata" al cardului (fundal + logo + banda de
+       vizitare) e grupat aici ca sa se stinga IMPREUNA spre
        margini, ca o vinieta, nu doar textura din spate. Elipsa 100%/100%
        urmareste forma dreptunghiulara a cardului; platoul opac merge pana la
        68% din raza ca zona centrala (unde sta sigla) sa ramana intotdeauna
@@ -127,7 +123,7 @@ const accentColor = tierColors[tier ?? ''] ?? 'var(--primary)';
     }
 
     /* Fundalul alb + textura de hexagoane sta pe un strat separat
-       (::before), sub logo/etichete, exact ca bara de navigare
+       (::before), sub logo, exact ca bara de navigare
        (navbar.css nav::before). Nu exista alt fundal opac sub el, asa ca
        acolo unde masca de mai sus stinge cardul se vede fundalul paginii
        prin spate. */
@@ -169,28 +165,6 @@ const accentColor = tierColors[tier ?? ''] ?? 'var(--primary)';
         opacity:   1;
     }
 
-    .tier-badge {
-        position:       absolute;
-        bottom:         30px;
-        left:           50%;
-        transform:      translateX(-50%);
-        z-index:        3;
-        font-family:    ui-monospace, 'Cascadia Code', monospace;
-        font-size:      10px;
-        font-weight:    700;
-        letter-spacing: 0.18em;
-        text-transform: uppercase;
-        white-space:    nowrap;
-        color:          var(--text-on-light);
-        opacity:        0.6;
-        transition:     opacity var(--transition), bottom var(--transition);
-    }
-    .sponsor-card:hover .tier-badge,
-    .sponsor-card:focus-visible .tier-badge {
-        opacity: 0;
-        bottom:  calc(var(--strip-h) + 2px);
-    }
-
     .logo-container {
         position:        relative;
         z-index:         2;
@@ -198,9 +172,10 @@ const accentColor = tierColors[tier ?? ''] ?? 'var(--primary)';
         display:         flex;
         align-items:     center;
         justify-content: center;
-        /* Padding-ul de jos lasa loc etichetei de nivel (bottom: 30px) sub
-           sigla, fara sa se suprapuna peste ea. */
-        padding:         clamp(12px, 3vw, 28px) clamp(10px, 2.5vw, 24px) 16px;
+        /* Fara eticheta de nivel sub sigla, padding-ul poate fi strans: latimea
+           e cea care limiteaza caseta (aspect-ratio fix), asa ca marginile
+           laterale mai mici inseamna direct sigla mai mare. */
+        padding:         clamp(8px, 2vw, 16px) clamp(6px, 1.6vw, 12px);
         transition:      transform var(--transition);
         overflow:        hidden;
     }
@@ -230,8 +205,15 @@ const accentColor = tierColors[tier ?? ''] ?? 'var(--primary)';
         object-fit: contain;
     }
 
+    /* Banda sta ascunsa sub marginea de jos si urca doar la hover, deci nu are
+       de ce sa ocupe un rand in coloana: pozitionata absolut, lasa
+       .logo-container sa umple tot cardul, iar sigla iese centrata fata de
+       card, nu fata de spatiul ramas deasupra benzii. */
     .visit-strip {
-        position:        relative;
+        position:        absolute;
+        left:            0;
+        right:           0;
+        bottom:          0;
         z-index:         3;
         display:         flex;
         align-items:     center;
@@ -246,11 +228,6 @@ const accentColor = tierColors[tier ?? ''] ?? 'var(--primary)';
     .sponsor-card:hover .visit-strip,
     .sponsor-card:focus-visible .visit-strip {
         transform: translateY(0%);
-    }
-
-    .visit-strip-placeholder {
-        height:     var(--strip-h);
-        flex-shrink: 0;
     }
 
     .visit-label {

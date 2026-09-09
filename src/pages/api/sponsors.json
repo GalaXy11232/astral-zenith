@@ -1,5 +1,21 @@
 [
     {
+        "title": "Partenerii nostri",
+        "tier": "partener",
+        "sponsors": [
+            {
+                "name": "Universitatea Copiilor",
+                "logo": "/assets/parteneri/Sigla_Asociatia_Universitatea_Copiilor.png",
+                "website": "https://unico.org.ro/"
+            },
+            {
+                "name": "Colegiul Național „Grigore Moisil”",
+                "logo": "/assets/parteneri/Sigla_CNGM.png",
+                "website": "https://www.moisil.ro/"
+            }
+        ]
+    },
+    {
         "title": "Sponsori Diamond",
         "tier": "diamond",
         "sponsors": [
@@ -111,22 +127,6 @@
                 "name": "TimeSalt",
                 "logo": "/assets/sponsori/timesalt.webp",
                 "website": "https://www.timesalt.co/"
-            }
-        ]
-    },
-    {
-        "title": "Partenerii nostri",
-        "tier": "partener",
-        "sponsors": [
-            {
-                "name": "Universitatea Copiilor",
-                "logo": "/assets/parteneri/Sigla_Asociatia_Universitatea_Copiilor.png",
-                "website": "https://unico.org.ro/"
-            },
-            {
-                "name": "Colegiul Național „Grigore Moisil”",
-                "logo": "/assets/parteneri/Sigla_CNGM.png",
-                "website": "https://www.moisil.ro/"
             }
         ]
     }

@@ -18,6 +18,34 @@ const TOOLTIP_ABBREVIATIONS: Record<string, string> = {
    litera pe dos, cum a fost "documnetare") deschidea la hover o caseta goala,
    fara niciun semn ca de fapt cautarea a dat gres. */
 const tooltipText = TOOLTIP_ABBREVIATIONS[tooltip] || tooltip;
+
+/*
+ * Departamentele au traducere scrisa de mana, din acelasi motiv ca etichetele
+ * din bara de navigare (vezi NavBar.astro): "Programare" e ambiguu in romana,
+ * iar Google alegea sensul de programare la medic — pe cardul lui Daniel Paun
+ * scria "Appointment". Cine are traducere aici primeste translate="no" plus
+ * perechea data-ro/data-en, pe care paint_nav_labels() din NavBar.astro o
+ * comuta la schimbarea limbii; un departament nou, fara intrare in dictionar,
+ * ramane pe mana Google, ca inainte.
+ */
+const DEPARTMENT_EN: Record<string, string> = {
+    'Mecanică':                'Mechanical',
+    'Lider Mecanică':          'Mechanical Lead',
+    'Voluntar Mecanică':       'Mechanical Volunteer',
+    'Team Leader & Mecanică':  'Team Leader & Mechanical',
+    'Programare':              'Programming',
+    'Lider Programare':        'Programming Lead',
+    'Voluntar de Programare':  'Programming Volunteer',
+    'Grafică':                 'Graphics',
+    'Lider Grafică':           'Graphics Lead',
+    'Voluntar Grafică':        'Graphics Volunteer',
+    'PR & Marketing':          'PR & Marketing',
+    'Lider PR & Marketing':    'PR & Marketing Lead',
+    'Voluntar PR & Marketing': 'PR & Marketing Volunteer',
+    'Non-Tehnic':              'Non-Technical',
+    'Profesor coordonator':    'Coordinating Teacher',
+};
+const departmentEn = DEPARTMENT_EN[department];
 ---
 
 <article class="member-card glass glass-hover">
@@ -33,7 +61,12 @@ const tooltipText = TOOLTIP_ABBREVIATIONS[tooltip] || tooltip;
     </div>
     <div class="info">
         <h3 class="name" translate="no">{name}</h3>
-        <p class="department">{department}</p>
+        <p
+            class="department"
+            translate={departmentEn ? "no" : undefined}
+            data-ro={departmentEn ? department : undefined}
+            data-en={departmentEn}
+        >{department}</p>
 
         <span class="facultate-tooltip"><i>{tooltip}</i>
         <div class="facultate-tooltiptext"> <i>{tooltipText}</i> </div>

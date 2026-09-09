@@ -12,6 +12,13 @@ import HexBackground from "../components/hexbackground.astro"
  * Ordinea sectiunilor si a cardurilor din fisier e ordinea de pe pagina.
  */
 import sponsorSections from "./api/sponsors.json";
+
+/*
+ * Siglele partenerilor sunt normalizate la aceeasi suprafata optica precum
+ * cele ale sponsorilor (vezi logo-metrics.ts), dar sectiunea are doar cateva
+ * carduri si a fost ceruta putin mai plina. Le dam un plus de 15% doar lor.
+ */
+const PARTENER_LOGO_SCALE = 1.15;
 ---
 
 <BaseLayout title="Sponsori">
@@ -32,6 +39,7 @@ import sponsorSections from "./api/sponsors.json";
                             logo={sponsor.logo}
                             website={sponsor.website}
                             tier={sectiune.tier}
+                            scale_factor={sectiune.tier === "partener" ? PARTENER_LOGO_SCALE : 1}
                         />
                     ))}
                 </div>

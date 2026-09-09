@@ -130,20 +130,54 @@ import ClientRouter from "astro/components/ClientRouter.astro";
         stashed.style.flexDirection = 'row';
     });
 
-    // After page fully loads: re-apply the active translation to new content.
-    document.addEventListener('astro:page-load', () => {
+    /**
+     * Limba activa. Widgetul din flags.js (url_structure "none") isi tine starea
+     * in localStorage.__GT_TRANSLATE_LANGS. Aici se citea cookie-ul googtrans,
+     * care apartine vechiului Google Translate Element si nu se mai scrie de
+     * nimeni — deci nu se reaplica nimic niciodata.
+     */
+    function active_language() {
+        try {
+            const stored = JSON.parse(localStorage.getItem('__GT_TRANSLATE_LANGS') || 'null');
+            if (typeof stored?.tgtLang === 'string') return stored.tgtLang;
+        } catch (e) { /* localStorage blocat sau JSON stricat */ }
+
+        return null;
+    }
+
+    /*
+     * Motorul de traducere se leaga de documentul pe care il gaseste cand se
+     * initializeaza. Dupa un swap ClientRouter nu se mai regaseste in DOM-ul
+     * nou: __GT.translator.translate() iese pe loc, fara eroare si fara sa
+     * atinga nici macar <html lang>, deci pagina in care intri ramane in
+     * romana. Nu il putem repune pe picioare din afara — reincarcarea
+     * scriptului nu ii reface starea interna.
+     *
+     * Cat timp e activa o traducere, scoatem deci linkurile interne din
+     * navigarea SPA. `data-astro-reload` face ClientRouter sa lase browserul sa
+     * incarce pagina normal, iar la incarcare flags.js porneste motorul din nou
+     * si reaplica limba salvata. Marcajul se pune la fiecare `astro:page-load`,
+     * fiindca linkurile paginii noi vin proaspete din HTML-ul de pe server.
+     */
+    function mark_internal_links(event) {
         const gt = window.gtranslateSettings;
-        if (!gt || typeof window.doGTranslate !== 'function') return;
 
-        const match = document.cookie.match('(^|;) ?googtrans=([^;]*)(;|$)');
-        const currentLang = match?.[2]?.split('/')?.[2];
+        // la comutare primim limba tinta in eveniment: localStorage inca n-a
+        // fost scris de motor in momentul clicului
+        const language = event?.detail?.language || active_language();
+        const translated = !!(gt && language && language !== gt.default_language);
 
-        if (currentLang && currentLang !== gt.default_language) {
-            window.doGTranslate(`${gt.default_language}|${currentLang}`);
-        }
+        document.querySelectorAll('a[href^="/"]').forEach((link) => {
+            if (translated) link.setAttribute('data-astro-reload', '');
+            else link.removeAttribute('data-astro-reload');
+        });
+    }
 
-        // document.getElementById("google_translate_element2")?.remove();
-    });
+    document.addEventListener('astro:page-load', mark_internal_links);
+
+    // butonul de limba din NavBar anunta comutarea, ca la 'theme-change':
+    // linkurile trebuie remarcate imediat, nu abia la urmatorul page-load
+    window.addEventListener('language-change', mark_internal_links);
 </script>
 
 

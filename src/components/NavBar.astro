@@ -186,25 +186,33 @@ const links = [
     // cate unul la fiecare navigare ClientRouter
     window.addEventListener("scroll", update_background);
 
-    /** Limba activa, din cookie-ul pus de GTranslate. Implicit romana. */
+    /**
+     * Limba activa. Widgetul din flags.js (url_structure "none") isi tine starea
+     * in localStorage.__GT_TRANSLATE_LANGS — exact cheia pe care o citeste si el
+     * la pornire. Cookie-ul googtrans apartinea vechiului Google Translate
+     * Element si nu se mai scrie de nimeni: citit de aici raspundea mereu 'ro',
+     * asa ca butonul nu se mai intorcea niciodata pe romana.
+     */
     function current_language(): string {
-        const match = document.cookie.match('(^|;) ?googtrans=([^;]*)(;|$)');
-        return match?.[2]?.split('/')?.[2] || 'ro';
+        try {
+            const stored = JSON.parse(localStorage.getItem('__GT_TRANSLATE_LANGS') || 'null');
+            if (typeof stored?.tgtLang === 'string') return stored.tgtLang;
+        } catch (e) { /* localStorage blocat sau JSON stricat */ }
+
+        return 'ro';
     }
 
-    /** Pune pe fiecare link eticheta din limba activa. */
-    function paint_nav_labels() {
-        const language = current_language();
-
+    /** Pune pe fiecare link eticheta din limba data. */
+    function paint_nav_labels(language: string = current_language()) {
         document.querySelectorAll<HTMLElement>('[data-ro][data-en]').forEach(link => {
             const label = language === 'en' ? link.dataset.en : link.dataset.ro;
             if (label && link.textContent?.trim() !== label) link.textContent = label;
         });
     }
 
-    function paint_lang_toggle(button: HTMLElement) {
+    function paint_lang_toggle(button: HTMLElement, language: string = current_language()) {
         // butonul arata limba in care INTRI, nu pe cea activa
-        const target = current_language() === 'ro' ? 'en' : 'ro';
+        const target = language === 'ro' ? 'en' : 'ro';
         const label = target === 'en' ? 'Switch to English' : 'Comută în română';
 
         button.dataset.target = target;
@@ -213,9 +221,9 @@ const links = [
     }
 
     /** Eticheta butonului de tema, in limba activa si pentru tema tinta. */
-    function paint_theme_toggle(button: HTMLElement) {
+    function paint_theme_toggle(button: HTMLElement, language: string = current_language()) {
         const going_light = document.documentElement.dataset.theme !== 'light';
-        const label = current_language() === 'en'
+        const label = language === 'en'
             ? (going_light ? 'Switch to light theme' : 'Switch to dark theme')
             : (going_light ? 'Comută pe tema deschisă' : 'Comută pe tema închisă');
 
@@ -255,43 +263,53 @@ const links = [
     }
 
     /*
-     * flags.js incarca motorul Google (translate_a/element.js) abia cand cineva
-     * atinge widgetul GTranslate — pointerenter/focusin pe .gtranslate_wrapper —
-     * sau cand cookie-ul googtrans arata deja alta limba. Dar noi ascundem
-     * widgetul (navbar.css: pointer-events:none) si punem .lang-toggle in locul
-     * lui, deci pentru un vizitator fara cookie nimic nu declanseaza incarcarea:
-     * doGTranslate exista, insa nu gaseste <select.goog-te-combo> si se
-     * reprogrameaza la infinit din 500 in 500 ms. Pe calculatorul de dezvoltare
-     * bugul nu se vede, fiindca acolo cookie-ul googtrans a ramas de la testele
-     * anterioare si atunci flags.js incarca motorul singur.
+     * flags.js incarca motorul de traducere (lib.min.js) abia cand cineva atinge
+     * widgetul GTranslate — pointerenter/focusin pe .gtranslate_wrapper — sau
+     * cand limba stocata difera deja de cea implicita. Dar noi ascundem widgetul
+     * (navbar.css: pointer-events:none) si punem .lang-toggle in locul lui, deci
+     * hoverul peste butonul nostru nu porneste nimic si primul clic asteapta
+     * toata descarcarea.
      *
-     * Il cerem noi, exact ca load_tlib din flags.js si prin acelasi
-     * window.gt_translate_script, ca widgetul sa nu il mai ceara a doua oara.
+     * Trimitem evenimentul chiar catre wrapper, ca sa porneasca loaderul lui
+     * flags.js. Un <script> ridicat de noi ar trebui sa treaca prin acelasi
+     * window.gt_translate_script, iar load_tlib din flags.js citeste variabila
+     * aia ca "motorul e gata": si-ar chema callbackul imediat, peste un __GT
+     * inca nedefinit, si ar arunca la primul clic.
      */
-    function load_translate_engine() {
-        const w = window as any;
-
-        // fara flags.js nu exista callbackul pe care il apeleaza scriptul Google
-        if (w.gt_translate_script || typeof w.googleTranslateElementInit2 !== 'function') return;
-
-        const script = document.createElement('script');
-        script.src = 'https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit2';
-        w.gt_translate_script = script;
-        document.body.appendChild(script);
+    function prewarm_translate_engine() {
+        document.querySelector('.gtranslate_wrapper')
+            ?.dispatchEvent(new PointerEvent('pointerenter'));
     }
 
     /**
-     * Ruleaza `done` cand cookie-ul googtrans ajunge la `language`. La primul
-     * clic motorul Google abia se descarca, deci raspunsul poate intarzia mult
-     * peste cele cateva zeci de ms in care se face o comutare ulterioara.
+     * Intoarcerea la limba originala nu e o traducere: doGTranslate('ro|ro') nu
+     * reface textul deja inlocuit. Motorul expune __GT.translator.revert(), care
+     * repune textul original si sterge __GT_TRANSLATE_LANGS din localStorage.
+     *
+     * Metoda apare abia dupa ce se incarca lib.min.js. Daca pagina s-a deschis
+     * deja tradusa, flags.js a pornit descarcarea la init si putem prinde clicul
+     * inaintea ei, deci asteptam scurt in loc sa iesim din functie.
      */
-    function when_language_applied(language: string, done: () => void) {
+    function revert_translation() {
         const deadline = Date.now() + 8000;
 
         (function poll() {
-            if (current_language() === language || Date.now() > deadline) done();
-            else window.setTimeout(poll, 100);
+            const translator = (window as any).__GT?.translator;
+
+            if (typeof translator?.revert === 'function') translator.revert();
+            else if (Date.now() < deadline) window.setTimeout(poll, 100);
         })();
+    }
+
+    /** Repicteaza intr-o singura trecere tot ce depinde de limba. */
+    function paint_language_ui(language: string) {
+        const lang_button = document.querySelector('.lang-toggle') as HTMLElement | null;
+        if (lang_button) paint_lang_toggle(lang_button, language);
+
+        const theme_button = document.querySelector('.theme-toggle') as HTMLElement | null;
+        if (theme_button) paint_theme_toggle(theme_button, language);
+
+        paint_nav_labels(language);
     }
 
     function init_lang_toggle() {
@@ -304,29 +322,35 @@ const links = [
         button.dataset.bound = "true";
 
         // pornim descarcarea din timp, ca primul clic sa nu astepte dupa ea
-        button.addEventListener('pointerenter', load_translate_engine);
-        button.addEventListener('focus', load_translate_engine);
+        button.addEventListener('pointerenter', prewarm_translate_engine);
+        button.addEventListener('focus', prewarm_translate_engine);
 
         button.addEventListener('click', () => {
             const translate = (window as any).doGTranslate;
             if (typeof translate !== 'function') return;
 
-            load_translate_engine();
-
-            // GTranslate asteapta mereu "limba_originala|limba_tinta";
-            // ro|ro readuce pagina la textul original
             const from = (window as any).gtranslateSettings?.default_language || 'ro';
             const target = button.dataset.target || 'en';
-            translate(`${from}|${target}`);
 
-            // cookie-ul se scrie de GTranslate, deci recitim dupa ce termina
-            when_language_applied(target, () => {
-                paint_lang_toggle(button);
-                paint_nav_labels();
+            if (target === from) revert_translation();
+            else translate(`${from}|${target}`);
 
-                const theme_button = document.querySelector('.theme-toggle') as HTMLElement | null;
-                if (theme_button) paint_theme_toggle(theme_button);
-            });
+            /*
+             * Repictam pe `target`, nu pe starea citita inapoi: motorul scrie
+             * localStorage abia dupa ce se incarca lib.min.js, deci imediat dupa
+             * clic starea e inca cea veche. Etichetele noastre sunt notranslate,
+             * asa ca motorul nu le atinge si nu e nimic de asteptat.
+             */
+            paint_language_ui(target);
+
+            /*
+             * BaseLayout asculta ca sa scoata linkurile interne din navigarea
+             * SPA cat timp pagina e tradusa — motorul nu supravietuieste unui
+             * swap ClientRouter. Trimitem limba in `detail` din acelasi motiv
+             * pentru care repictam pe `target`: localStorage se scrie abia
+             * dupa ce se incarca motorul.
+             */
+            window.dispatchEvent(new CustomEvent('language-change', { detail: { language: target } }));
         });
     }
 
@@ -334,7 +358,9 @@ const links = [
         document.addEventListener(ev, update_background);
         document.addEventListener(ev, init_lang_toggle);
         document.addEventListener(ev, init_theme_toggle);
-        document.addEventListener(ev, paint_nav_labels);
+        // apel infasurat: ca listener, primul argument ar fi Event, iar
+        // parametrul `language` l-ar compara cu 'en' si ar pica mereu pe romana
+        document.addEventListener(ev, () => paint_nav_labels());
     });
 </script>
 

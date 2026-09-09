@@ -9,8 +9,8 @@ const { date, title,  image, imageAlt, scale_factor = 1} = Astro.props;
 
     <div class="result-card__panel glass">
         <span class="glass-sheen" aria-hidden="true"></span>
-        <div class="result-card__media">
-        <img style = {`transform: scale(${scale_factor})`} src={image} alt={imageAlt ?? title} loading="lazy" />
+        <div class="result-card__media" style = {`--media-scale: ${scale_factor}`}>
+        <img src={image} alt={imageAlt ?? title} loading="lazy" />
         </div>
 
         <div class="result-card__content">
@@ -75,9 +75,15 @@ const { date, title,  image, imageAlt, scale_factor = 1} = Astro.props;
         transform: rotate(45deg);
     }
 
+    /* `scale_factor` largeste CASETA, nu imaginea din ea: pana acum punea un
+       transform: scale() pe <img>, care creste peste caseta si era retezat de
+       overflow-ul de mai jos — sigla iesea la fel de mare, doar cu marginile
+       taiate. Siglele care umplu tot fisierul (tabara de la Timisoara) au
+       nevoie de mai mult loc, nu de zoom. Implicit 1, deci cardurile care nu
+       cer nimic raman neatinse. */
     .result-card__media {
         flex: 0 0 auto;
-        width: 6.5rem;
+        width: calc(6.5rem * var(--media-scale, 1));
         height: auto;
         border-radius: 0.75rem;
         overflow: hidden;
