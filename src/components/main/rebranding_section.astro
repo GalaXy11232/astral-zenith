@@ -22,8 +22,12 @@
     </div>
 
     <div class="logo-wrapper">
-        <img src="/assets/Branding Zenith/Sigla_alb.png" alt="Zenith" class="logo logo-dark" />
-        <img src="/assets/Branding Zenith/Sigla_mov.png" alt="Zenith" class="logo logo-light" />
+        <!-- Sectiunea e mult sub linia de plutire, iar ambele variante de tema
+             se descarca (vezi NavBar.astro pentru de ce se randeaza amandoua).
+             loading="lazy" + dimensiuni: nu mai intra in prima incarcare si nu
+             mai sar randurile cand apar. -->
+        <img src="/assets/Branding Zenith/Sigla_alb.png" alt="Sigla Zenith" class="logo logo-dark"  loading="lazy" decoding="async" width="280" height="280" />
+        <img src="/assets/Branding Zenith/Sigla_mov.png" alt="Sigla Zenith" class="logo logo-light" loading="lazy" decoding="async" width="280" height="280" />
     </div>
 
 </div>

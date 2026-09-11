@@ -57,12 +57,19 @@ const carduri = await Promise.all(activitati.map(async (activitate) => {
 }));
 ---
 
-<BaseLayout title = "Activitatea echipei">
+<BaseLayout title = "Activitatea echipei"
+    description="Activitatea echipei Zenith 19084: ateliere, demonstratii, voluntariat si evenimente de promovare a roboticii.">
     <NavBar activeLink = {2} />
     <HexBackground />
 
+    <!-- Titlul paginii, doar pentru cititoarele de ecran si pentru Google:
+         designul nu prevede un h1 vizibil aici, dar pagina trebuie sa aiba unul. -->
+    <h1 class="sr-only">Activitatea echipei Zenith 19084</h1>
+
+    <main id="main-content">
+
     <div class="title-container">
-        <span class="title-underline">Activitatea Noastră</span>
+        <h2 class="title-underline">Activitatea Noastră</h2>
     </div>
 
     {carduri.map(({ slug, data, Content, coperta }) => (
@@ -76,6 +83,8 @@ const carduri = await Promise.all(activitati.map(async (activitate) => {
             <Content />
         </ActivityCard>
     ))}
+    </main>
+
 
     <Footer />
 </BaseLayout>

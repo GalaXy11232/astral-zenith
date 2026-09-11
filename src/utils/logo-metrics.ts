@@ -43,12 +43,17 @@ export const LOGO_BOX_RATIO = 1.9;
 
 /**
  * Suprafata tinta a desenului, in unitati in care inaltimea casetei = 1
- * (deci suprafata casetei = LOGO_BOX_RATIO = 1.9). 0.62 inseamna ca desenul
- * acopera ~33% din caseta: destul cat sa se citeasca, dar cu aer in jur.
- * Valoarea e aleasa ca doar siglele extrem de late sa fie nevoite sa se
- * micsoreze ca sa incapa in latime.
+ * (deci suprafata casetei = LOGO_BOX_RATIO = 1.9). 0.80 inseamna ca desenul
+ * acopera ~42% din caseta: destul cat sa se citeasca, dar cu aer in jur.
+ *
+ * Urcat de la 0.62, ca siglele compacte sa nu mai para pierdute in caseta.
+ * Creste DOAR ce are loc: cele foarte late sunt deja limitate de plafonul de
+ * latime de mai jos, deci raman pe loc (Laropharm, 6.5:1, nu se misca deloc;
+ * Sharp Solutions, 5:1, creste 8%), in timp ce cele patrate si compacte cresc
+ * cu ~14%. Exact asimetria ceruta: mai mari cele cu spatiu gol in jur, neatinse
+ * cele care ating deja marginea.
  */
-const TARGET_AREA = 0.62;
+const TARGET_AREA = 0.80;
 
 export interface LogoMetrics {
     /** Latimea imaginii, ca procent din latimea casetei. */
@@ -59,6 +64,30 @@ export interface LogoMetrics {
      *  casetei, in procente din propria ei dimensiune. */
     offsetXPct: number;
     offsetYPct: number;
+
+    /**
+     * Fisierul NU are canal alfa, deci sigla vine lipita pe un dreptunghi
+     * colorat (Super Foundation pe rosu, timesalt pe magenta). Nu se poate
+     * decupa: in ambele desenul e ALB, deci fara fundal ar ramane alb pe alb.
+     * Cardul le afiseaza atunci ca "pastila de brand" — sigla umple placa si
+     * ii preia coltul rotunjit — ca dreptunghiul sa para intentionat.
+     */
+    opaque: boolean;
+
+    /**
+     * Nu am putut masura fisierul (cel mai des: lipseste de pe disc). Cardul
+     * arata numele sponsorului in locul unei imagini rupte.
+     */
+    missing: boolean;
+
+    /**
+     * Raportul latime/inaltime al FISIERULUI intreg (nu al desenului). Il
+     * folosesc pastilele: ele se dimensioneaza pe inaltime, cu latimea `auto`,
+     * iar `auto` inseamna 0 pana se descarca imaginea — si toate siglele sunt
+     * `loading="lazy"`. Pus ca `aspect-ratio` inline, latimea se stie de la
+     * primul cadru, deci nu mai sare asezarea cand intra poza.
+     */
+    fileRatio: number;
 }
 
 /** Sigla masurata o singura data per proces (build-ul si dev-serverul cer
@@ -70,21 +99,25 @@ const cache = new Map<string, LogoMetrics>();
  * ne purtam ca si cum desenul ar umple exact fisierul si ar fi centrat:
  * comportamentul vechi, fara normalizare, dar fara sa cada build-ul.
  *
- * ATENTIE: acest fallback readuce exact bug-ul pe care fisierul il rezolva
- * (sigle inegale), doar ca tacut. De aceea orice cadere se raporteaza in
- * consola — daca vezi avertismentul, siglele NU sunt normalizate.
+ * Marcam rezultatul cu `missing: true`, iar cardul deseneaza numele
+ * sponsorului in locul imaginii — altfel iesea un <img> rupt in pagina.
+ * Caderea se raporteaza si in consola: un avertisment aici inseamna ca un
+ * sponsor e in sponsors.json fara fisier de sigla pe disc.
  */
 const FALLBACK: LogoMetrics = {
     widthPct: 100,
     heightPct: 100,
     offsetXPct: -50,
     offsetYPct: -50,
+    opaque: false,
+    missing: true,
+    fileRatio: 1,
 };
 
 function fallbackWithWarning(publicPath: string, reason: unknown): LogoMetrics {
     console.warn(
         `[logo-metrics] Nu am putut masura "${publicPath}" (${reason}). ` +
-        `Sigla se afiseaza nenormalizata si va parea mai mare/mai mica decat celelalte.`
+        `Cardul arata numele sponsorului in loc de sigla.`
     );
     return FALLBACK;
 }
@@ -106,6 +139,7 @@ async function measure(publicPath: string): Promise<LogoMetrics> {
 
     let imgW: number;
     let imgH: number;
+    let hasAlpha: boolean;
     let contentW: number;
     let contentH: number;
     let offsetLeft: number;
@@ -118,6 +152,9 @@ async function measure(publicPath: string): Promise<LogoMetrics> {
         }
         imgW = meta.width;
         imgH = meta.height;
+        // Citit din metadata, care oricum se incarca aici: fara canal alfa =
+        // sigla are fundal lipit in fisier. Nu costa o a doua trecere.
+        hasAlpha = meta.hasAlpha === true;
 
         // trim() taie marginea uniforma din jur — transparenta la siglele cu
         // canal alfa, alba la cele fara (ambele exista in public/assets).
@@ -173,5 +210,8 @@ async function measure(publicPath: string): Promise<LogoMetrics> {
         heightPct,
         offsetXPct: -centerX * 100,
         offsetYPct: -centerY * 100,
+        opaque: !hasAlpha,
+        missing: false,
+        fileRatio: imgW / imgH,
     };
 }

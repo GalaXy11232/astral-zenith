@@ -11,9 +11,16 @@ import MediaVideo from '../components/media/MediaVideo.astro';
 ---
 
 
-<BaseLayout title = "Presă">
+<BaseLayout title = "Presă"
+    description="Zenith 19084 in presa: articole, interviuri si aparitii media despre echipa de robotica a Colegiului „Grigore Moisil”.">
     <NavBar activeLink = {6} />
     <Hexbackground />
+
+    <!-- Titlul paginii, doar pentru cititoarele de ecran si pentru Google:
+         designul nu prevede un h1 vizibil aici, dar pagina trebuie sa aiba unul. -->
+    <h1 class="sr-only">Zenith 19084 in presa</h1>
+
+    <main id="main-content">
 
     <MediaEvent
         title="Istanbul Premier Event - Premiul Inspire 2"
@@ -21,7 +28,7 @@ import MediaVideo from '../components/media/MediaVideo.astro';
         cover="/assets/stiri/istanbul/thumbnail.jpeg"
         uid="event-istanbul"
     >
-        <span class="me-label">Articole & surse</span>
+        <h3 class="me-section-label">Articole & surse</h3>
         <div class="me-grid">
             <!-- <MediaLink 
                 href="https://www.ziar.com/news=17680422" 
@@ -48,7 +55,7 @@ import MediaVideo from '../components/media/MediaVideo.astro';
 
         <hr class="me-divider" />
 
-        <span class="me-label">Galerie foto</span>
+        <h3 class="me-section-label">Galerie foto</h3>
         <div class="me-media-grid">
             <MediaImage src = "/assets/activitati/2026-06-26-istanbul-premier-event/IMG_2111.webp" alt = 'poza istanbul' />
             <MediaImage src = "/assets/activitati/2026-06-26-istanbul-premier-event/istanbul.webp" alt = 'poza istanbul' />
@@ -61,9 +68,10 @@ import MediaVideo from '../components/media/MediaVideo.astro';
     <MediaEvent
         title="Interviu Prima News - Viitor pentru România"
         date="26 - 28 iunie 2026"
-        cover=""
+        cover="/assets/stiri/prima/prima-news-2.jpeg"
+        uid="event-prima-news"
     >
-        <span class="me-label">Surse</span>
+        <h3 class="me-section-label">Surse</h3>
         <div class="me-grid">
             <MediaLink 
                 href = "https://www.youtube.com/watch?v=gfCv_WEXd-U"
@@ -74,11 +82,15 @@ import MediaVideo from '../components/media/MediaVideo.astro';
 
         <hr class="me-divider" />
 
-        <span class="me-label">Galerie foto & video</span>
+        <h3 class="me-section-label">Galerie foto & video</h3>
         <div class="me-media-grid">
-            
+            <MediaImage src="/assets/stiri/prima/prima-news-1.jpeg" alt="Interviu Prima News" />
+            <MediaImage src="/assets/stiri/prima/prima-news-2.jpeg" alt="Interviu Prima News" />
+            <MediaImage src="/assets/stiri/prima/prima-news-3.jpeg" alt="Interviu Prima News" />
         </div>
     </MediaEvent>
+    </main>
+
 
     <Footer />
 </BaseLayout>

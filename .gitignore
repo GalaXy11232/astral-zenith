@@ -14,8 +14,9 @@ pnpm-debug.log*
 
 
 # environment variables
-.env
-.env.production
+# .env* (nu doar .env si .env.production): .env.local si .env.*.local nu erau
+# acoperite, deci primul secret pus acolo ar fi ajuns comis.
+.env*
 
 # macOS-specific files
 .DS_Store

@@ -6,14 +6,23 @@ import GalleryImageVisualizer from "../components/gallery_image_visualizer.astro
 import Hexbackground from "../components/hexbackground.astro";
 ---
 
-<BaseLayout title="Galerie" user_scalable = {false}>
+<BaseLayout title="Galerie"
+    description="Galerie foto din competitiile, atelierele si evenimentele echipei de robotica Zenith 19084.">
     <NavBar activeLink={5} />
 
     <Hexbackground />
+
+    <!-- Titlul paginii, doar pentru cititoarele de ecran si pentru Google:
+         designul nu prevede un h1 vizibil aici, dar pagina trebuie sa aiba unul. -->
+    <h1 class="sr-only">Galerie foto Zenith 19084</h1>
+
+    <main id="main-content">
     <GalleryImageVisualizer />
     <div class="gallery" id="gallery-root">
         <div class="gallery-loading"></div>
     </div>
+    </main>
+
 
     <Footer />
 </BaseLayout>
@@ -184,16 +193,12 @@ import Hexbackground from "../components/hexbackground.astro";
         font-weight: 600;
         letter-spacing: 0.08em;
         text-transform: uppercase;
-        color: var(--glass-text);
-        background: var(--glass-fill);
-        border: 1px solid var(--glass-border);
         cursor: pointer;
-        transition: background 0.25s ease, border-color 0.25s ease;
-    }
 
-    .view-toggle:hover {
-        background: var(--glass-fill-strong);
-        border-color: var(--glass-border-hover);
+        /* Textura (gradient, blur, margine, umbra, culoarea textului) vine din
+           .glass + .glass-hover din global.css, ca la carduri. Aici nu se mai
+           scrie niciuna: inainte butonul avea doar --glass-fill plat, deci era
+           singura "cutie" de pe site fara backdrop-filter si fara sheen. */
     }
 
     .view-toggle:focus-visible {
@@ -289,6 +294,10 @@ function openFullView(img: HTMLImageElement) {
     }));
 
     visualizer.src = img.dataset.src ?? img.src; // use real src
+    /* Miniatura are deja un alt descriptiv (vezi mai jos, `img.alt = ...`).
+       Fara randul asta, poza marita ramanea cu alt="" din markup, adica era
+       anuntata ca decorativa — exact poza pe care utilizatorul a cerut-o. */
+    visualizer.alt = img.alt || '';
     visualizer.setAttribute('data-visible', 'true');
     container.style.zIndex = '100';
     // backgroundColor, nu background: e doar o culoare, iar prescurtarea cu
@@ -401,7 +410,7 @@ function buildSection(folder: FolderData, i: number): Entry | null {
 
     const viewToggle = document.createElement('button');
     viewToggle.type = 'button';
-    viewToggle.className = 'view-toggle';
+    viewToggle.className = 'view-toggle glass glass-hover';
     inner.appendChild(viewToggle);
 
     panel.appendChild(inner);
@@ -425,7 +434,12 @@ function buildSection(folder: FolderData, i: number): Entry | null {
 /** Butonul arata unde te DUCI, nu unde esti. */
 function paintToggle(entry: Entry) {
     const goingToGrid = viewMode === 'wheel';
+    /* Sheen-ul se rescrie aici, nu la creare: innerHTML de mai jos ar sterge
+       un <span> pus o singura data, iar butonul ramanea fara reflexie dupa
+       prima comutare. E absolut-pozitionat, deci nu intra in flex si nu
+       primeste `gap`. */
     entry.viewToggle.innerHTML =
+        '<span class="glass-sheen" aria-hidden="true"></span>' +
         (goingToGrid ? ICON_GRID : ICON_WHEEL) +
         `<span>${goingToGrid ? 'Grilă' : 'Roată'}</span>`;
     entry.viewToggle.setAttribute('aria-label',

@@ -19,9 +19,16 @@ import sponsorSections from "./api/sponsors.json";
 const sponsoriSiParteneri = sponsorSections.reduce((n, s) => n + s.sponsors.length, 0);
 ---
 
-<BaseLayout title = "Rezultatele Noastre">
+<BaseLayout title = "Rezultatele Noastre"
+    description="Premiile si rezultatele echipei Zenith 19084 in competitiile FIRST Tech Challenge, nationale si internationale.">
     <NavBar activeLink = {1}/>
     <Hexbackground />
+
+    <!-- Titlul paginii, doar pentru cititoarele de ecran si pentru Google:
+         designul nu prevede un h1 vizibil aici, dar pagina trebuie sa aiba unul. -->
+    <h1 class="sr-only">Rezultatele echipei Zenith 19084</h1>
+
+    <main id="main-content">
      
     <div class="stats-grid">
         <StatsCard end = {sponsoriSiParteneri} label = "Sponsori & Parteneri" icon = "/assets/icons/Sponsori__2_.webp" duration = {850} />
@@ -35,7 +42,7 @@ const sponsoriSiParteneri = sponsorSections.reduce((n, s) => n + s.sponsors.leng
     </div>
 
     <div class="title-container">
-        <span class="title-underline">Rezultatele echipei</span>
+        <h2 class="title-underline">Rezultatele echipei</h2>
     </div>
     
     <ResultsTimeline>
@@ -164,6 +171,8 @@ const sponsoriSiParteneri = sponsorSections.reduce((n, s) => n + s.sponsors.leng
         </ResultCard>
 
     </ResultsTimeline>
+    </main>
+
     
     <Footer />
 </BaseLayout>

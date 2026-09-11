@@ -4,14 +4,14 @@
         "tier": "partener",
         "sponsors": [
             {
-                "name": "Universitatea Copiilor",
-                "logo": "/assets/parteneri/Sigla_Asociatia_Universitatea_Copiilor.png",
-                "website": "https://unico.org.ro/"
-            },
-            {
                 "name": "Colegiul Național „Grigore Moisil”",
                 "logo": "/assets/parteneri/Sigla_CNGM.png",
                 "website": "https://www.moisil.ro/"
+            },
+            {
+                "name": "Universitatea Copiilor",
+                "logo": "/assets/parteneri/Sigla_Asociatia_Universitatea_Copiilor.png",
+                "website": "https://unico.org.ro/"
             }
         ]
     },
@@ -21,7 +21,7 @@
         "sponsors": [
             {
                 "name": "SUPER Foundation",
-                "logo": "/assets/sponsori/Super Foundation.webp",
+                "logo": "/assets/sponsori/Super Foundation.png",
                 "website": "https://www.super.xyz/"
             },
             {
@@ -54,11 +54,6 @@
                 "name": "Arbomedia",
                 "logo": "/assets/sponsori/arbomedia.png",
                 "website": "https://arbomedia.ro/"
-            },
-            {
-                "name": "Glob Trans MD SRL",
-                "logo": "/assets/sponsori/Glob_Trans_MD.webp",
-                "website": "#"
             }
         ]
     },

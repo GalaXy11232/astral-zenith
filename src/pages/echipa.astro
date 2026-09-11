@@ -13,13 +13,20 @@ import mentors from "./api/mentors.json";
 ---
 
 
-<BaseLayout title = "Echipa">
+<BaseLayout title = "Echipa"
+    description="Membrii, voluntarii si mentorii echipei de robotica Zenith 19084 de la Colegiul National „Grigore Moisil”.">
     <NavBar activeLink={3} />
     <Hexbackground />
 
+    <!-- Titlul paginii, doar pentru cititoarele de ecran si pentru Google:
+         designul nu prevede un h1 vizibil aici, dar pagina trebuie sa aiba unul. -->
+    <h1 class="sr-only">Echipa Zenith 19084</h1>
+
+    <main id="main-content">
+
 
     <div class="title-container">
-        <span class="title-underline">Membrii echipei</span>
+        <h2 class="title-underline">Membrii echipei</h2>
     </div>
     <div style = "padding-bottom: 5rem;"></div>
 
@@ -37,7 +44,7 @@ import mentors from "./api/mentors.json";
     <div style = "padding-top: 5rem;"></div>
     <div style = "padding-top: 5rem;"></div>
      <div class="title-container">
-        <span class="title-underline">Voluntarii echipei</span>
+        <h2 class="title-underline">Voluntarii echipei</h2>
     </div>
     <div style = "padding-bottom: 5rem;"></div>
 
@@ -55,7 +62,7 @@ import mentors from "./api/mentors.json";
     <div style = "padding-top: 5rem;"></div>
     <div style = "padding-top: 5rem;"></div>
      <div class="title-container">
-        <span class="title-underline">Mentorii echipei</span>
+        <h2 class="title-underline">Mentorii echipei</h2>
     </div>
     <div style = "padding-bottom: 5rem;"></div>
     
@@ -71,6 +78,8 @@ import mentors from "./api/mentors.json";
     </MembersGrid>
     
     <div style = "padding-bottom: 8rem;"></div>
+    </main>
+
 
     <Footer />
 </BaseLayout>

@@ -2,13 +2,16 @@
 
 ---
 
-<div class = 'full-img hidden' translate = 'no'>
+<div class = 'full-img hidden' translate = 'no' role="dialog" aria-modal="true" aria-label="Vizualizare poza">
     <!-- fara src: un src="" gol face browserul sa ceara din nou pagina
          curenta ca imagine. JS-ul il completeaza la deschidere. -->
     <img id = 'image-visualizer' alt="">
     <div class = "img-switcher-wrapper">
-        <p id = 'left-img' class = 'img-switcher-btn hidden'>&lt;</p>
-        <p id = 'right-img' class = 'img-switcher-btn hidden'>&gt;</p>
+        <!-- <button>, nu <p>: erau paragrafe, deci fara rol, fara tabindex si
+             fara activare din tastatura — sagetile de navigare nu existau
+             pentru cine nu foloseste mouse-ul. -->
+        <button type="button" id = 'left-img'  class = 'img-switcher-btn hidden' aria-label="Poza anterioara">&lt;</button>
+        <button type="button" id = 'right-img' class = 'img-switcher-btn hidden' aria-label="Poza urmatoare">&gt;</button>
     </div>
 </div>
 
@@ -44,6 +47,13 @@
     #right-img { right: 10%; }
 
     .img-switcher-btn {
+        /* Erau <p> si au devenit <button> ca sa fie accesibile din tastatura:
+           fara reset ar aparea cu fundal, chenar si font de buton. */
+        background: none;
+        border: 0;
+        padding: 0;
+        font-family: inherit;
+        cursor: pointer;
         position: absolute;
         color: white;
         font-size: 250%;
@@ -92,14 +102,32 @@
                     visible = 'false';
                 }
 
-                if (visible && ![image_element, left_img, right_img].includes(target)) {
-                    image_element.src = '';                
+                /* `visible` e un STRING, deci si 'false' e truthy: cu `if (visible)`
+                   ramura de inchidere se executa la FIECARE mouseup de pe
+                   pagina, nu doar cand vizualizatorul chiar e deschis. */
+                if (visible === 'true' && ![image_element, left_img, right_img].includes(target)) {
+                    /* Nu se mai goleste `src`. Exact asta avertizeaza si
+                       comentariul din markup mai sus: src="" face browserul sa
+                       ceara inca o data pagina curenta, ca imagine. Elementul e
+                       oricum scos din vedere prin z-index mai jos. */
                     image_element.setAttribute('data-visible', 'false');
                     full_image.style.zIndex = '-1';
 
                     window.dispatchEvent(new Event('close-image-visualizer'));
                 }
             })
+
+            /* Escape. Pana acum vizualizatorul se inchidea DOAR cu click in
+               afara, deci cine naviga din tastatura ramanea blocat in el.
+               Acelasi tipar ca la lightbox-ul din MediaEvent.astro. */
+            document.addEventListener('keydown', (e) => {
+                if (e.key !== 'Escape') return;
+                if (image_element.getAttribute('data-visible') !== 'true') return;
+
+                image_element.setAttribute('data-visible', 'false');
+                full_image.style.zIndex = '-1';
+                window.dispatchEvent(new Event('close-image-visualizer'));
+            });
     }
 
     ['astro:page-load', 'DOMContentLoaded'].forEach((ev) => {

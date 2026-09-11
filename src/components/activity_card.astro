@@ -18,7 +18,12 @@ const {
 // Cand pagina are un slug stabil (folderul activitatii), il folosim pe el:
 // id-ul ajunge in HTML, deci cu Math.random() ancora se schimba la fiecare
 // build si un link catre /activitate#... nu mai nimereste acelasi card.
-const uid = uidProp ?? `activity-${Math.random().toString(36).slice(2, 8)}`;
+const uid = uidProp ?? ('activity-' + String(title)
+    .toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 48));
 ---
 
 <div style = "margin: 5rem 3rem;">

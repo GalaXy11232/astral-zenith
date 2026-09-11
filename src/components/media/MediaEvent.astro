@@ -10,8 +10,16 @@ interface Props {
 
 let { title, cover, uid = '', coverAlt = title, coverFocus = 'center', date } = Astro.props;
 
+/* Id-ul se calculeaza la BUILD, deci Math.random() aici dadea alt id la
+   fiecare deploy si orice link trimis catre #me-... se rupea. Derivat din
+   titlu: stabil intre build-uri cat timp titlul nu se schimba. */
 if (uid == '')
-    uid = `me-${Math.random().toString(36).slice(2, 8)}`;
+    uid = 'me-' + String(title)
+        .toLowerCase()
+        .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-+|-+$/g, '')
+        .slice(0, 48);
 ---
 
 <section class="me-block glass glass-hover" id={uid}>
@@ -84,8 +92,10 @@ if (uid == '')
         transition: transform 5s ease;
     }
 
+    /* scale(1) e transformarea identitate: tranzitia de deasupra nu avea ce
+       anima. */
     .me-block:hover .me-banner-img {
-        transform: scale(1);
+        transform: scale(1.05);
     }
 
     .me-banner-gradient {
@@ -325,7 +335,9 @@ if (uid == '')
         }
     }
 
-    @media () {
+    /* Era `@media ()` — conditie goala, CSS invalid, deci tot blocul era
+       aruncat tacut de parser si reduced-motion nu functiona aici. */
+    @media (prefers-reduced-motion: reduce) {
         .me-block,
         .me-block * {
             transition: none !important;
@@ -470,11 +482,17 @@ if (uid == '')
         document.addEventListener('keydown', onEsc);
     }
 
+    /* Handle-ul timer-ului de inchidere. Fara el, daca inchizi si redeschizi
+       in mai putin de 260ms, timer-ul vechi se declanseaza peste lightbox-ul
+       NOU: ii pune display:none si ii sterge continutul. */
+    let closeTimer: number | undefined;
+
     function closeLightbox() {
         const lb = document.getElementById('me-lightbox');
         if (!lb) return;
         lb.style.opacity = '0';
-        setTimeout(() => {
+        window.clearTimeout(closeTimer);
+        closeTimer = window.setTimeout(() => {
             lb.style.display = 'none';
             const vid = lb.querySelector('video');
             if (vid) { vid.pause(); vid.src = ''; }

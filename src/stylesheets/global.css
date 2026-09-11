@@ -358,16 +358,21 @@
 /* Acelasi contur si pe cardurile de sponsori si parteneri (ambele sectiuni
    folosesc sponsor_card.astro), tot doar pe tema deschisa.
 
-   Aici e nevoie de shorthand-ul complet, nu doar de border-width ca la
-   cardurile de mai sus: .sponsor-card nu are deloc border, iar border-style
-   implicit e `none` — cu latime dar fara stil nu s-ar desena nimic.
+   Aici conturul e de 1px, NU de 4px ca la cardurile de activitate si de
+   membru de mai sus. Motivul e ca la cardul de sponsor cei 4px nu se vedeau ca
+   un contur, ci ca o margine goala pe dinauntru: cardul are latime si inaltime
+   fixe (--card-size) si box-sizing: border-box, deci grosimea se scade din
+   interior — 8px pe fiecare axa, care ii luau placii 198px -> 192px si siglei
+   174px -> 168px. Cardul de membru nu patea la fel, fiindca inaltimea lui nu e
+   fixa si poate creste inapoi.
 
-   Cardul are latime si inaltime fixe (--card-size) si box-sizing: border-box,
-   deci cei 4px se scad din interior: sigla, care e dimensionata procentual,
-   se micsoreaza cu ~8px pe fiecare axa. Hover-ul misca doar transform, deci
-   nu intra in conflict. */
+   Culoarea ramane insa tare (brand-700 la 0.55, nu alb): pe cardul de sponsor
+   border-color e alb 0.55, ceea ce pe pagina deschisa nu s-ar vedea deloc, iar
+   cardul — lavanda foarte diluata pe fundal aproape alb — ar ramane fara
+   muchie. Se pastreaza definitia, se pierde doar grosimea. */
 :root[data-theme="light"] .sponsor-card {
-    border: 4px solid rgb(var(--brand-700-rgb) / 0.75);
+    border-width: 1px;
+    border-color: rgb(var(--brand-700-rgb) / 0.55);
 }
 
 /* Butonul rotund "Inapoi sus" de pe marginea footerului, doar pe tema
@@ -578,6 +583,40 @@ h1, h2, h3 { font-family: 'Prompt', sans-serif; }
 
 .hidden { display: none !important; }
 
+/* Link-ul „Sari la continut”: invizibil pana e focusat cu Tab, apoi apare in
+   coltul din stanga sus. Nu se poate face cu display:none — ala l-ar scoate si
+   din ordinea de tabulare, adica exact ce trebuie sa ramana. */
+.skip-link {
+    position: absolute;
+    top: -100px;
+    left: 8px;
+    z-index: 1000;
+    padding: 0.6rem 1rem;
+    border-radius: 0 0 8px 8px;
+    background: var(--brand-500);
+    color: #fff;
+    font-weight: 600;
+    text-decoration: none;
+    transition: top 0.15s ease;
+}
+.skip-link:focus { top: 0; }
+
+/* Titlu citit doar de cititoarele de ecran. Paginile trebuie sa aiba un <h1>
+   ca sa aiba o structura corecta, dar designul nu prevede unul vizibil peste
+   tot. `clip-path` + 1px, NU `display:none` sau `visibility:hidden` — acelea
+   l-ar scoate si din arborele de accesibilitate, adica exact ce nu vrem. */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+    border: 0;
+}
+
 /* Titlurile de sectiune din paginile interioare ("Rezultatele echipei",
    "Activitatea Noastră", "Sponsori Gold" etc.).
 
@@ -596,6 +635,19 @@ h1, h2, h3 { font-family: 'Prompt', sans-serif; }
 }
 
 .title-underline {
+    /* inline-block, si NU block. Titlurile astea erau <span> si au devenit
+       <h2> (paginile trebuie sa aiba o structura de titluri corecta). Dar un
+       <h2> e block: cutia lui se intinde pe toata latimea lui .title-container,
+       iar linia de dedesubt e `width: 50%` DIN CUTIE — deci devenea jumatate
+       din latimea paginii, nu jumatate din latimea textului.
+       inline-block readuce cutia pe text, exact ca la <span>, si .title-container
+       o centreaza mai departe prin text-align. Galeria isi construieste titlul
+       din JS ca <span>, de aceea acolo linia arata corect si a ramas reperul.
+
+       margin: 0 — <h2> vine cu margine implicita de la browser, <span> nu avea. */
+    display: inline-block;
+    margin: 0;
+
     font-size: clamp(25px, 2.5vw + 1rem, 34px);
     font-weight: 600;
     color: var(--accent-text);

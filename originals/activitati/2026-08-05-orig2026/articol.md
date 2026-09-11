@@ -2,6 +2,7 @@
 date: 2026-09-05
 dateLabel: 05 septembrie 2026
 title: Open Robotics Intelligent Grid 2026
+focus: 80% 10%
 ---
 
 În perioada 1-6 septembrie, am participat cu mult entuziasm la tabăra Open Robotics Intelligent Grid, organizată extraordinar de echipa CSH #17861.

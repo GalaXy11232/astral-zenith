@@ -2,7 +2,28 @@
 import "../stylesheets/global.css";
 import "../stylesheets/navbar.css";
 
-const { title, user_scalable = true } = Astro.props;
+const {
+    title,
+    user_scalable = true,
+    /* Descrierea paginii. Intra in <meta name="description">, in og:description
+       si in twitter:description — deci se scrie o singura data, per pagina. */
+    description = 'Zenith 19084 — echipa de robotica FIRST Tech Challenge a Colegiului National „Grigore Moisil” din Bucuresti. Rezultate, activitati, galerie si parteneri.',
+    /* Poza pentru previzualizarea linkurilor. Cale ABSOLUTA la build, din
+       `site` din astro.config — Facebook/WhatsApp/Discord ignora caile
+       relative si ar afisa link gol. */
+    ogImage = '/assets/render.png',
+} = Astro.props;
+
+/* Astro.site vine din `site` in astro.config.mjs. Daca lipseste, canonical si
+   og:url ies goale si previzualizarile se strica — de aceea e setat acolo. */
+const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+const ogImageURL   = new URL(ogImage, Astro.site);
+
+/* Titlul din tab si din rezultatele Google. Inainte se scria `<title> {title} </title>`
+   cu spatii literale inauntru si fara nume de echipa, deci homepage-ul aparea
+   in Google drept „Acasa”, fara niciun indiciu ca e vorba de Zenith. */
+const SITE_NAME = 'Zenith 19084';
+const fullTitle = title === 'Acasa' ? `${SITE_NAME} - Home` : `${title} | ${SITE_NAME}`;
 
 import ClientRouter from "astro/components/ClientRouter.astro";
 ---
@@ -26,17 +47,42 @@ import ClientRouter from "astro/components/ClientRouter.astro";
 		<link rel="icon" href="/tab_icon.ico" />
 		<meta name="viewport" content=`width=device-width, initial-scale=1.0${!user_scalable ? ', user-scalable=no' : ''}` />
 		<meta name="generator" content= {Astro.generator} />
-		<title> {title} </title>
+		<title>{fullTitle}</title>
+		<meta name="description" content={description} />
+		<link rel="canonical" href={canonicalURL} />
 
+		<!-- Previzualizarea linkului cand cineva da share pe Facebook, WhatsApp,
+		     Discord sau Messenger. Fara ele iese un dreptunghi gri fara text —
+		     iar pagina de presa exista tocmai ca sa fie trimisa mai departe. -->
+		<meta property="og:type" content="website" />
+		<meta property="og:site_name" content="Zenith 19084" />
+		<meta property="og:locale" content="ro_RO" />
+		<meta property="og:title" content={fullTitle} />
+		<meta property="og:description" content={description} />
+		<meta property="og:url" content={canonicalURL} />
+		<meta property="og:image" content={ogImageURL} />
+		<meta name="twitter:card" content="summary_large_image" />
+		<meta name="twitter:title" content={fullTitle} />
+		<meta name="twitter:description" content={description} />
+		<meta name="twitter:image" content={ogImageURL} />
+
+		<!-- Fara preconnect, fontul cere DNS + TLS abia dupa ce se parseaza
+		     <link>-ul de mai jos: doua drumuri dus-intors in plus inainte de
+		     prima litera desenata. -->
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 	    <link href="https://fonts.googleapis.com/css2?family=Prompt:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
 
         <ClientRouter />
 	</head>
 
     <body style="background-color: var(--page-bg);">
-        <!-- <div> -->
-            <slot />    
-        <!-- </div> -->
+        <!-- Primul element focusabil din pagina. Fara el, cine navigheaza din
+             tastatura trece prin cele 8 linkuri de meniu plus comutatoarele de
+             tema si limba pe FIECARE pagina, inainte sa ajunga la continut.
+             Ascuns pana primeste focus (vezi .skip-link in global.css). -->
+        <a class="skip-link" href="#main-content">Sari la continut</a>
+        <slot />
     </body>
 
     <script is:inline>
@@ -57,10 +103,7 @@ import ClientRouter from "astro/components/ClientRouter.astro";
 </html>
 
 <script>
-	// force remove the astro menu during testing
 	document.addEventListener("astro:page-load", () => {
-		console.log("Connected");
-
 		const astro = document.querySelector("astro-dev-toolbar");
         const body = document.body;
 		if (astro) 
@@ -182,8 +225,11 @@ import ClientRouter from "astro/components/ClientRouter.astro";
 
 
 <!-- swiper -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"/>
-<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js" is:inline />
+<!-- Versiuni exacte, nu `@11`: altfel jsDelivr serveste orice minor nou, iar
+     o regresie la ei devine o regresie la noi, fara niciun commit de partea
+     noastra. `defer` ca sa nu blocheze parserul. -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11.2.6/swiper-bundle.min.css"/>
+<script src="https://cdn.jsdelivr.net/npm/swiper@11.2.6/swiper-bundle.min.js" defer is:inline></script>
 
 <script is:inline>
     function initSwiper() {

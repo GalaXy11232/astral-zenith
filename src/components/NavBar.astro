@@ -41,7 +41,9 @@ const links = [
     { name: "Contact",    en: "Contact",  href: "/contact" }     // 7
 ]
 ---
-<div class = 'mobile-background-blur' onclick = 'switch_menu_visibility("0px")' />
+<!-- Doar suprafata de inchidere prin click in afara. aria-hidden fiindca nu e
+     un control real: de la tastatura meniul se inchide cu butonul X. -->
+<div class = 'mobile-background-blur' aria-hidden="true" onclick = 'switch_menu_visibility("0px")' />
 <nav>
     <div class = 'home-container'>
         <a class = 'navbar-home scale-hover' href="/">
@@ -64,7 +66,17 @@ const links = [
     <div class = 'links-container'>
         <div class="gtranslate_wrapper"></div>
 
-        <a class="hamburger-btn" onclick = 'switch_menu_visibility()' >&#8801;</a>
+        <!-- <button>, nu <a> fara href: un <a> fara href nu intra in ordinea de
+             tabulare si nu se activeaza cu Enter/Space, deci meniul mobil era
+             imposibil de deschis de la tastatura. -->
+        <button
+            type="button"
+            class="hamburger-btn"
+            aria-label="Deschide meniul"
+            aria-expanded="false"
+            aria-controls="mobile-nav"
+            onclick="switch_menu_visibility()"
+        >&#8801;</button>
         <!-- genereaza dinamic linkurile -> se poate atribui din index activeLink prop -->
         <div class="links-wrapper">
             {
@@ -145,9 +157,14 @@ const links = [
     </div>
 </nav>
 
-<div class="mobile-nav">
+<div class="mobile-nav" id="mobile-nav">
     <div class="mobile-xbtn-container">
-        <a class = 'mobile-xbtn' onclick = 'switch_menu_visibility()'>x</a>
+        <button
+            type="button"
+            class="mobile-xbtn"
+            aria-label="Inchide meniul"
+            onclick="switch_menu_visibility()"
+        >x</button>
     </div>
     <div style = "display: flex; justify-content: center; width: 100%; height: 100%;">
         <div class="mobile-links-wrapper">
@@ -365,27 +382,38 @@ const links = [
 </script>
 
 <script is:inline>
-    function switch_menu_visibility(force_value = null) {
-        let mobilenav = document.querySelector('.mobile-nav');
-        let bgblur = document.querySelector('.mobile-background-blur');
-        let wd = mobilenav.style.width;
+    /* Sertarul inchis se ascundea doar cu width:0 + overflow:hidden, deci cele
+       8 linkuri dinauntru ramaneau in ordinea de tabulare: pe ecran mic, Tab
+       intra in linkuri invizibile. `inert` le scoate din tab order SI din
+       arborele de accesibilitate, fara sa strice animatia de latime. */
+    function apply_menu_state(open) {
+        const mobilenav = document.querySelector('.mobile-nav');
+        const bgblur    = document.querySelector('.mobile-background-blur');
+        const burger    = document.querySelector('.hamburger-btn');
+        if (!mobilenav || !bgblur) return;
 
-        if (force_value) {
-            mobilenav.style.width = force_value;
-            bgblur.style.opacity = force_value == '0px' ? '0' : '1';
-        }
-        else {
-            mobilenav.style.width = wd == '0px' ? '100%' : '0px';
-            bgblur.style.opacity = wd == '0px' ? '1' : '0';
-        }
+        mobilenav.style.width = open ? '100%' : '0px';
+        bgblur.style.opacity  = open ? '1' : '0';
+        mobilenav.inert = !open;
+        if (burger) burger.setAttribute('aria-expanded', open ? 'true' : 'false');
+    }
+
+    function switch_menu_visibility(force_value = null) {
+        const mobilenav = document.querySelector('.mobile-nav');
+        if (!mobilenav) return;
+
+        if (force_value !== null) apply_menu_state(force_value !== '0px');
+        else apply_menu_state(mobilenav.style.width === '0px');
     }
 
     function onload_menu_setup() {
-        let mobilenav = document.querySelector('.mobile-nav');
-        let bgblur = document.querySelector('.mobile-background-blur');
-        
-        mobilenav.style.width = '0px'; 
-        bgblur.style.opacity = '0';
+        const mobilenav = document.querySelector('.mobile-nav');
+        const bgblur = document.querySelector('.mobile-background-blur');
+        /* Rulat pe fiecare astro:page-load, deci si pe o eventuala pagina fara
+           NavBar (404). Fara garda, handler-ul ar arunca acolo. */
+        if (!mobilenav || !bgblur) return;
+
+        apply_menu_state(false);
         bgblur.addEventListener('transitionend', () => {
             bgblur.style.pointerEvents = bgblur.style.opacity == '0' ? 'none' : 'all';
         });

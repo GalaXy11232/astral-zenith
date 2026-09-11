@@ -243,7 +243,18 @@ async function initBackground() {
 
     let rafId: number;
 
+    /* Fundalul asta ruleaza o bucla rAF infinita, cu hexagoane care se rotesc
+       si urca, pe 6 din cele 8 pagini. Era singurul element puternic animat de
+       pe site fara nicio verificare de reduced-motion (WCAG 2.2.2). Cu
+       preferinta activa desenam O SINGURA data — geometria ramane pe ecran,
+       dar nemiscata — in loc sa oprim tot si sa lasam pagina goala. */
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+
     const animate = () => {
+        if (reduceMotion.matches) {
+            renderer.render(scene, camera);
+            return;
+        }
         rafId = requestAnimationFrame(animate);
 
         // Apply animations to each ring

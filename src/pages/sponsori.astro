@@ -21,16 +21,23 @@ import sponsorSections from "./api/sponsors.json";
 const PARTENER_LOGO_SCALE = 1.15;
 ---
 
-<BaseLayout title="Sponsori">
+<BaseLayout title="Sponsori"
+    description="Sponsorii si partenerii care sustin echipa de robotica Zenith 19084. Alatura-te si tu proiectului.">
     <NavBar activeLink={4} />
     <HexBackground />
+
+    <!-- Titlul paginii, doar pentru cititoarele de ecran si pentru Google:
+         designul nu prevede un h1 vizibil aici, dar pagina trebuie sa aiba unul. -->
+    <h1 class="sr-only">Sponsorii si partenerii echipei Zenith 19084</h1>
+
+    <main id="main-content">
 
     <div class="sponsor-page">
 
         {sponsorSections.map((sectiune) => (
             <section class="sponsor-section">
                 <div class="title-container">
-                    <span class="title-underline">{sectiune.title}</span>
+                    <h2 class="title-underline">{sectiune.title}</h2>
                 </div>
                 <div class="cards-grid">
                     {sectiune.sponsors.map((sponsor) => (
@@ -47,6 +54,8 @@ const PARTENER_LOGO_SCALE = 1.15;
         ))}
 
     </div>
+    </main>
+
 
     <Footer />
 </BaseLayout>

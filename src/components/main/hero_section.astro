@@ -18,7 +18,10 @@ const {
 } = Astro.props;
 ---
 
-<script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
+<!-- Versiune FIXATA. Era `@google/model-viewer` fara versiune, adica unpkg
+     servea mereu ultima publicata: o schimbare incompatibila la ei strica
+     hero-ul de pe prima pagina fara sa atingem noi nimic. -->
+<script type="module" src="https://unpkg.com/@google/model-viewer@4.0.0/dist/model-viewer.min.js"></script>
 
 <section class="hero">
 
@@ -408,7 +411,7 @@ const {
         }
     }
 
-    /* @media (prefers-reduced-motion: reduce) {
+    @media (prefers-reduced-motion: reduce) {
         .hero-eyebrow,
         .hero-word,
         .hero-sub,
@@ -429,7 +432,7 @@ const {
         .spinner-ring { animation: spin 1.2s linear infinite; }
         .scroll-line,
         .scroll-dot { animation: none; opacity: 1; }
-    } */
+    }
 </style>
 
 <script>

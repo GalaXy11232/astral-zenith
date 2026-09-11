@@ -14,6 +14,13 @@ const logoStyle = [
     `transform: translate(${m.offsetXPct}%, ${m.offsetYPct}%)`,
 ].join('; ');
 
+// Siglele fara canal alfa (Super Foundation, timesalt) au fundalul lipit in
+// fisier si desenul ALB, deci nu se pot decupa — alb pe placa alba ar fi
+// invizibil. Le afisam ca "pastila": sigla umple placa, cu colt rotunjit, ca
+// dreptunghiul colorat sa para ales, nu uitat acolo. Normalizarea optica nu li
+// se aplica: desenul lor E tot fisierul.
+const isChip = m.opaque;
+
 const tierColors: Record<string, string> = {
     bronze:   'var(--tier-bronze)',
     gold:     'var(--tier-gold)',
@@ -30,12 +37,26 @@ const accentColor = tierColors[tier ?? ''] ?? 'var(--primary)';
         href={website}
         target={website === '#' ? '_self' : '_blank'}
         rel="noopener noreferrer"
-        class="sponsor-card"
+        class="sponsor-card glass glass-hover"
         aria-label={website !== '#' ? `Vizitează website-ul ${name}` : name}
         style={`--accent: ${accentColor};`}
     >
-        <div class="card-fade">
-            <div class="logo-container">
+        <span class="glass-sheen" aria-hidden="true"></span>
+
+        <div class:list={["logo-plate", isChip && "is-chip"]}>
+            {m.missing ? (
+                <span class="logo-fallback">{name}</span>
+            ) : isChip ? (
+                <img
+                    src={logo}
+                    alt={`${name} logo`}
+                    class="sponsor-logo"
+                    loading="lazy"
+                    decoding="async"
+                    draggable="false"
+                    style={`aspect-ratio: ${m.fileRatio}`}
+                />
+            ) : (
                 <div class="logo-box">
                     <img
                         src={logo}
@@ -47,25 +68,23 @@ const accentColor = tierColors[tier ?? ''] ?? 'var(--primary)';
                         style={logoStyle}
                     />
                 </div>
-            </div>
-
-            {website !== '#' && (
-                <div class="visit-strip">
-                    <span class="visit-label" style={`color: ${tier === 'partener' ? 'var(--brand-950)' : '#fff'}`}>
-                        Vizitează website-ul
-                    </span>
-                    <svg class="visit-arrow" style={`color: ${tier === 'partener' ? 'var(--brand-950)' : '#fff'}`} viewBox="0 0 16 16" fill="none" aria-hidden="true">
-                        <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
-                </div>
             )}
         </div>
 
-        <!-- Corner-notch traieste in afara lui .card-fade dinadins: e singurul
-             indiciu vizual ca link-ul duce spre un site extern, iar in coltul
-             cardului "raza" mastii radiale de mai jos e deja aproape de zero,
-             asa ca daca ar sta inauntru ar disparea aproape complet. Ramane
-             plin, deasupra stingerii, ca un fel de eticheta lipita pe card. -->
+        {website !== '#' && (
+            <div class="visit-strip">
+                <span class="visit-label" style={`color: ${tier === 'partener' ? 'var(--brand-950)' : '#fff'}`}>
+                    Vizitează website-ul
+                </span>
+                <svg class="visit-arrow" style={`color: ${tier === 'partener' ? 'var(--brand-950)' : '#fff'}`} viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                    <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </div>
+        )}
+
+        <!-- Singurul indiciu vizual, in repaus, ca link-ul duce spre un site
+             extern. Sta in afara placii albe ca sa ramana pe muchia cardului,
+             unde se vede peste sticla. -->
         <span class="corner-notch" aria-hidden="true" style={`display: ${website === '#' ? 'none' : 'block'}`}></span>
     </a>
 </div>
@@ -81,11 +100,13 @@ const accentColor = tierColors[tier ?? ''] ?? 'var(--primary)';
 
     .sponsor-card {
         --card-size:      clamp(140px, 20vw, 200px);
-        --card-bg:        #ffffff;
         --strip-h:        35px;
-        --radius:         14px;
+        /* 18px = activity_card; inainte era 14px, singurul colt de raza asta
+           de pe site. */
+        --radius:         18px;
         --notch:          22px;
         --transition:     0.5s cubic-bezier(0.175, 0.885, 0.32, 1);
+
 
         position:        relative;
         display:         flex;
@@ -98,54 +119,164 @@ const accentColor = tierColors[tier ?? ''] ?? 'var(--primary)';
         outline:         none;
         cursor:          pointer;
         flex-shrink:     0;
-        transition:      transform var(--transition);
         user-select:     none;
+
+        /* Sticla in nuanta DESCHISA de mov, nu in cea intunecata din .glass.
+           Nu e preferinta de culoare, e singurul mod in care siglele pot sta
+           direct pe card: sunt desenate cu cerneala inchisa, pentru fundal
+           deschis. Pe sticla intunecata 9 din 18 cadeau sub 3:1, iar SERA
+           Print House — cerneala rgb(1,1,1) — ajungea la 1.31, negru pe
+           aproape-negru. Aici aceeasi sigla e la ~13:1.
+
+           OPACITATEA VARIAZA, si asta e tot rostul. Prima incercare avea un
+           singur strat la 0.97 peste tot: blur-ul din spate nu se mai vedea
+           nicaieri, deci cardul iesea un dreptunghi plat, fara material.
+           Acum corpul e dens in centru (acolo sta sigla si acolo conteaza
+           contrastul) si se subtiaza spre margini, unde sticla chiar lasa
+           fundalul sa treaca. De aceea e radial, nu liniar: densitatea
+           urmareste sigla, nu o directie.
+
+           Valorile (0.36 centru -> 0.10 margine) sunt cerute explicit, cu
+           compromisul asumat si masurat: la subtirimea asta suprafata ajunge
+           in zona de mijloc, iar acolo se pierd siglele DESCHISE (Online
+           Electro, Universitatea Copiilor, ATI) si cele GRI (Sharp Solutions),
+           nu cele inchise — SERA, cea mai inchisa cerneala, e inca pe la 6:1.
+           Daca vreuna trebuie recuperata, se face punctual, pe cardul ei
+           (logo-metrics.ts masoara oricum luminozitatea fiecarui fisier), nu
+           ingrosand sticla peste tot.
+
+           Peste el, o maturare speculara in diagonala — lumina care cade pe
+           muchie. Ea da senzatia de sticla, nu transparenta in sine. */
+        background:
+            linear-gradient(135deg,
+                rgb(255 255 255 / 0.62) 0%,
+                rgb(255 255 255 / 0.18) 30%,
+                rgb(255 255 255 / 0)    52%),
+            radial-gradient(ellipse 125% 125% at 48% 42%,
+                rgb(var(--brand-050-rgb) / 0.36) 0%,
+                rgb(var(--brand-100-rgb) / 0.28) 55%,
+                rgb(var(--brand-200-rgb) / 0.10) 100%);
+
+        /* Rama alba, nu --glass-border (alb 0.20): pe lavanda deschisa aceea
+           dispare. Alb la 0.55 se vede ca muchie aprinsa fata de pagina
+           intunecata — exact citirea de sticla groasa. */
+        border-color: rgb(255 255 255 / 0.55);
+        box-shadow:
+            0 10px 34px var(--shadow-soft),
+            0 2px 10px rgb(var(--brand-900-rgb) / 0.25),
+            /* muchia speculara de sus */
+            inset 0  1px 0 rgb(255 255 255 / 0.95),
+            /* grosime: umbra interioara jos, ca marginea de jos sa para corp,
+               nu taietura */
+            inset 0 -16px 28px -16px rgb(var(--brand-500-rgb) / 0.50),
+            inset 0 0 0 1px rgb(255 255 255 / 0.18);
         -webkit-user-select: none;
     }
 
-    /* Tot continutul "de suprafata" al cardului (fundal + logo + banda de
-       vizitare) e grupat aici ca sa se stinga IMPREUNA spre
-       margini, ca o vinieta, nu doar textura din spate. Elipsa 100%/100%
-       urmareste forma dreptunghiulara a cardului; platoul opac merge pana la
-       68% din raza ca zona centrala (unde sta sigla) sa ramana intotdeauna
-       plina, iar stingerea reala se vede doar pe ultima treime, spre colturi
-       si margini. Corner-notch-ul ramane deliberat in afara acestui strat
-       (vezi .astro) ca sa nu dispara complet in colt. */
-    .card-fade {
+    /* Placa deschisa pe care sta sigla — echivalentul lui .image-wrapper din
+       membru_card.astro, doar ca deschisa in loc de .glass-inset, din motivul
+       explicat la --logo-plate-bg.
+
+       Inainte aici era un card alb opac cu textura de hexagoane, stins spre
+       margini cu o masca radiala. Masca a disparut odata cu el: rostul ei era
+       sa topeasca placa alba in pagina, iar pe un card de sticla ar fi sters
+       exact muchia si sheen-ul care fac sticla sa se vada. Textura a disparut
+       fiindca statea direct in spatele siglelor. */
+    /* Bloom-ul de sus al sheen-ului, rescris pentru cardul deschis. Cel din
+       global.css e construit pe --glass-hilite (alb 0.30) si --glass-fill
+       (alb 0.07): valori gandite pentru sticla intunecata, unde albul slab se
+       vede. Pe lavanda deschisa nu se distinge nimic, deci sheen-ul — adica
+       tocmai stratul care face suprafata sa para lucioasa — lipsea cu totul.
+       Aici albul urca pana la 0.85 si se stinge mai devreme, ca sa ramana o
+       lumina clara sus, nu o ceata pe tot cardul. */
+    .sponsor-card .glass-sheen::before {
+        background: radial-gradient(ellipse at 50% 0%,
+            rgb(255 255 255 / 0.85) 0%,
+            rgb(255 255 255 / 0.30) 42%,
+            rgb(255 255 255 / 0)    72%);
+    }
+
+    /* Nu mai exista placa: sigla sta direct pe sticla. Elementul ramane doar
+       ca sa tina incadrarea (padding + centrare) si zoom-ul de la hover.
+
+       Istoric, ca sa nu se reintoarca: a fost card alb opac cu textura de
+       hexagoane, apoi placa alba plina, apoi placa stinsa pe margini. Ultima
+       arata a imagine neincarcata — o forma fara contur inauntrul unei rame de
+       sticla cu contur citeste ca eroare de randare, nu ca decizie. Varianta
+       curenta scapa de problema eliminand suprafata, nu incercand sa o ascunda.
+
+       Fara placa, marginile pot fi din nou stranse: nu mai e nicio suprafata
+       alba care sa aiba nevoie de distanta fata de rama, deci caseta siglei
+       revine la ~174px, cat era inainte de toata povestea. */
+    .logo-plate {
         position:        relative;
-        z-index:          0;
+        z-index:         2;
+        flex:            1;
         display:         flex;
-        flex-direction:  column;
-        width:           100%;
-        height:          100%;
-        mask-image:      radial-gradient(ellipse 100% 100% at 50% 50%, black 68%, transparent 100%);
-        -webkit-mask-image: radial-gradient(ellipse 100% 100% at 50% 50%, black 68%, transparent 100%);
+        align-items:     center;
+        justify-content: center;
+        margin:          0;
+        padding:         14px 12px;
+        overflow:        hidden;
+        transition:      transform 0.3s cubic-bezier(0.25, 1, 0.5, 1);
     }
 
-    /* Fundalul alb + textura de hexagoane sta pe un strat separat
-       (::before), sub logo, exact ca bara de navigare
-       (navbar.css nav::before). Nu exista alt fundal opac sub el, asa ca
-       acolo unde masca de mai sus stinge cardul se vede fundalul paginii
-       prin spate. */
-    .card-fade::before {
-        content:        '';
-        position:       absolute;
-        inset:           0;
-        z-index:         0;
-        pointer-events:  none;
-        background-color: var(--card-bg);
-        background-image:
-            url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='64' viewBox='0 0 56 64'%3E%3Cpolygon points='28,8 43.6,17 43.6,35 28,44 12.4,35 12.4,17' fill='%234b219d' fill-opacity='0.10' stroke='%234b219d' stroke-width='1.4' stroke-opacity='0.20'/%3E%3C/svg%3E"),
-            url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='64' viewBox='0 0 56 64'%3E%3Cpolygon points='28,8 43.6,17 43.6,35 28,44 12.4,35 12.4,17' fill='%238453e5' fill-opacity='0.07' stroke='%238453e5' stroke-width='1.4' stroke-opacity='0.14'/%3E%3C/svg%3E");
-        background-position: 0 0, 28px 32px;
-        background-size: 56px 64px;
-        background-repeat: repeat;
+    /* Zoom-ul interior ramane, dar fara translateY: cardul se ridica deja cu
+       6px prin .glass-hover, iar cele doua miscari se adunau. */
+    .sponsor-card:hover .logo-plate,
+    .sponsor-card:focus-visible .logo-plate {
+        transform: scale(1.04);
     }
 
-    .sponsor-card:hover,
-    .sponsor-card:focus-visible {
-        transform:  translateY(-3px);
+    /* Pastila de brand: sigla umple placa si ii preia coltul. Fara caseta cu
+       raport fix — la ele desenul E fisierul, deci n-au ce normaliza. width
+       auto + height 100% tine raportul exact, ca rotunjirea sa urmareasca
+       chiar dreptunghiul colorat, nu o cutie cu benzi goale pe laturi. */
+    /* Pastilele n-au nevoie de placa dedesubt: imaginea lor e opaca si acopera
+       oricum tot ce e sub ea. */
+    .logo-plate.is-chip {
+        /* Padding generos dinadins. Placa tine acum tot cardul, iar pastila,
+           daca o lasi sa-l umple, redevine exact caramida de care scapam —
+           doar ca rosie. Asa ramane o placuta clar asezata pe sticla, cu aer
+           in jur, adica arata ca o alegere. */
+        padding: 18px;
+        /* block, nu flex: ca element de flex, imaginea isi ia latimea de baza
+           din `width: auto` si iesea 0. Ca element de bloc, `height: 100%` +
+           `width: auto` o dimensioneaza dupa propriul raport, exact ce trebuie
+           ca rotunjirea sa urmareasca dreptunghiul colorat. */
+        display: block;
     }
+    .logo-plate.is-chip .sponsor-logo {
+        position:      static;
+        display:       block;
+        margin:        0 auto;
+        width:         auto;
+        height:        100%;
+        max-width:     100%;
+        object-fit:    contain;
+        border-radius: calc(var(--radius) - 6px);
+        transform:     none;
+    }
+
+    /* Sponsorul fara fisier de sigla pe disc (vezi `missing` din
+       logo-metrics.ts): mai bine numele scris, decat o imagine rupta. */
+    .logo-fallback {
+        padding:        0 6px;
+        font-size:      0.82rem;
+        font-weight:    700;
+        line-height:    1.25;
+        text-align:     center;
+        letter-spacing: 0.02em;
+        /* Nu var(--accent): culorile de nivel (platinum #4cafd4, silver
+           #a8b0ba) sunt deschise si se pierd pe lavanda. Si nu mostenit, ca
+           .glass pune alb pe alb. */
+        color:          rgb(var(--brand-900-rgb) / 0.82);
+        overflow-wrap:  anywhere;
+    }
+
+    /* Ridicarea la hover vine din .glass-hover (-6px), ca la carduri de membru
+       si de activitate. Regula veche de aici (-3px) era mai specifica, fiindca
+       Astro scopeaza stilurile componentei, deci ar fi castigat tacut. */
 
     .corner-notch {
         position:   absolute;
@@ -163,25 +294,6 @@ const accentColor = tierColors[tier ?? ''] ?? 'var(--primary)';
     .sponsor-card:focus-visible .corner-notch {
         transform: scale(1.3);
         opacity:   1;
-    }
-
-    .logo-container {
-        position:        relative;
-        z-index:         2;
-        flex:            1;
-        display:         flex;
-        align-items:     center;
-        justify-content: center;
-        /* Fara eticheta de nivel sub sigla, padding-ul poate fi strans: latimea
-           e cea care limiteaza caseta (aspect-ratio fix), asa ca marginile
-           laterale mai mici inseamna direct sigla mai mare. */
-        padding:         clamp(8px, 2vw, 16px) clamp(6px, 1.6vw, 12px);
-        transition:      transform var(--transition);
-        overflow:        hidden;
-    }
-    .sponsor-card:hover .logo-container,
-    .sponsor-card:focus-visible .logo-container {
-        transform: translateY(-4px) scale(1.04);
     }
 
     /* Caseta in care se aseaza sigla. Are raport de aspect FIX (acelasi numar
@@ -207,7 +319,7 @@ const accentColor = tierColors[tier ?? ''] ?? 'var(--primary)';
 
     /* Banda sta ascunsa sub marginea de jos si urca doar la hover, deci nu are
        de ce sa ocupe un rand in coloana: pozitionata absolut, lasa
-       .logo-container sa umple tot cardul, iar sigla iese centrata fata de
+       .logo-plate sa umple tot cardul, iar sigla iese centrata fata de
        card, nu fata de spatiul ramas deasupra benzii. */
     .visit-strip {
         position:        absolute;
@@ -257,7 +369,7 @@ const accentColor = tierColors[tier ?? ''] ?? 'var(--primary)';
         outline-offset: 3px;
     }
 
-    /* @media (prefers-reduced-motion: reduce) {
+    @media (prefers-reduced-motion: reduce) {
         .sponsor-card,
         .sponsor-card * {
             transition: none !important;
@@ -271,7 +383,7 @@ const accentColor = tierColors[tier ?? ''] ?? 'var(--primary)';
         .sponsor-card:focus-visible .visit-strip {
             opacity: 1;
         }
-    } */
+    }
 
     @media (max-width: 860px) {
         .visit-label {

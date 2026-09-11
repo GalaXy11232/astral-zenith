@@ -1,0 +1,100 @@
+---
+/**
+ * Pagina 404.
+ *
+ * Inainte nu exista: orice adresa gresita ajungea la pagina implicita a
+ * hostingului — nestilizata, in engleza si fara nicio cale inapoi in site.
+ *
+ * `activeLink` ramane pe -1 (implicitul din NavBar), fiindca 404 nu corespunde
+ * niciunei intrari din meniu.
+ */
+import BaseLayout from "../layouts/BaseLayout.astro";
+import NavBar from "../components/NavBar.astro";
+import Footer from "../components/footer.astro";
+import Hexbackground from "../components/hexbackground.astro";
+---
+
+<BaseLayout
+    title="Pagina nu a fost gasita"
+    description="Pagina cautata nu exista. Intoarce-te la pagina principala a echipei de robotica Zenith 19084.">
+    <NavBar />
+    <Hexbackground />
+
+    <main id="main-content" class="notfound">
+        <p class="notfound__code" aria-hidden="true">404</p>
+        <h1 class="notfound__title">Pagina nu a fost găsită</h1>
+        <p class="notfound__text">
+            Linkul pe care l-ai urmat nu duce nicăieri — poate a fost mutat sau
+            șters între timp.
+        </p>
+
+        <div class="notfound__actions">
+            <a class="notfound__btn glass glass-hover" href="/">
+                <span class="glass-sheen" aria-hidden="true"></span>
+                Înapoi la pagina principală
+            </a>
+            <a class="notfound__link" href="/contact">Scrie-ne dacă ceva e stricat</a>
+        </div>
+    </main>
+
+    <Footer />
+</BaseLayout>
+
+<style>
+    .notfound {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 0.9rem;
+        min-height: 60vh;
+        padding: 4rem 1.5rem 6rem;
+        text-align: center;
+    }
+
+    .notfound__code {
+        margin: 0;
+        font-size: clamp(4rem, 18vw, 9rem);
+        font-weight: 800;
+        line-height: 1;
+        color: var(--brand-500);
+        opacity: 0.45;
+    }
+
+    .notfound__title {
+        margin: 0;
+        font-size: clamp(1.4rem, 4vw, 2.1rem);
+        color: var(--glass-text);
+    }
+
+    .notfound__text {
+        max-width: 46ch;
+        margin: 0;
+        line-height: 1.6;
+        color: var(--glass-text-soft);
+    }
+
+    .notfound__actions {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1rem;
+        margin-top: 1.4rem;
+    }
+
+    .notfound__btn {
+        padding: 0.85rem 1.9rem;
+        border-radius: 999px;
+        font-weight: 600;
+        letter-spacing: 0.04em;
+        text-decoration: none;
+        color: var(--glass-text);
+    }
+
+    .notfound__link {
+        color: var(--glass-text-dim);
+        font-size: 0.92rem;
+    }
+
+    .notfound__link:hover { color: var(--glass-text-soft); }
+</style>
