@@ -137,13 +137,28 @@ const { date, title,  image, imageAlt, scale_factor = 1} = Astro.props;
         .result-card__date {
             position: static;
             display: inline-block;
-            margin-bottom: 0.75rem;
+            margin-bottom: 0.5rem;
+            padding: 0.3rem 0.85rem;
+            font-size: 0.75rem;
         }
 
+        /* Pe coloana, sigla nu mai sta langa text, ci deasupra lui — la 104px
+           plus 24px de padding de jur imprejur impingea titlul in jumatatea de
+           jos a ecranului inca de la primul card. */
         .result-card__panel {
             flex-direction: column;
             text-align: center;
+            gap: 0.85rem;
+            padding: 1rem;
+            border-radius: 0.85rem;
         }
+
+        .result-card__media {
+            width: calc(4.75rem * var(--media-scale, 1));
+        }
+
+        .result-card__title       { font-size: 1rem; margin-bottom: 0.35rem; }
+        .result-card__description { font-size: 0.95rem; line-height: 1.45; }
 
         .result-card__panel::before {
             display: none;

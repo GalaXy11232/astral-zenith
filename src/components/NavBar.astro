@@ -5,13 +5,13 @@
  * scroll). Ambele se randeaza in HTML ca schimbarea sa nu depinda de JS.
  */
 const home_button_src = {
-    dark:  "/assets/Logo_alb.png",
-    light: "/assets/Logo_mov.png",
+    dark:  "/assets/Logo_alb.webp",
+    light: "/assets/Logo_mov.webp",
 };
 
 // Colegiul National „Grigore Moisil” — acelasi link ca pe pagina de sponsori
 const school = {
-    logo: "/assets/parteneri/Sigla_CNGM.png",
+    logo: "/assets/parteneri/Sigla_CNGM.webp",
     name: "Colegiul Național „Grigore Moisil”",
     website: "https://www.moisil.ro/"
 };
@@ -318,6 +318,53 @@ const links = [
         })();
     }
 
+    /**
+     * Plasa de siguranta pentru limba salvata: o reaplica pe documentul curent
+     * daca nimeni altcineva n-a facut-o.
+     *
+     * Doua cazuri in care se pierde:
+     *
+     *  - la incarcarea unei pagini in care limba stocata difera de cea
+     *    implicita, flags.js cheama `load_tlib()` FARA callback: aduce
+     *    lib.min.js, dar nu-i cere nimic. Lib incearca sa reia singur
+     *    traducerea cand e gata, insa daca acel drum nu porneste, nimic nu-l
+     *    mai impinge si pagina ramane in romana.
+     *
+     *  - intoarcerea din bfcache (alt tab pe telefon, butonul Inapoi):
+     *    lib.min.js isi pune singur un listener de `pagehide` care REFACE
+     *    textul original cand pagina e pusa deoparte, iar la intoarcere nu mai
+     *    ruleaza niciun script care sa traduca inapoi.
+     *
+     * Semnalul dupa care ne luam e <html lang>: motorul il pune pe limba tinta
+     * cat timp traduce si il da inapoi cand reface originalul, deci e singurul
+     * indiciu din afara ca documentul ASTA e tradus. `translator.finished` nu
+     * e bun de nimic aici — ramane true si dupa ce te-ai mutat pe alta pagina,
+     * fiindca se refera la pagina dinainte.
+     *
+     * Cat timp semnalul lipseste, asteptam: daca lib porneste singur, punem
+     * mana pe frana; daca nu porneste, cerem noi traducerea. Asteptarea dupa
+     * libReady are acelasi motiv ca in revert_translation(): `load_tlib` isi
+     * cheama callbackul imediat ce window.gt_translate_script exista, chiar
+     * daca scriptul inca n-a rulat, deci `__GT` poate lipsi.
+     */
+    function reapply_translation() {
+        const from = (window as any).gtranslateSettings?.default_language || 'ro';
+        const target = current_language();
+        if (target === from) return;
+
+        const deadline = Date.now() + 8000;
+
+        (function poll() {
+            // motorul s-a apucat (sau a si terminat): nu ne bagam peste el
+            if (document.documentElement.lang === target) return;
+
+            const translator = (window as any).__GT?.translator;
+
+            if (translator?.libReady) translator.translate(from, target);
+            else if (Date.now() < deadline) window.setTimeout(poll, 100);
+        })();
+    }
+
     /** Repicteaza intr-o singura trecere tot ce depinde de limba. */
     function paint_language_ui(language: string) {
         const lang_button = document.querySelector('.lang-toggle') as HTMLElement | null;
@@ -378,6 +425,17 @@ const links = [
         // apel infasurat: ca listener, primul argument ar fi Event, iar
         // parametrul `language` l-ar compara cu 'en' si ar pica mereu pe romana
         document.addEventListener(ev, () => paint_nav_labels());
+    });
+
+    /* Doar pe astro:page-load, nu si pe DOMContentLoaded ca cele de mai sus:
+       ClientRouter il trimite oricum si la prima incarcare, iar doua apeluri ar
+       insemna doua treceri peste toata pagina. */
+    document.addEventListener('astro:page-load', reapply_translation);
+
+    /* `pageshow` persistat nu reruleaza scripturile si nu da astro:page-load,
+       deci intoarcerea din bfcache are nevoie de propriul carlig. */
+    window.addEventListener('pageshow', (event) => {
+        if (event.persisted) reapply_translation();
     });
 </script>
 

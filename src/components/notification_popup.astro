@@ -70,7 +70,7 @@ const {
         <span class="notif__content">
             <span class="notif__badge">
                 <span class="notif__dot" aria-hidden="true"></span>
-                {intensity === "bold" ? "Noutate!!!" : "Noutate"}
+                Noutate
             </span>
             <span class="notif__text">{text}</span>
 
@@ -305,16 +305,33 @@ const {
         50% { transform: scale(0.7); opacity: 0.4; }
     }
 
-    @media (max-width: 420px) {
+    /*
+     * Pe telefon notificarea ocupa 320px dintr-un ecran de 375 — 85% — si sunt
+     * doua, una peste alta, chiar peste hero. La 72vw raman ~270px: se citeste
+     * la fel de bine, dar pagina de dedesubt nu mai dispare sub ele.
+     */
+    @media (max-width: 700px) {
         .notif {
-            width: clamp(230px, 92vw, 320px);
+            width: clamp(220px, 72vw, 280px);
         }
         .notif__link {
-            padding: 0.9rem 1rem;
+            gap: 0.7rem;
+            padding: 0.8rem 0.9rem;
         }
         .notif__image {
-            width: 3.6rem;
-            height: 3.6rem;
+            width: 3rem;
+            height: 3rem;
+        }
+        .notif__text {
+            font-size: 0.88rem;
+            line-height: 1.35;
+        }
+        .notif__cta {
+            font-size: 0.76rem;
+        }
+        .notif__badge {
+            font-size: 0.62rem;
+            padding: 0.15rem 0.45rem;
         }
     }
 </style>

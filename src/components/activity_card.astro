@@ -26,7 +26,7 @@ const uid = uidProp ?? ('activity-' + String(title)
     .slice(0, 48));
 ---
 
-<div style = "margin: 5rem 3rem;">
+<div class="activity-card-wrap">
     <article class="activity-card glass">
         <span class="glass-sheen" aria-hidden="true"></span>
         {/* Fara conditia asta, o activitate fara coperta randa <img src="">,
@@ -88,6 +88,14 @@ const uid = uidProp ?? ('activity-' + String(title)
 </div>
 
 <style>
+    /* Era `style="margin: 5rem 3rem"` scris in atribut, deci nu se putea
+       schimba pe telefon. Pe un ecran de 375px cei 3rem laterali lasau cardului
+       74% din latime, iar cele 5rem de sus si de jos puneau 80px de gol intre
+       doua activitati — pe 71 de carduri, aproape zece ecrane numai de spatiu. */
+    .activity-card-wrap {
+        margin: 5rem 3rem;
+    }
+
     /* sticla vine din .glass (global.css) */
     .activity-card {
         border-radius: 18px;
@@ -219,12 +227,41 @@ const uid = uidProp ?? ('activity-' + String(title)
         border-radius:  3px;
     }
 
+    @media (max-width: 700px) {
+        .activity-card-wrap {
+            margin: 2rem 1rem;
+        }
+
+        /* Coperta avea 280px fixi, adica peste o treime din inaltimea ecranului
+           inainte sa apara titlul. */
+        .thumbnail-wrap {
+            height: 190px;
+            border-radius: 14px 14px 0 0;
+        }
+
+        .activity-card {
+            border-radius: 14px;
+        }
+    }
+
     @media (max-width: 520px) {
         .card-body {
             padding: 1.1rem 1.1rem 1.4rem;
         }
         .card-title {
             font-size: 1rem;
+        }
+        .card-content-inner :global(p) {
+            font-size: 1rem;
+            line-height: 1.5;
+        }
+
+        /* Taietura previzualizarii se calculeaza din line-height x font-size
+           (vezi comentariul de la .card-content). Aici paragraful a trecut pe
+           1rem / 1.5, deci factorul nu mai e 1.66em, ci 1.5em — fara randul
+           asta previzualizarea ar arata 3.3 randuri in loc de 3. */
+        .card-content {
+            max-height: calc(1.5em * var(--preview-lines, 3) + 0.4em);
         }
     }
 

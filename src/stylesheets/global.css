@@ -148,7 +148,15 @@
     --nav-btn-bg:              rgb(var(--brand-200-rgb) / 0.12);
     --nav-btn-bg-hover:        rgb(var(--brand-200-rgb) / 0.24);
     --nav-btn-border:          rgb(var(--brand-100-rgb) / 0.34);
+    /* Sertarul mobil e transparent aici si tot ce se vede prin el e voalul
+       .mobile-background-blur de dedesubt, care face blurul. Pe tema deschisa
+       sertarul are nevoie de suprafata proprie, altfel ar ramane un panou
+       plin — vezi tokenii din :root[data-theme="light"]. */
     --mobile-nav-bg:           #1e075900;
+    --mobile-nav-filter:       none;
+    /* Voalul de sub sertar. Separat de --scrim fiindca lightboxul galeriei
+       foloseste --scrim si pe tema deschisa il vrea inchis. */
+    --mobile-scrim:            var(--scrim);
 
     /* ─── Footer ─────────────────────────────────────────────────────── */
     --footer-bg: linear-gradient(160deg, var(--brand-900) 0%, var(--brand-950) 100%);
@@ -287,7 +295,22 @@
     --nav-btn-bg:       rgb(var(--brand-800-rgb) / 0.08);
     --nav-btn-bg-hover: rgb(var(--brand-800-rgb) / 0.16);
     --nav-btn-border:   rgb(var(--brand-700-rgb) / 0.28);
-    --mobile-nav-bg:    #ffffff;
+    /* Era #ffffff plin: sertarul acoperea complet pagina, deci pe tema
+       deschisa meniul aparea ca un dreptunghi alb, fara blurul care se vede
+       pe tema intunecata. Acum e sticla ca restul suprafetelor — alb
+       translucid peste un voal deschis, prin care pagina se ghiceste. */
+    --mobile-nav-bg:     rgb(255 255 255 / 0.40);
+    --mobile-nav-filter: blur(14px) saturate(180%);
+    /* --scrim e brand-950 la 0.35, adica un voal inchis: sub albul de mai sus
+       ar fi iesit un panou murdar, iar textul (brand-700) ar fi pierdut
+       contrast. Lavanda deschisa tine meniul in familia temei.
+
+       Alfa-urile sunt alese impreuna: pagina razbate prin amandoua straturile
+       in proportie de (1 - 0.40) * (1 - 0.28) = 0.43, apropiat de cei 0.50 pe
+       care ii lasa voalul singur pe tema intunecata — deci meniul se citeste
+       la fel in ambele teme. Textul (brand-700) ramane la ~7.4:1 chiar si in
+       cazul cel mai prost, peste hexagoanele lavanda. */
+    --mobile-scrim:      rgb(var(--brand-100-rgb) / 0.28);
     /* Sublinierea paginii active: brand-400 e ~2.2:1 pe alb, adica marcajul
        "unde sunt" aproape dispare. brand-700 il tine vizibil. */
     --navlink_underline_color: var(--brand-700);
@@ -335,12 +358,13 @@
    alb linia practic dispare si cutiile n-au margine. Alfa a urcat de la
    0.45 la 0.75 — la 0.45 linia inca nu se vedea peste fundalul deschis.
 
-   Grosimea e 4px, ceruta explicit. Nu strica asezarea: box-sizing e
-   border-box global, deci cei 4px intra in latimea cutiei, nu se adauga
-   la ea. */
+   Grosimea e 2px: la 4px, cat era ceruta initial, conturul nu se mai citea
+   ca o linie, ci ca o rama groasa in jurul continutului. Nu strica asezarea:
+   box-sizing e border-box global, deci grosimea intra in latimea cutiei, nu
+   se adauga la ea. */
 :root[data-theme="light"] .activity-card.glass,
 :root[data-theme="light"] .member-card.glass {
-    border-width: 4px;
+    border-width: 2px;
     border-color: rgb(var(--brand-700-rgb) / 0.75);
 }
 
@@ -351,7 +375,7 @@
    deschisa, adica sub cel din repaus, deci hover-ul ar fi palit, nu
    aprins. */
 :root[data-theme="light"] .member-card.glass-hover:hover {
-    border-width: 4px;
+    border-width: 2px;
     border-color: rgb(var(--brand-700-rgb) / 0.95);
 }
 
@@ -655,6 +679,19 @@ h1, h2, h3 { font-family: 'Prompt', sans-serif; }
     padding: .75rem;
 }
 
+/* Titlul in sine ramane la 25px (clamp-ul il tine deja jos pe telefon), dar
+   casetele din jur — 2rem sub container si .75rem de jur imprejur — adaugau
+   62px de inaltime pentru doua cuvinte. */
+@media (max-width: 700px) {
+    .title-container {
+        margin-bottom: 1.25rem;
+    }
+
+    .title-underline {
+        padding: .4rem .5rem;
+    }
+}
+
 .title-underline::after {
     position: absolute;
     content: "";
@@ -755,6 +792,33 @@ h1, h2, h3 { font-family: 'Prompt', sans-serif; }
     margin-bottom: 40px;
     color: var(--glass-text);
     text-align: center;
+}
+
+/* Cardurile glisante pe telefon: 400px de inaltime minima si 40px de padding
+   sunt masuri de desktop. Pe un ecran de 812px cardul lua jumatate din el,
+   aproape tot gol sub text. */
+@media (max-width: 700px) {
+    .obiectiv {
+        padding: 24px 22px 30px;
+        min-height: 300px;
+    }
+
+    .obiectiv .titlu {
+        font-size: 21px;
+        margin-bottom: 22px;
+    }
+
+    .obiectiv .paragraf {
+        font-size: 0.95rem;
+    }
+
+    .swiper {
+        padding-top: 30px;
+    }
+
+    .targets {
+        min-height: 0;
+    }
 }
 
 .obiectiv .paragraf {

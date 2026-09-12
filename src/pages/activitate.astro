@@ -88,3 +88,20 @@ const carduri = await Promise.all(activitati.map(async (activitate) => {
 
     <Footer />
 </BaseLayout>
+
+<style is:global>
+    /* Cardurile cresc cu o tranzitie pe max-height (vezi activity_card.astro).
+       Ancorarea de scroll a browserului isi alege un reper de sub punctul care
+       creste si compenseaza mutand pozitia de scroll — masurat: -51px la un
+       card din mijlocul paginii, adica exact saltul "in sus" pe care il simti
+       cand apesi pe "Citeste mai mult".
+
+       Regula trebuie sa stea pe scroller (radacina), nu pe card:
+       overflow-anchor pe .card-content scoate doar cardul din lista de
+       repere, iar reperul ales e oricum in afara lui, deci nu schimba nimic.
+
+       is:global, dar numai pe pagina asta: ClientRouter schimba <head>-ul la
+       fiecare navigare, deci regula nu ajunge pe restul site-ului, unde
+       ancorarea e utila (imagini lazy care se incarca deasupra ecranului). */
+    html { overflow-anchor: none; }
+</style>

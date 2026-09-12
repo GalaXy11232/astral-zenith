@@ -24,4 +24,20 @@
         max-width: 1400px; 
         width: 100%;
     }
+
+    /*
+     * Pe telefon incapea un singur card pe rand: 200px de card plus 32px de
+     * spatiu cer 432px, iar ecranul are 375. Cele 53 de persoane ieseau pe
+     * douazeci si sase de ecrane de derulat.
+     *
+     * Spatiul scade la 12px si apare o margine laterala, iar cardul se ingusteaza
+     * din membru_card.astro pana la `calc(50% - 6px)` — adica exact doua pe rand,
+     * la orice latime de telefon, fara sa ghicim un numar fix de pixeli.
+     */
+    @media (max-width: 700px) {
+        .team-grid {
+            gap: .75rem;
+            padding-inline: 1rem;
+        }
+    }
 </style>

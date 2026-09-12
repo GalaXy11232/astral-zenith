@@ -18,11 +18,6 @@ const {
 } = Astro.props;
 ---
 
-<!-- Versiune FIXATA. Era `@google/model-viewer` fara versiune, adica unpkg
-     servea mereu ultima publicata: o schimbare incompatibila la ei strica
-     hero-ul de pe prima pagina fara sa atingem noi nimic. -->
-<script type="module" src="https://unpkg.com/@google/model-viewer@4.0.0/dist/model-viewer.min.js"></script>
-
 <section class="hero">
 
     <div class="hero-inner">
@@ -436,6 +431,47 @@ const {
 </style>
 
 <script>
+    /*
+     * Motorul model-viewer are 256 KB gzipped si se descarca de pe unpkg la
+     * FIECARE deschidere a paginii de start, desi modelul propriu-zis (37 MB)
+     * e deja amanat cum trebuie: <model-viewer> are reveal="manual" si tine
+     * calea in data-src, deci nu se incarca nimic pana nu apesi butonul.
+     * Motorul urmeaza acum aceeasi regula ca modelul pe care il deseneaza.
+     *
+     * Promisiunea sta la nivel de modul, nu in initHero(): scriptul se
+     * executa o singura data, deci ramane o singura descarcare chiar daca
+     * treci de mai multe ori prin pagina cu ClientRouter sau apesi butonul
+     * inainte si inapoi.
+     *
+     * Versiune FIXATA. Era `@google/model-viewer` fara versiune, adica unpkg
+     * servea mereu ultima publicata: o schimbare incompatibila la ei strica
+     * hero-ul de pe prima pagina fara sa atingem noi nimic.
+     */
+    const MODEL_VIEWER_SRC =
+        'https://unpkg.com/@google/model-viewer@4.0.0/dist/model-viewer.min.js';
+
+    let enginePromise: Promise<void> | null = null;
+
+    function loadModelViewer(): Promise<void> {
+        if (enginePromise) return enginePromise;
+
+        enginePromise = new Promise<void>((resolve, reject) => {
+            const script = document.createElement('script');
+            script.type = 'module';
+            script.src = MODEL_VIEWER_SRC;
+            script.addEventListener('error', () => reject(new Error('model-viewer nu s-a incarcat')), { once: true });
+            document.head.appendChild(script);
+
+            /* `load` pe un <script type="module"> se declanseaza cand s-a
+               executat modulul, dar elementul custom se inregistreaza tot
+               atunci — whenDefined e semnalul corect, si acopera si cazul in
+               care scriptul era deja in pagina din alt motiv. */
+            customElements.whenDefined('model-viewer').then(() => resolve());
+        });
+
+        return enginePromise;
+    }
+
     function initHero() {
         const toggle      = document.getElementById('model-toggle') as HTMLButtonElement;
         const photoView   = document.getElementById('robot-photo-view') as HTMLDivElement;
@@ -452,6 +488,13 @@ const {
  
         let modelLoaded  = false;
         let modelShowing = false;
+ 
+        function failSpinner(message: string) {
+            spinner.style.display = 'flex';
+            spinner.querySelector('.spinner-label')!.textContent = message;
+            spinner.querySelector('.spinner-ring')!.setAttribute(
+                'style', 'animation-play-state:paused;border-top-color:var(--danger);');
+        }
  
         function showModel() {
             photoView.classList.remove('visible');
@@ -473,12 +516,19 @@ const {
  
                 modelViewer.addEventListener('error', (event: any) => {
                     console.error('model-viewer failed to load the model', event.detail ?? event);
-                    spinner.querySelector('.spinner-label')!.textContent = 'Modelul nu a putut fi încărcat';
-                    spinner.querySelector('.spinner-ring')!.setAttribute('style', 'animation-play-state:paused;border-top-color:var(--danger);');
+                    failSpinner('Modelul nu a putut fi încărcat');
                 }, { once: true });
  
-                modelViewer.setAttribute('src', modelViewer.dataset.src ?? '');
-                modelViewer.dismissPoster?.();
+                /* Motorul intai, modelul dupa. Ascultatorii de mai sus se pot
+                   pune de pe acum: raman pe acelasi nod si dupa ce elementul
+                   custom se ridica. */
+                loadModelViewer().then(() => {
+                    modelViewer.setAttribute('src', modelViewer.dataset.src ?? '');
+                    modelViewer.dismissPoster?.();
+                }).catch((error: any) => {
+                    console.error(error);
+                    failSpinner('Modelul nu a putut fi încărcat');
+                });
             } else {
                 spinner.style.display = 'none';
             }

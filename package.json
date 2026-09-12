@@ -7,6 +7,7 @@
   },
   "scripts": {
     "dev": "astro dev",
+    "dev:host": "astro dev --host",
     "images": "node scripts/optimize-images.mjs",
     "build": "npm run images && astro build",
     "preview": "astro preview",

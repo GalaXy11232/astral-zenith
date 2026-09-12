@@ -71,7 +71,12 @@ import ClientRouter from "astro/components/ClientRouter.astro";
 		     prima litera desenata. -->
 		<link rel="preconnect" href="https://fonts.googleapis.com" />
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-	    <link href="https://fonts.googleapis.com/css2?family=Prompt:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+		<!-- Doar greutatile folosite. Se cereau toate noua, si inca o data pe
+		     toate in italic — optsprezece variante, din care site-ul foloseste
+		     cinci (400, 500, 600, 700, 800) si niciun italic. Axa `ital,` a
+		     disparut cu totul: fara ea, un <em> ratacit nu mai poate declansa
+		     descarcarea unei fete in plus, il inclina browserul sintetic. -->
+	    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
         <ClientRouter />
 	</head>
@@ -193,8 +198,14 @@ import ClientRouter from "astro/components/ClientRouter.astro";
      * initializeaza. Dupa un swap ClientRouter nu se mai regaseste in DOM-ul
      * nou: __GT.translator.translate() iese pe loc, fara eroare si fara sa
      * atinga nici macar <html lang>, deci pagina in care intri ramane in
-     * romana. Nu il putem repune pe picioare din afara — reincarcarea
-     * scriptului nu ii reface starea interna.
+     * romana.
+     *
+     * S-a incercat si repornirea lui pe loc, fara reincarcare: revert() chiar
+     * ii sterge referinta catre nodul tradus, iar translate() de dupa
+     * reconstruieste parcurgerea peste DOM-ul nou si intoarce true. Numai ca
+     * traducerea tot nu ajunge la capat — translator.finished ramane false —
+     * deci pagina ar fi ramas in romana de tot. Vezi reapply_translation() din
+     * NavBar.astro, care acopera celelalte doua cazuri in care se pierde limba.
      *
      * Cat timp e activa o traducere, scoatem deci linkurile interne din
      * navigarea SPA. `data-astro-reload` face ClientRouter sa lase browserul sa
@@ -221,36 +232,4 @@ import ClientRouter from "astro/components/ClientRouter.astro";
     // butonul de limba din NavBar anunta comutarea, ca la 'theme-change':
     // linkurile trebuie remarcate imediat, nu abia la urmatorul page-load
     window.addEventListener('language-change', mark_internal_links);
-</script>
-
-
-<!-- swiper -->
-<!-- Versiuni exacte, nu `@11`: altfel jsDelivr serveste orice minor nou, iar
-     o regresie la ei devine o regresie la noi, fara niciun commit de partea
-     noastra. `defer` ca sa nu blocheze parserul. -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11.2.6/swiper-bundle.min.css"/>
-<script src="https://cdn.jsdelivr.net/npm/swiper@11.2.6/swiper-bundle.min.js" defer is:inline></script>
-
-<script is:inline>
-    function initSwiper() {
-        new Swiper(".mySwiper", {
-            effect: "coverflow",
-            grabCursor: true,
-            centeredSlides: true,
-            slidesPerView: "auto",
-            initialSlide: Math.floor(document.querySelectorAll('.swiper-slide').length / 2),
-            coverflowEffect: {
-                rotate: 50,
-                stretch: 0,
-                depth: 100,
-                modifier: 0.9,
-                slideShadows: true,
-            },
-            pagination: {
-                el: ".swiper-pagination",
-            },
-        });
-    }
-
-    document.addEventListener('astro:page-load', initSwiper);
 </script>

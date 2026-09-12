@@ -108,6 +108,9 @@ a img {
 .navbar-school {
     display: flex;
     align-items: center;
+    /* Inaltimea o dadea sigla: pe ecran mic ea scade la 42px si tragea linkul
+       sub minimul de 44. */
+    min-height: 44px;
     margin-left: .85rem;
     padding-left: .85rem;
     border-left: 1px solid var(--nav-divider);
@@ -181,6 +184,7 @@ a img {
 /* --- comutator de limba: un singur buton, cu steagul limbii in care intri --- */
 .lang-toggle,
 .theme-toggle {
+    position: relative;
     flex: 0 0 auto;
     display: flex;
     align-items: center;
@@ -191,8 +195,26 @@ a img {
     border-radius: 50%;
     border: 1px solid var(--nav-btn-border);
     background: var(--nav-btn-bg);
-    overflow: hidden;
     cursor: pointer;
+}
+
+/* Discurile au 36px, sub minimul de 44px pentru o tinta apasata cu degetul.
+   Nu le marim — la 44px ar dezechilibra bara — ci crestem doar suprafata care
+   prinde apasarea, cu un disc invizibil de 44px peste ele.
+
+   `inset` negativ, nu width/height: zona creste simetric in jurul butonului,
+   oricat ar fi el de mare. Si de aceea `overflow: hidden` a plecat de pe buton
+   pe steaguri (mai jos): pe buton ar fi retezat exact bucata de ::after care
+   iese in afara si n-ar fi ramas nimic in plus de apasat. */
+.lang-toggle::after,
+.theme-toggle::after {
+    content: '';
+    position: absolute;
+    /* -5px, nu -4px: `inset` se masoara fata de cutia de PADDING a butonului,
+       adica 34px dupa cei doi pixeli de chenar, nu fata de cei 36 pe care ii
+       vezi. 34 + 2x5 = 44. */
+    inset: -5px;
+    border-radius: 50%;
 }
 
 .lang-toggle:hover,
@@ -227,7 +249,10 @@ a img {
 :root[data-theme="light"] .logo-dark  { display: none; }
 :root[data-theme="light"] .logo-light { display: block; }
 
-.lang-flag { display: none; width: 100%; height: 100%; }
+/* `slice` din SVG-uri umple caseta taind ce iese in afara, deci taierea in
+   cerc trebuie sa se intample undeva — pana acum o facea `overflow: hidden`
+   de pe buton. */
+.lang-flag { display: none; width: 100%; height: 100%; border-radius: 50%; overflow: hidden; }
 .lang-flag svg { display: block; width: 100%; height: 100%; }
 
 .lang-toggle[data-target="ro"] .lang-flag--ro { display: block; }
@@ -243,6 +268,12 @@ a img {
         width: 0;
 
         background: var(--mobile-nav-bg);
+        /* Pe tema intunecata tokenul e `none`: sertarul e transparent si
+           blurul il face voalul de dedesubt. Pe tema deschisa sertarul are
+           fundal propriu (alb translucid), deci isi aduce si blurul lui —
+           altfel ar acoperi pagina cu un dreptunghi plin. */
+        backdrop-filter: var(--mobile-nav-filter);
+        -webkit-backdrop-filter: var(--mobile-nav-filter);
         transition: width 0.2s cubic-bezier(0.215, 0.610, 0.355, 1);
     }
 
@@ -292,7 +323,11 @@ a img {
         /* Fara asta primea albastrul implicit de link din Bootstrap — se
            vedea si pe tema intunecata, dar sare in ochi pe meniul alb. */
         color: var(--navlink_color);
-        margin: 1rem 2rem 3rem 0;
+        /* Ca la hamburger: glifa are ~27.8px, prea ingust de apasat. Cei 9px
+           de padding o duc peste 44 si se scad din marginea din dreapta, ca
+           „x"-ul sa ramana cam unde era. */
+        padding: 0 9px;
+        margin: 1rem 1.5rem 3rem 0;
         font-size: min(300%, 12vw);
         text-decoration: none;
         user-select: none;
@@ -316,6 +351,10 @@ a img {
         text-decoration: none;
         font-size: 300%;
         user-select: none;
+        /* Glifa „≡" are 28px latime, deci butonul era 28x72: destul pe
+           verticala, prea ingust pe orizontala pentru un deget. Padding-ul il
+           duce la 44px fara sa mute simbolul. */
+        padding: 0 8px;
     }
 
     .mobile-background-blur {
@@ -327,7 +366,7 @@ a img {
         /* display: none; */
         pointer-events: none;
 
-        background: var(--scrim);
+        background: var(--mobile-scrim);
         backdrop-filter: blur(12px) saturate(180%);
         transition: .5s cubic-bezier(0.215, 0.610, 0.355, 1);
     }

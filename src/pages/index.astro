@@ -31,7 +31,7 @@ import VideoTextSplitSection from "../components/main/video_text_split_section.a
         
         <NotificationPopup 
             text="Aruncă un ochi asupra performanței noastre la unul dintre cele mai prestigioase evenimente FTC!"
-            image="/assets/stiri/istanbul/event icon.png"
+            image="/assets/stiri/istanbul/event icon.webp"
             storage_entry="istanbul"
             link="/news/#event-istanbul"
             side = 'left'
@@ -41,7 +41,7 @@ import VideoTextSplitSection from "../components/main/video_text_split_section.a
         />
         <NotificationPopup 
             text="Am creat și un joc despre FTC care sigur o să îți placă!"
-            image="/assets/Super Into the Deep Icon.png"
+            image="/assets/Super Into the Deep Icon.webp"
             storage_entry="jocintothedeep"
             link="#gamenotif-id"
             side = 'left'
@@ -56,7 +56,7 @@ import VideoTextSplitSection from "../components/main/video_text_split_section.a
     <HeroSection 
         motto = 'Visions above ground'
         subtitle = "Echipa de robotică a Colegiului Național „Grigore Moisil”"
-        robotImage = "/assets/render_sq.png"
+        robotImage = "/assets/render_sq.webp"
         modelSrc="/model robot bengos decode.glb"
     />
 
@@ -87,7 +87,7 @@ import VideoTextSplitSection from "../components/main/video_text_split_section.a
 
 
      <VideoTextSplitSection
-        url = '/assets/Super Into the Deep Bootsplash.png'
+        url = '/assets/Super Into the Deep Bootsplash.webp'
         title = "Vezi și jocul nostru!"
         text_align = 'center'
         glass
@@ -207,3 +207,37 @@ import VideoTextSplitSection from "../components/main/video_text_split_section.a
 
     <Footer />
 </BaseLayout>
+
+<!-- Swiper sta aici, NU in BaseLayout: carusel exista doar pe pagina asta
+     (.mySwiper), iar din layout se descarcau 48 KB de JS+CSS pe toate cele opt
+     pagini, plus un initSwiper() care rula degeaba la fiecare navigare. -->
+<!-- swiper -->
+<!-- Versiuni exacte, nu `@11`: altfel jsDelivr serveste orice minor nou, iar
+     o regresie la ei devine o regresie la noi, fara niciun commit de partea
+     noastra. `defer` ca sa nu blocheze parserul. -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11.2.6/swiper-bundle.min.css"/>
+<script src="https://cdn.jsdelivr.net/npm/swiper@11.2.6/swiper-bundle.min.js" defer is:inline></script>
+
+<script is:inline>
+    function initSwiper() {
+        new Swiper(".mySwiper", {
+            effect: "coverflow",
+            grabCursor: true,
+            centeredSlides: true,
+            slidesPerView: "auto",
+            initialSlide: Math.floor(document.querySelectorAll('.swiper-slide').length / 2),
+            coverflowEffect: {
+                rotate: 50,
+                stretch: 0,
+                depth: 100,
+                modifier: 0.9,
+                slideShadows: true,
+            },
+            pagination: {
+                el: ".swiper-pagination",
+            },
+        });
+    }
+
+    document.addEventListener('astro:page-load', initSwiper);
+</script>

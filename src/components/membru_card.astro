@@ -56,7 +56,7 @@ const departmentEn = DEPARTMENT_EN[department];
             alt={`Portrait of ${name}`} 
             loading="lazy" 
 
-            onerror = "this.src = '/assets/icons/membru no photo zenith.png'"
+            onerror = "this.src = '/assets/icons/membru no photo zenith.webp'"
         />
     </div>
     <div class="info">
@@ -185,5 +185,36 @@ const departmentEn = DEPARTMENT_EN[department];
         line-height: 1.4;
         
         white-space: pre-wrap; 
+    }
+
+    /*
+     * Doua carduri pe rand pe telefon (vezi si membri_grid.astro). Latimea se
+     * leaga de spatiul dintre ele: jumatate din rand minus jumatate din cei
+     * 12px de gap. Restul — padding, colturi, poza, text — scade in aceeasi
+     * proportie, altfel cardul ingustat ar arata ca un card mare inghesuit.
+     */
+    @media (max-width: 700px) {
+        .member-card {
+            max-width: calc(50% - .375rem);
+            padding: 12px;
+            border-radius: 16px;
+        }
+
+        .image-wrapper {
+            border-radius: 12px;
+            margin-bottom: 12px;
+        }
+
+        .info { gap: 3px; }
+
+        .name       { font-size: .95rem; }
+        .department { font-size: .8rem; line-height: 1.3; }
+
+        /* Doar eticheta si spatiile. Latimea casetei NU se atinge: `fit-content`
+           impreuna cu left:0 / right:0 o tine inauntrul cardului, iar orice
+           incercare de a o largi (max-content) o scoate din ecran — cardul are
+           165px, caseta ar fi cerut 225. */
+        .facultate-tooltip > i { font-size: .75rem; }
+        .facultate-tooltiptext { padding: 5px .9em; }
     }
 </style>

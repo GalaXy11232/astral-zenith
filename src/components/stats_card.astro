@@ -96,14 +96,36 @@ const { end, label, icon, duration = 1500, iconAlt } = Astro.props;
                 drop-shadow(0 2px 3px var(--shadow-soft));
     }
 
+    /*
+     * Doua casute pe rand pe telefon (vezi .stats-grid din rezultate.astro),
+     * deci fiecare are ~165px. Iconita si cifra, gandite pentru un card de
+     * 280px, trebuie sa scada odata cu el; altfel textul „Participare
+     * evenimente" nu mai are unde sa incapa langa bula de 55px.
+     */
+    @media (max-width: 700px) {
+        .stat-card {
+            gap: .5rem;
+            padding: .9rem .85rem;
+            border-radius: 1rem;
+        }
+
+        .stat-card__number { font-size: clamp(1.35rem, 6vw, 1.9rem); }
+        .stat-card__label  { margin-top: .3rem; font-size: .78rem; line-height: 1.25; }
+
+        .stat-card__icon {
+            width: 2.3rem;
+            height: 2.3rem;
+        }
+    }
+
     @media (max-width: 420px) {
         .stat-card {
-            padding: 1.35rem 1.15rem;
+            padding: .8rem .7rem;
         }
 
         .stat-card__icon {
-            width: 3.1rem;
-            height: 3.1rem;
+            width: 2rem;
+            height: 2rem;
         }
     }
 </style>

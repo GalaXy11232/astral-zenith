@@ -116,6 +116,25 @@ const CONFIG = {
     },
 };
 
+/*
+ * Pe telefon scena asta costa mult mai mult decat arata: 14 inele x 12
+ * hexagoane inseamna 168 de desenari pe cadru, cu antialiasing, la doua ori
+ * densitatea ecranului — pe un ecran de 3x asta e de patru ori mai multi
+ * fragmenti decat are nevoie. Reducem numarul de forme si desenam la 1x;
+ * cilindrul arata la fel, fiindca oricum se pierde in ceata dupa cateva inele.
+ *
+ * Functie, nu constanta: ClientRouter tine modulul incarcat intre pagini, deci
+ * o valoare calculata o singura data ar ramane blocata pe latimea de la prima
+ * incarcare (ex. rotirea telefonului, sau fereastra redimensionata pe desktop).
+ */
+const isPhone = () => window.matchMedia('(max-width: 700px)').matches;
+
+/* Ecran tactil: nu exista cursor dupa care sa se miste paralaxa, deci nici
+   ascultatorul de mousemove n-are ce cauta acolo. */
+const isCoarsePointer = () => window.matchMedia('(pointer: coarse)').matches;
+
+const MOBILE_CYLINDER = { rings: 8, hexPerRing: 8 };
+
 const pick = <T>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)];
 
 async function initBackground() {
@@ -135,8 +154,9 @@ async function initBackground() {
     const theme = themeColors();
 
     // Renderer
-    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    const phone = isPhone();
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: !phone, alpha: false });
+    renderer.setPixelRatio(phone ? 1 : Math.min(window.devicePixelRatio, 2));
     renderer.setSize(window.innerWidth, window.innerHeight);
 
     // Scene
@@ -175,7 +195,8 @@ async function initBackground() {
     hexGeo.rotateX(Math.PI / 2);
 
     // Build rings
-    const { radius, hexPerRing, rings, ringSpacing, yOffset } = CONFIG.cylinder;
+    const { radius, ringSpacing, yOffset } = CONFIG.cylinder;
+    const { rings, hexPerRing } = phone ? MOBILE_CYLINDER : CONFIG.cylinder;
     const ringGroups: any[] = [];
 
     for (let r = 0; r < rings; r++) {
@@ -220,7 +241,8 @@ async function initBackground() {
         targetRotY =  (e.clientX / window.innerWidth  - 0.5) * 2 * CONFIG.motion.parallax;
         targetRotX = -(e.clientY / window.innerHeight - 0.5) * 2 * CONFIG.motion.parallax;
     };
-    window.addEventListener('mousemove', onMouse);
+    const wantsParallax = !isCoarsePointer();
+    if (wantsParallax) window.addEventListener('mousemove', onMouse);
 
     const onResize = () => {
         camera.aspect = window.innerWidth / window.innerHeight;
@@ -295,9 +317,22 @@ async function initBackground() {
 
     animate();
 
+    /*
+     * Bucla nu se oprea niciodata. Pe telefon o pagina lasata deschisa intr-un
+     * tab din fundal continua sa invarta hexagoanele: browserul incetineste
+     * rAF, dar nu il opreste, si scena tot se deseneaza. O oprim de tot cat
+     * timp pagina nu se vede si o repornim la intoarcere.
+     */
+    const onVisibility = () => {
+        if (document.hidden) cancelAnimationFrame(rafId);
+        else if (!reduceMotion.matches) animate();
+    };
+    document.addEventListener('visibilitychange', onVisibility);
+
     const cleanup = () => {
         cancelAnimationFrame(rafId);
-        window.removeEventListener('mousemove', onMouse);
+        if (wantsParallax) window.removeEventListener('mousemove', onMouse);
+        document.removeEventListener('visibilitychange', onVisibility);
         window.removeEventListener('resize', onResize);
         renderer.dispose();
         hexGeo.dispose();

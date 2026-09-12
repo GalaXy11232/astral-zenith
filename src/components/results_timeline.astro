@@ -13,7 +13,24 @@
         position: relative;
         max-width: 64rem;
         margin-inline: auto;
-        padding: 3rem 1rem;
+        padding: 3rem var(--rail-pad);
+
+        /*
+         * Linia si stelele se asezau din numere scrise de mana si nu cadeau
+         * una peste alta: pe desktop centrul stelei ratea linia cu 0.4px in
+         * fiecare parte (deci 0.8px intre steaua din stanga si cea din
+         * dreapta), iar pe mobil cu 13px.
+         *
+         * Diferenta vine din faptul ca cele doua se masoara de la lucruri
+         * diferite: linia e pozitionata absolut, deci fata de cutia de
+         * PADDING a containerului, iar steaua e un ::after pe card, deci fata
+         * de cutia de CONTINUT — cu --rail-pad mai la dreapta. De aceea orice
+         * offset de stea scade --rail-pad, iar restul iese din aceleasi trei
+         * masuri de mai jos.
+         */
+        --rail-pad:  1rem;    /* padding-ul orizontal al containerului */
+        --star-size: .75rem;
+        --rail-gap:  2.5rem;  /* de la marginea cardului la centrul liniei */
     }
 
     .results-timeline__line {
@@ -43,8 +60,8 @@
         content: "";
         position: absolute;
         top: 4.4rem;
-        width: .75rem;
-        height: .75rem;
+        width: var(--star-size);
+        height: var(--star-size);
         background: linear-gradient(135deg, var(--brand-300), var(--brand-500));
         clip-path: polygon(
             50% 0%,
@@ -63,7 +80,7 @@
 
     @media (min-width: 980px) {
         .results-timeline__items > :global(*) {
-        width: calc(50% - 2.5rem);
+        width: calc(50% - var(--rail-gap));
         }
 
         .results-timeline__items > :global(*:nth-child(odd)) {
@@ -76,12 +93,16 @@
             text-align: start !important;
         }
 
+        /* Cardul are latimea calc(50% - --rail-gap), deci marginea lui dinspre
+           centru cade fix la --rail-gap de centrul liniei, indiferent de
+           latimea ecranului. Steaua trebuie impinsa cu inca o jumatate din
+           ea, ca sa se centreze pe linie, nu sa se lipeasca de ea. */
         .results-timeline__items > :global(*:nth-child(odd))::after {
-        right: -2.85rem;
+            right: calc(-1 * (var(--rail-gap) + var(--star-size) / 2));
         }
 
         .results-timeline__items > :global(*:nth-child(even))::after {
-            left: -2.85rem;
+            left: calc(-1 * (var(--rail-gap) + var(--star-size) / 2));
         }
 
         
@@ -100,8 +121,13 @@
 
 
     @media (max-width: 979px) {
+        .results-timeline {
+            /* linia nu mai e in mijloc, ci pe marginea din stanga */
+            --rail-x: 1.4rem;
+        }
+
         .results-timeline__line {
-            left: 1.4rem;
+            left: var(--rail-x);
         }
 
         .results-timeline__items > :global(*) {
@@ -109,8 +135,28 @@
             padding-left: 3rem;
         }
 
+        /* cardul incepe la --rail-pad de cutia de padding, deci offsetul stelei
+           porneste de la linie si scade drumul ala plus jumatate de stea */
         .results-timeline__items > :global(*)::after {
-            left: 0.85rem;
+            left: calc(var(--rail-x) - var(--rail-pad) - var(--star-size) / 2);
+        }
+    }
+
+    /* Pe telefon cardul pierdea 48px in stanga pentru linie si inca 16 de
+       padding, deci ii ramaneau 79% din ecran; iar cele 3.5rem dintre carduri
+       insemnau un gol de 56px la fiecare rezultat. Steaua are ~21px desenati
+       in jurul lui --rail-x (1.4rem), deci 2.25rem lasa loc destul. */
+    @media (max-width: 700px) {
+        .results-timeline {
+            padding: 2rem var(--rail-pad);
+        }
+
+        .results-timeline__items {
+            gap: 2rem;
+        }
+
+        .results-timeline__items > :global(*) {
+            padding-left: 2.25rem;
         }
     }
 </style>

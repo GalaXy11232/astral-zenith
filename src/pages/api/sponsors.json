@@ -5,12 +5,12 @@
         "sponsors": [
             {
                 "name": "Colegiul Național „Grigore Moisil”",
-                "logo": "/assets/parteneri/Sigla_CNGM.png",
+                "logo": "/assets/parteneri/Sigla_CNGM.webp",
                 "website": "https://www.moisil.ro/"
             },
             {
                 "name": "Universitatea Copiilor",
-                "logo": "/assets/parteneri/Sigla_Asociatia_Universitatea_Copiilor.png",
+                "logo": "/assets/parteneri/Sigla_Asociatia_Universitatea_Copiilor.webp",
                 "website": "https://unico.org.ro/"
             }
         ]
@@ -21,7 +21,7 @@
         "sponsors": [
             {
                 "name": "SUPER Foundation",
-                "logo": "/assets/sponsori/Super Foundation.png",
+                "logo": "/assets/sponsori/Super Foundation.webp",
                 "website": "https://www.super.xyz/"
             },
             {
@@ -52,7 +52,7 @@
             },
             {
                 "name": "Arbomedia",
-                "logo": "/assets/sponsori/arbomedia.png",
+                "logo": "/assets/sponsori/arbomedia.webp",
                 "website": "https://arbomedia.ro/"
             }
         ]
