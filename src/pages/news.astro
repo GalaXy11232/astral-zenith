@@ -6,8 +6,6 @@ import Hexbackground from "../components/hexbackground.astro"
 
 import MediaEvent from '../components/media/MediaEvent.astro';
 import MediaLink  from '../components/media/MediaLink.astro';
-import MediaImage from '../components/media/MediaImage.astro';
-import MediaVideo from '../components/media/MediaVideo.astro';
 ---
 
 
@@ -21,6 +19,39 @@ import MediaVideo from '../components/media/MediaVideo.astro';
     <h1 class="sr-only">Zenith 19084 in presa</h1>
 
     <main id="main-content">
+
+    <MediaEvent
+        title="Smart Urban Mobility - Interviu Antena 3 CNN"
+        date="11 octombrie 2026"
+        cover="/assets/stiri/smart-urban-mobility/cover.jpeg"
+        coverAlt="Interviul Antena 3 CNN la standul echipei Zenith, la Meet the Future"
+        coverFocus="50% 35%"
+        uid="event-smart-urban-mobility"
+    >
+        <h3 class="me-section-label">Articole & surse</h3>
+        <div class="me-grid">
+            <MediaLink
+                href="https://www.antena3.ro/conferinte/smart-urban-mobility-elevii-de-la-colegiul-grigore-moisil-au-construit-un-submarin-autonom-care-exploreaza-zone-greu-accesibile-806722.html"
+                source="Antena 3 CNN"
+                label="Elevii de la Colegiul „Grigore Moisil” au construit un submarin autonom care explorează zone greu accesibile"
+            />
+            <MediaLink
+                href="https://www.antena3.ro/life/timp-liber/roboti-construiti-de-elevi-si-mobilitatea-urmatorilor-cinci-ani-meet-the-future-smart-urban-mobility-in-cadrul-sab-accesorii-806571.html"
+                source="Antena 3 CNN"
+                label="Roboți construiți de elevi și mobilitatea următorilor cinci ani: „Meet the Future”"
+            />
+            <MediaLink
+                href="https://incomemagazine.ro/roboti-construiti-de-elevi-si-mobilitatea-urmatorilor-cinci-ani-meet-the-future-incheie-smart-urban-mobility-in-cadrul-sab-accesorii/?amp=1"
+                source="Income Magazine"
+                label="„Meet the Future” încheie Smart Urban Mobility, în cadrul SAB & Accesorii"
+            />
+            <MediaLink
+                href="https://www.instagram.com/p/DeWt96AAMJL/"
+                source="Instagram"
+                label="Zenith la Meet the Future - Smart Urban Mobility"
+            />
+        </div>
+    </MediaEvent>
 
     <MediaEvent
         title="Istanbul Premier Event - Premiul Inspire 2"
@@ -52,17 +83,6 @@ import MediaVideo from '../components/media/MediaVideo.astro';
                 label="Elevi din București au obținut locul doi la o competiție internațională de robotică" 
             />
         </div>
-
-        <hr class="me-divider" />
-
-        <h3 class="me-section-label">Galerie foto</h3>
-        <div class="me-media-grid">
-            <MediaImage src = "/assets/activitati/2026-06-26-istanbul-premier-event/IMG_2111.webp" alt = 'poza istanbul' />
-            <MediaImage src = "/assets/activitati/2026-06-26-istanbul-premier-event/istanbul.webp" alt = 'poza istanbul' />
-            <MediaImage src = "/assets/activitati/2026-06-26-istanbul-premier-event/WhatsApp Image 2026-06-30 at 2.04.47 AM.webp" alt = 'poza istanbul' />
-            <MediaImage src = "/assets/activitati/2026-06-26-istanbul-premier-event/WhatsApp Image 2026-06-30 at 2.04.51 AM (2).webp" alt = 'poza istanbul' />
-            <!-- <MediaVideo src="https://www.youtube.com/watch?v=_koqmYqoH6g" poster="/assets/galerie/6_Meet_The_Future,_13_ian._2024/DSC07271.webp" /> -->
-        </div>
     </MediaEvent>
 
     <MediaEvent
@@ -78,15 +98,6 @@ import MediaVideo from '../components/media/MediaVideo.astro';
                 source="Prima News"   
                 label = "Viitor pentru România: Robotică și viitor | Zenith, Colegiul „Grigore Moisil”" 
             />
-        </div>
-
-        <hr class="me-divider" />
-
-        <h3 class="me-section-label">Galerie foto & video</h3>
-        <div class="me-media-grid">
-            <MediaImage src="/assets/stiri/prima/prima-news-1.jpeg" alt="Interviu Prima News" />
-            <MediaImage src="/assets/stiri/prima/prima-news-2.jpeg" alt="Interviu Prima News" />
-            <MediaImage src="/assets/stiri/prima/prima-news-3.jpeg" alt="Interviu Prima News" />
         </div>
     </MediaEvent>
     </main>

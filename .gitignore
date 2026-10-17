@@ -29,3 +29,7 @@ dist/
 .vscode/ 
 *.py
 .vercel
+
+# Instructiunile locale pentru Claude Code. Sunt preferinte de mediu, nu cod:
+# fiecare om care lucreaza la site isi tine varianta lui.
+CLAUDE.md

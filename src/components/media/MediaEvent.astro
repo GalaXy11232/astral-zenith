@@ -175,10 +175,43 @@ if (uid == '')
         margin:     0;
     }
 
+    /* Flex, nu grid: cerinta e ca linkurile sa stea pe mijloc, iar o grila
+       lipeste ultimul rand incomplet in stanga — la patru surse, a patra
+       ramanea singura sub prima coloana. Cu flex + justify-content: center
+       randul incomplet se centreaza.
+       Coloanele au latime FIXA (o treime, o doime), nu flex-grow: cu grow,
+       linkul ramas singur s-ar intinde pe toata latimea in loc sa se
+       centreze. Cate coloane incap decide container query-ul de mai jos,
+       dupa latimea grilei, nu a ecranului — cardul are max-width 860px. */
     .me-body :global(.me-grid) {
-        display:               grid;
-        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-        gap:                   10px;
+        container-type:  inline-size;
+        display:         flex;
+        flex-wrap:       wrap;
+        justify-content: center;
+        gap:             10px;
+    }
+
+    /* Centrarea are sens doar pentru randul incomplet de SUB un rand plin.
+       Cand toate linkurile incap pe primul rand si tot nu-l umplu (Prima
+       News are unul singur), un link centrat pluteste in mijlocul cardului,
+       departe de eticheta aliniata la stanga de deasupra — de aceea acolo
+       raman la stanga, ca inainte.
+       "Nu exista al treilea link" acopera ambele asezari: pe trei coloane
+       primul rand nu e plin; pe doua, un singur link e la stanga, iar doua
+       umplu randul oricum. Pe o coloana fiecare link ia toata latimea. */
+    .me-body :global(.me-grid:not(:has(> .me-link:nth-child(3)))) {
+        justify-content: flex-start;
+    }
+
+    .me-body :global(.me-grid > .me-link) {
+        flex: 0 0 calc((100% - 2 * 10px) / 3);
+    }
+
+    /* sub trei coloane de ~220px (cat aveau in grila) */
+    @container (max-width: 690px) {
+        .me-body :global(.me-grid > .me-link) {
+            flex-basis: calc((100% - 10px) / 2);
+        }
     }
 
     .me-body :global(.me-link) {
@@ -243,11 +276,21 @@ if (uid == '')
         color:          var(--ac);
     }
 
+    /* Doua randuri, apoi „…”. Titlurile de presa sunt lungi (al Antena 3
+       avea cinci randuri intr-o coloana de 258px) si cardurile de pe acelasi
+       rand se intind la inaltimea celui mai lung. Linkul e o invitatie la
+       click, nu locul unde se citeste titlul — textul intreg e in `title`. */
     .me-body :global(.me-link-label) {
         font-size:   0.88rem;
         font-weight: 500;
         color:       var(--text);
         line-height: 1.4;
+
+        display:            -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
+        line-clamp:         2;
+        overflow:           hidden;
     }
 
     .me-body :global(.me-media-grid) {
@@ -329,9 +372,12 @@ if (uid == '')
     }
 
     @media (max-width: 500px) {
-        .me-body :global(.me-grid),
         .me-body :global(.me-media-grid) {
             grid-template-columns: 1fr;
+        }
+
+        .me-body :global(.me-grid > .me-link) {
+            flex-basis: 100%;
         }
     }
 

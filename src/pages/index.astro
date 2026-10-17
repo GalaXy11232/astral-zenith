@@ -28,8 +28,20 @@ import VideoTextSplitSection from "../components/main/video_text_split_section.a
     
 
     <NotificationStack side="left" top="100px">
-        
-        <NotificationPopup 
+
+        <NotificationPopup
+            text="Am fost la Antena 3 CNN, la Smart Urban Mobility. Vezi articolele despre câteva dintre proiectele noastre."
+            image="/assets/stiri/smart-urban-mobility/event-icon.jpeg"
+            imageAlt="Interviul Antena 3 CNN la standul Zenith"
+            storage_entry="smart-urban-mobility"
+            link="/news/#event-smart-urban-mobility"
+            side = 'left'
+            intensity="bold"
+
+            delay={3500}
+        />
+
+        <NotificationPopup
             text="Aruncă un ochi asupra performanței noastre la unul dintre cele mai prestigioase evenimente FTC!"
             image="/assets/stiri/istanbul/event icon.webp"
             storage_entry="istanbul"
@@ -39,7 +51,9 @@ import VideoTextSplitSection from "../components/main/video_text_split_section.a
             
             delay={5500}
         />
-        <NotificationPopup 
+        <!-- Notificarea jocului e scoasa: jocul incarca prea mult. Codul ramane
+             aici ca sa poata fi repusa. -->
+        <!-- <NotificationPopup
             text="Am creat și un joc despre FTC care sigur o să îți placă!"
             image="/assets/Super Into the Deep Icon.webp"
             storage_entry="jocintothedeep"
@@ -50,7 +64,7 @@ import VideoTextSplitSection from "../components/main/video_text_split_section.a
             imagePosY="-5px"
             
             delay={13500}
-        />
+        /> -->
     </NotificationStack>
 
     <HeroSection 
